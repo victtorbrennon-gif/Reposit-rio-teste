@@ -1,0 +1,183 @@
+'use strict';
+// Plano personalizado: rotina da semana, treinos e guias.
+// Ao mudar a rotina sugerida, aumente PRESET_VERSION para o app oferecer a atualização.
+
+const PRESET_VERSION = 1;
+const WEEKDAYS = [1, 2, 3, 4, 5];
+
+// [horário, período, título, dias]
+const PRESET_ITEMS = [
+  // Segunda a sexta
+  ['06:00', 'manha', 'Acordar + 1 copo d’água', WEEKDAYS],
+  ['06:10', 'manha', 'Café da manhã + creatina (5 g)', WEEKDAYS],
+  ['06:35', 'manha', 'Café/pré-treino e sair pra levar a esposa (Santa Etelvina)', WEEKDAYS],
+  ['07:40', 'manha', 'Treino do dia (aba Plano)', WEEKDAYS],
+  ['09:00', 'manha', 'Pós-treino: whey ou refeição com proteína', WEEKDAYS],
+  ['09:20', 'manha', 'Banho + rosto + protetor solar', WEEKDAYS],
+  ['09:45', 'manha', 'Renda extra: bloco de foco (1h30)', WEEKDAYS],
+  ['11:30', 'manha', 'Almoço', WEEKDAYS],
+  ['12:15', 'tarde', 'Mochila: marmita, lanche, garrafa, protetor', WEEKDAYS],
+  ['12:35', 'tarde', 'Sair pro trabalho (Coroado)', WEEKDAYS],
+  ['16:00', 'tarde', 'Lanche com proteína', WEEKDAYS],
+  ['19:00', 'noite', 'Refeição no trabalho (marmita)', WEEKDAYS],
+  ['22:30', 'noite', 'Ceia leve com proteína', WEEKDAYS],
+  ['22:40', 'noite', 'Lavar o rosto + hidratante', WEEKDAYS],
+  ['23:00', 'noite', 'Dormir (celular longe 15 min antes)', WEEKDAYS],
+
+  // Sábado (turno alternado: 8h–12h ou 11h–15h)
+  ['07:00', 'manha', 'Acordar + café da manhã + creatina', [6]],
+  ['', 'manha', 'Trabalho de sábado (4h, ver o turno)', [6]],
+  ['', 'tarde', 'Cardio + abdômen 30–40 min (antes ou depois do turno)', [6]],
+  ['', 'noite', 'Live', [6]],
+  ['', 'noite', 'Tempo com a esposa ou amigos', [6]],
+  ['23:30', 'noite', 'Rosto + dormir', [6]],
+
+  // Domingo
+  ['07:30', 'manha', 'Acordar (no máx. 1h30 depois do normal) + creatina', [0]],
+  ['08:00', 'manha', 'Pesar e medir a cintura, em jejum (aba Progresso)', [0]],
+  ['09:00', 'manha', 'Lavar e revisar a moto (pneus, corrente, óleo, luzes)', [0]],
+  ['10:00', 'manha', 'Preparar as marmitas da semana', [0]],
+  ['', 'tarde', 'Tempo com a esposa, família ou amigos', [0]],
+  ['18:00', 'noite', 'Planejar a semana + anotar os gastos', [0]],
+  ['22:40', 'noite', 'Rosto + dormir às 23h', [0]],
+];
+
+function presetItems() {
+  return PRESET_ITEMS.map(([time, period, title, days]) => ({ id: uid(), title, period, time, days }));
+}
+
+// Treinos por dia da semana (0 = domingo). [exercício, séries×reps, descanso]
+const WORKOUTS = {
+  1: { title: 'Peito, ombro e tríceps', ex: [
+    ['Supino reto (barra ou halter)', '4 × 6–8', '2 min'],
+    ['Supino inclinado com halter', '3 × 8–10', '90 s'],
+    ['Desenvolvimento com halter sentado', '3 × 8–10', '90 s'],
+    ['Elevação lateral', '4 × 12–15', '60 s'],
+    ['Crucifixo ou peck deck', '3 × 12', '60 s'],
+    ['Tríceps na polia com corda', '3 × 10–12', '60 s'],
+    ['Tríceps francês', '2 × 10–12', '60 s'],
+    ['Cardio: esteira inclinada, ritmo de caminhada', '15 min', ''],
+  ] },
+  2: { title: 'Costas e bíceps', ex: [
+    ['Puxada frente (ou barra fixa)', '4 × 8–10', '90 s'],
+    ['Remada curvada com barra', '4 × 8', '2 min'],
+    ['Remada unilateral (serrote)', '3 × 10 cada lado', '60 s'],
+    ['Face pull na polia', '3 × 12–15', '60 s'],
+    ['Rosca direta', '3 × 8–10', '60 s'],
+    ['Rosca martelo', '3 × 10–12', '60 s'],
+    ['Cardio: bicicleta moderada', '15 min', ''],
+  ] },
+  3: { title: 'Pernas (foco em quadríceps)', ex: [
+    ['Agachamento livre ou hack', '4 × 6–8', '2–3 min'],
+    ['Leg press', '3 × 10–12', '2 min'],
+    ['Cadeira extensora', '3 × 12–15', '60 s'],
+    ['Stiff', '3 × 8–10', '90 s'],
+    ['Panturrilha em pé', '4 × 12–15', '60 s'],
+    ['Prancha', '3 × 40 s', '45 s'],
+    ['Cardio: caminhada leve', '10 min', ''],
+  ] },
+  4: { title: 'Superior (volume)', ex: [
+    ['Supino inclinado com barra', '3 × 8', '2 min'],
+    ['Puxada com pegada fechada', '3 × 8–10', '90 s'],
+    ['Remada na máquina', '3 × 10', '90 s'],
+    ['Desenvolvimento na máquina', '3 × 10', '90 s'],
+    ['Elevação lateral', '3 × 15', '60 s'],
+    ['Rosca + tríceps na polia (em sequência)', '3 × 12', '60 s'],
+    ['Cardio HIIT na bike: 30 s forte / 60 s leve', '10 min', ''],
+  ] },
+  5: { title: 'Inferior (posterior e glúteo)', ex: [
+    ['Levantamento terra romeno', '4 × 8', '2 min'],
+    ['Agachamento búlgaro', '3 × 10 cada perna', '90 s'],
+    ['Mesa flexora', '3 × 10–12', '60 s'],
+    ['Elevação pélvica', '3 × 10', '90 s'],
+    ['Cadeira abdutora', '2 × 15', '60 s'],
+    ['Panturrilha sentado', '3 × 15', '60 s'],
+    ['Cardio: esteira inclinada', '15 min', ''],
+  ] },
+  6: { title: 'Cardio + abdômen (horário livre)', ex: [
+    ['Caminhada rápida, bike, pelada ou natação', '30–40 min', ''],
+    ['Prancha', '3 × 45 s', '45 s'],
+    ['Abdominal infra (elevação de pernas)', '3 × 12', '45 s'],
+    ['Prancha lateral', '2 × 30 s cada lado', '30 s'],
+  ] },
+  0: { title: 'Descanso', ex: [
+    ['Caminhada leve (opcional)', '20–30 min', ''],
+    ['Alongamento / mobilidade', '10 min', ''],
+  ] },
+};
+
+const TRAINING_TIPS = `
+<p><b>Como progredir:</b> use uma carga em que você chegue ao fim da faixa de repetições com 1–2 repetições ainda "sobrando". Quando fizer o número máximo de repetições em <b>todas</b> as séries, aumente a carga na próxima vez (2–5 kg nas pernas, 1–2 kg nos braços). Anote a carga no campo "kg".</p>
+<p><b>Aquecimento:</b> 5 min de bike + 1–2 séries leves do primeiro exercício.</p>
+<p><b>A cada 6–8 semanas:</b> faça uma semana mais leve (metade das séries) para recuperar.</p>
+<p><b>Tempo total:</b> cerca de 60 min de musculação + 10–15 min de cardio. Termina perto das 9h.</p>`;
+
+// Guias (conteúdo fixo do app)
+const GUIDES = [
+  ['💊 Suplementos', `
+<p><b>Ordem de prioridade (pra gastar bem):</b></p>
+<ol>
+<li><b>Creatina:</b> a mais estudada e a mais barata. <b>3–5 g todo dia</b>, inclusive nos dias sem treino, em qualquer horário (deixei no café da manhã). Não precisa fazer "saturação". Pode inchar um pouco no começo, porque é água dentro do músculo.</li>
+<li><b>Whey:</b> não é obrigatório. Serve para bater a meta de proteína quando a comida não alcança. 1 dose (≈25–30 g de proteína) no pós-treino ou no lanche das 16h.</li>
+<li><b>Cafeína:</b> um <b>café coado forte</b> faz quase o mesmo que o pré-treino e custa bem menos. Tome por volta de 06:35, antes de sair: o efeito chega no treino das 07:40. Fique em 150–200 mg nessa dose e não passe de 400 mg no dia todo.</li>
+</ol>
+<p><b>Sem cafeína depois das 15h:</b> você dorme às 23h e ela atrapalha o sono por muitas horas. No trabalho à noite, prefira água, chá sem cafeína ou café descafeinado.</p>
+<p>Se você tiver pressão alta, problema no coração ou nos rins, ou tomar algum remédio, confirme com um médico antes de usar pré-treino ou creatina.</p>`],
+
+  ['🍽️ Alimentação', `
+<p><b>Objetivo:</b> perder gordura sem perder músculo. Isso pede um déficit pequeno (comer um pouco menos do que gasta) e <b>proteína alta</b>.</p>
+<ul>
+<li><b>Proteína:</b> cerca de <b>180 g por dia</b>, divididos em 5 refeições de 30–40 g. Fontes: ovos, frango, peixe (jaraqui, tambaqui, matrinxã), carne magra, iogurte, whey.</li>
+<li><b>Prato do almoço e da marmita:</b> metade de salada ou legumes, um quarto de proteína, um quarto de arroz, macaxeira, batata ou feijão.</li>
+<li><b>Café da manhã (06:10):</b> algo leve antes da moto e do treino, como pão ou tapioca com 2–3 ovos, banana e café.</li>
+<li><b>Ceia (22:30):</b> leve e com proteína: ovos, iogurte, whey com leite. Evite fritura e muito volume à noite, porque atrapalham o sono.</li>
+<li><b>Corte primeiro:</b> refrigerante, suco de caixinha, lanche da rua à noite e açaí com açúcar ou leite condensado.</li>
+<li><b>Marmitas no domingo:</b> economizam dinheiro e evitam comida de rua no trabalho.</li>
+</ul>
+<p><b>Como saber se está funcionando:</b> pese e meça a cintura todo domingo. Se a cintura cai e a força no treino se mantém ou sobe, está certo. Se nada mudou em 3 semanas, diminua um pouco o carboidrato da noite.</p>
+<p><b>Água:</b> com 100 kg, calor de Manaus e treino, a meta é ~3,5 L por dia (14 copos de 250 ml).</p>`],
+
+  ['😴 Sono', `
+<p>Dormindo às 23h e acordando às 6h, você tem <b>7 horas</b>. É o mínimo para ganhar músculo e perder gordura, então cada minuto conta.</p>
+<ul>
+<li><b>Horário fixo</b>, inclusive no fim de semana: no máximo 1h30 a mais no domingo.</li>
+<li><b>Ao chegar do trabalho:</b> ceia leve, banho morno, quarto escuro e fresco (ar ou ventilador).</li>
+<li><b>Celular fora da cama</b> 15 min antes de dormir. Se precisar, use o modo noturno.</li>
+<li><b>Nada de cafeína depois das 15h.</b></li>
+<li><b>Se estiver muito cansado:</b> um cochilo de 20 min por volta das 11h, antes do almoço, ajuda. Mais que isso atrapalha a noite.</li>
+<li><b>Ronco forte ou acordar cansado mesmo dormindo bem:</b> vale falar com um médico, porque é comum com peso alto e prejudica tudo.</li>
+</ul>`],
+
+  ['🧴 Pele', `
+<p>Moto, sol forte, capacete e suor são os maiores inimigos da pele aqui.</p>
+<ul>
+<li><b>Manhã (depois do banho das 09:20):</b> lave o rosto com sabonete facial suave e passe <b>protetor solar FPS 50</b>. Reaplique antes de sair às 12:35, porque são vários minutos de sol na moto.</li>
+<li><b>Noite (22:40):</b> lave o rosto para tirar o suor e a sujeira do capacete, e passe um hidratante leve (oil-free).</li>
+<li><b>Capacete:</b> lave o forro ou use balaclava e lave toda semana.</li>
+<li><b>Fronha:</b> troque 2× por semana.</li>
+<li><b>Ajudam muito:</b> água, sono e menos açúcar.</li>
+<li><b>Acne, manchas ou espinhas que não passam:</b> procure um dermatologista. Dá para conseguir pelo SUS.</li>
+</ul>`],
+
+  ['🛵 Trajeto (estimativas de moto)', `
+<ul>
+<li><b>Tancredo Neves → Santa Etelvina:</b> ~35–45 min no trânsito da manhã. Saindo 06:35, você chega por volta de 07:15–07:20.</li>
+<li><b>Santa Etelvina → academia (perto de casa):</b> ~20 min. Chega 07:40.</li>
+<li><b>Tancredo Neves → Coroado:</b> ~15–20 min. Saindo 12:35, sobra uma margem até as 13h.</li>
+<li><b>Coroado → casa (22h):</b> ~15–20 min. Chega por volta de 22:20.</li>
+</ul>
+<p>Esses tempos são estimativas. Se o seu tempo real for diferente, ajuste os horários na aba <b>Rotina</b>.</p>`],
+
+  ['🔧 Moto (domingo, 09:00)', `
+<ul>
+<li><b>Pneus:</b> calibre toda semana e veja se há desgaste ou prego.</li>
+<li><b>Corrente:</b> limpe e lubrifique a cada ~500 km ou depois de pegar chuva.</li>
+<li><b>Óleo:</b> confira o nível e troque no prazo do manual.</li>
+<li><b>Luzes, freios e buzina:</b> teste tudo.</li>
+<li><b>Lavagem:</b> uma vez por semana, ou a cada 15 dias se estiver sem tempo.</li>
+</ul>`],
+
+  ['💰 Renda extra', `
+<p>Reservei <b>1h30 de segunda a sexta (09:45–11:15)</b>, ou seja, 7h30 por semana de foco, e o domingo à noite para planejar.</p>
+<p>Quando você mandar seus ganhos e gastos, a gente decide o que fazer nesse bloco, por exemplo aproveitar as lives que você já faz. Até lá, use o tempo para listar o que você sabe fazer e o que as pessoas já te pedem.</p>`],
+];

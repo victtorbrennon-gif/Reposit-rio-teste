@@ -9,16 +9,15 @@ const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 const DEFAULT_STATE = {
-  items: [
-    { id: uid(), title: 'Beber um copo de água ao acordar', period: 'manha', time: '07:00', days: ALL_DAYS },
-    { id: uid(), title: 'Arrumar a cama', period: 'manha', time: '', days: ALL_DAYS },
-    { id: uid(), title: 'Exercício', period: 'tarde', time: '18:00', days: [1, 2, 3, 4, 5] },
-    { id: uid(), title: 'Ler 20 minutos', period: 'noite', time: '22:00', days: ALL_DAYS },
-  ],
+  items: presetItems(),
+  presetVersion: 0, // versão da rotina sugerida (plan.js) já aplicada ou recusada
+  wk: {},     // { 'AAAA-MM-DD': [índices dos exercícios feitos] }
+  loads: {},  // { 'nome do exercício': 'carga' }
+  body: [],   // [{ d: 'AAAA-MM-DD', kg, cm }]
   done: {},   // { 'AAAA-MM-DD': [ids] }
   water: {},  // { 'AAAA-MM-DD': n }
   notes: {},  // { 'AAAA-MM-DD': texto }
-  waterGoal: 8,
+  waterGoal: 14,
   startDate: null, // primeiro dia de uso; dias anteriores não contam nas estatísticas
 };
 
@@ -27,7 +26,7 @@ function load() {
     const raw = localStorage.getItem(KEY);
     if (raw) return { ...structuredClone(DEFAULT_STATE), ...JSON.parse(raw) };
   } catch (e) { /* armazenamento indisponível */ }
-  return structuredClone(DEFAULT_STATE);
+  return { ...structuredClone(DEFAULT_STATE), presetVersion: PRESET_VERSION };
 }
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignora */ }
@@ -96,6 +95,21 @@ function renderToday() {
   renderHeader();
   const wrap = $('#today-list');
   wrap.innerHTML = '';
+  if ((state.presetVersion || 0) < PRESET_VERSION) {
+    wrap.append(el('div', { class: 'card banner' },
+      el('b', {}, '✨ Sua rotina personalizada está pronta'),
+      el('p', { class: 'muted small' }, 'Troca as atividades atuais pela rotina nova (trabalho, treino, sono e pele). O histórico de progresso é mantido.'),
+      el('div', { class: 'row' },
+        el('button', { class: 'btn ghost', onclick: () => { state.presetVersion = PRESET_VERSION; save(); renderToday(); } }, 'Agora não'),
+        el('button', { class: 'btn grow', onclick: () => {
+          state.items = presetItems();
+          state.presetVersion = PRESET_VERSION;
+          state.waterGoal = Math.max(state.waterGoal, 14);
+          save(); renderToday();
+        } }, 'Aplicar rotina'),
+      ),
+    ));
+  }
   const items = itemsFor(new Date());
   const done = state.done[todayKey()] || [];
   if (!items.length) {
@@ -241,6 +255,103 @@ function renderManage() {
   if (!state.items.length) wrap.append(el('div', { class: 'empty' }, 'Nenhuma atividade ainda.'));
 }
 
+// ---------- Aba Plano ----------
+let planDay = new Date().getDay();
+
+function renderPlan() {
+  const chips = $('#plan-days');
+  chips.innerHTML = '';
+  const names = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  [1, 2, 3, 4, 5, 6, 0].forEach((d) => {
+    chips.append(el('button', {
+      type: 'button', class: d === planDay ? 'on' : '', 'aria-pressed': String(d === planDay),
+      onclick: () => { planDay = d; renderPlan(); },
+    }, names[d]));
+  });
+
+  const w = WORKOUTS[planDay];
+  const isToday = planDay === new Date().getDay();
+  const k = todayKey();
+  const doneList = (isToday && state.wk[k]) || [];
+  $('#plan-title').textContent = w.title;
+  $('#plan-sub').textContent = isToday ? `Hoje · ${doneList.length}/${w.ex.length} feitos` : 'Toque em hoje para marcar';
+
+  const list = $('#plan-list');
+  list.innerHTML = '';
+  w.ex.forEach(([name, sets, rest], i) => {
+    const done = doneList.includes(i);
+    const toggle = () => {
+      if (!isToday) return;
+      const cur = state.wk[k] || [];
+      state.wk[k] = cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i];
+      save(); renderPlan();
+    };
+    const load = el('input', {
+      class: 'load', inputmode: 'decimal', placeholder: 'kg', 'aria-label': `Carga de ${name}`,
+      onclick: (e) => e.stopPropagation(),
+      onchange: (e) => { const v = e.target.value.trim(); if (v) state.loads[name] = v; else delete state.loads[name]; save(); },
+    });
+    load.value = state.loads[name] || '';
+    const isCardio = !rest || /cardio|caminhada|alongamento/i.test(name);
+    list.append(el('div', {
+      class: 'task ex' + (done ? ' done' : '') + (isToday ? '' : ' readonly'),
+      role: 'checkbox', 'aria-checked': String(done), tabindex: isToday ? '0' : '-1',
+      onclick: toggle,
+      onkeydown: (e) => { if (e.target === e.currentTarget && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); toggle(); } },
+    },
+      el('span', { class: 'check' }, done ? '✓' : ''),
+      el('span', { class: 't-title' }, name, el('small', {}, [sets, rest && `descanso ${rest}`].filter(Boolean).join(' · '))),
+      isCardio ? null : load,
+    ));
+  });
+
+  const g = $('#guides');
+  if (!g.childElementCount) {
+    const tips = el('details', { class: 'card guide' }, el('summary', {}, '🏋️ Como treinar e progredir'));
+    tips.insertAdjacentHTML('beforeend', TRAINING_TIPS);
+    g.append(tips);
+    for (const [title, html] of GUIDES) {
+      const d = el('details', { class: 'card guide' }, el('summary', {}, title));
+      d.insertAdjacentHTML('beforeend', html);
+      g.append(d);
+    }
+  }
+}
+
+// ---------- Peso e cintura ----------
+function renderBody() {
+  const list = $('#body-list');
+  list.innerHTML = '';
+  const rows = [...state.body].sort((a, b) => b.d.localeCompare(a.d)).slice(0, 8);
+  if (!rows.length) list.append(el('p', { class: 'muted small' }, 'Nenhum registro ainda. Meça todo domingo, em jejum.'));
+  rows.forEach((r, idx) => {
+    const prev = rows[idx + 1];
+    const diff = (v, p, unit) => (p == null || v == null ? '' : ` (${v - p > 0 ? '+' : ''}${(v - p).toFixed(1).replace('.', ',')}${unit})`);
+    list.append(el('div', { class: 'body-row' },
+      el('span', {}, r.d.split('-').reverse().slice(0, 2).join('/')),
+      el('span', {}, r.kg != null ? `${String(r.kg).replace('.', ',')} kg${diff(r.kg, prev && prev.kg, '')}` : '–'),
+      el('span', {}, r.cm != null ? `${String(r.cm).replace('.', ',')} cm${diff(r.cm, prev && prev.cm, '')}` : '–'),
+      el('button', { class: 'icon-btn', 'aria-label': 'Apagar registro', onclick: () => {
+        if (!confirm('Apagar este registro?')) return;
+        state.body = state.body.filter((x) => x !== r); save(); renderBody();
+      } }, '✕'),
+    ));
+  });
+}
+
+function onBodySubmit(e) {
+  e.preventDefault();
+  const num = (s) => { const v = parseFloat(String(s).replace(',', '.')); return Number.isFinite(v) ? v : null; };
+  const kg = num($('#b-kg').value), cm = num($('#b-cm').value);
+  if (kg == null && cm == null) return;
+  const d = todayKey();
+  state.body = state.body.filter((x) => x.d !== d);
+  state.body.push({ d, kg, cm });
+  save();
+  e.target.reset();
+  renderBody();
+}
+
 // ---------- Aba Progresso ----------
 function renderProgress() {
   // sequência: dias consecutivos (contando de ontem, ou de hoje se já ≥80%) com ≥80%
@@ -303,6 +414,7 @@ function renderProgress() {
   if (!state.items.length) per.append(el('div', { class: 'empty' }, 'Sem atividades.'));
 
   $('#water-goal').value = state.waterGoal;
+  renderBody();
 }
 
 function exportData() {
@@ -340,6 +452,7 @@ function show(view) {
 function renderAll() {
   renderHeader();
   if (currentView === 'hoje') renderToday();
+  if (currentView === 'plano') renderPlan();
   if (currentView === 'rotina') renderManage();
   if (currentView === 'progresso') renderProgress();
 }
@@ -352,6 +465,7 @@ $('#note').addEventListener('input', onNoteInput);
 $('#item-form').addEventListener('submit', onSubmit);
 $('#f-cancel').addEventListener('click', resetForm);
 $('#export').addEventListener('click', exportData);
+$('#body-form').addEventListener('submit', onBodySubmit);
 $('#import').addEventListener('change', importData);
 $('#water-goal').addEventListener('change', (e) => {
   state.waterGoal = Math.min(30, Math.max(1, parseInt(e.target.value, 10) || 8));

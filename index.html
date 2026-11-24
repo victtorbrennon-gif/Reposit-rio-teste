@@ -48,6 +48,17 @@
       </div>
     </section>
 
+    <!-- PLANO -->
+    <section class="view" id="view-plano" hidden>
+      <div class="days chips" id="plan-days"></div>
+      <div class="card-head plan-head">
+        <h2 id="plan-title">Treino</h2>
+        <span class="muted small" id="plan-sub"></span>
+      </div>
+      <div id="plan-list"></div>
+      <div id="guides"></div>
+    </section>
+
     <!-- ROTINA -->
     <section class="view" id="view-rotina" hidden>
       <div class="card">
@@ -102,6 +113,16 @@
         <div id="per-item"></div>
       </div>
       <div class="card">
+        <h2>⚖️ Peso e cintura</h2>
+        <form id="body-form" class="row">
+          <input id="b-kg" inputmode="decimal" placeholder="Peso (kg)" aria-label="Peso em kg">
+          <input id="b-cm" inputmode="decimal" placeholder="Cintura (cm)" aria-label="Cintura em cm">
+          <button class="btn" type="submit">Salvar</button>
+        </form>
+        <p class="muted small">Meça a cintura na altura do umbigo, sem encolher a barriga.</p>
+        <div id="body-list"></div>
+      </div>
+      <div class="card">
         <h2>Backup</h2>
         <p class="muted small">Os dados ficam só neste aparelho. Exporte para guardar uma cópia ou passar para outro celular.</p>
         <div class="row">
@@ -117,10 +138,12 @@
 
   <nav class="tabs">
     <button data-view="hoje" class="active"><span>✅</span>Hoje</button>
+    <button data-view="plano"><span>🏋️</span>Plano</button>
     <button data-view="rotina"><span>🗓️</span>Rotina</button>
     <button data-view="progresso"><span>📈</span>Progresso</button>
   </nav>
 
+  <script src="plan.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

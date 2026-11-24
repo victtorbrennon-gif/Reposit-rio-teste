@@ -154,3 +154,19 @@ legend { font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
 .tabs button span { font-size: 1.3rem; filter: grayscale(1); opacity: .6; }
 .tabs button.active { color: var(--accent); font-weight: 600; }
 .tabs button.active span { filter: none; opacity: 1; }
+
+/* plano */
+.banner { border-color: var(--accent); }
+.banner p { margin: 6px 0 12px; }
+.chips { margin: 12px 0 4px; }
+.plan-head { margin: 16px 4px 10px; }
+.plan-head h2 { margin: 0; }
+.task.ex .t-title small { display: block; color: var(--muted); font-size: .8rem; margin-top: 2px; text-decoration: none; }
+.task.readonly { cursor: default; }
+.task .load { width: 64px; flex: none; text-align: center; padding: 8px 6px; }
+.guide summary { font-weight: 600; cursor: pointer; }
+.guide p, .guide li { font-size: .9rem; line-height: 1.5; }
+.guide ul, .guide ol { padding-left: 20px; margin: 8px 0; }
+.guide li { margin-bottom: 6px; }
+#body-form input { min-width: 0; }
+.body-row { display: grid; grid-template-columns: 48px 1fr 1fr 28px; gap: 6px; align-items: center; font-size: .85rem; padding: 6px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }

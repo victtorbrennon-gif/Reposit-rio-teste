@@ -1,6 +1,6 @@
 // Cache simples para o app funcionar offline.
-const CACHE = 'minha-rotina-v1';
-const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.json', 'icon.svg'];
+const CACHE = 'minha-rotina-v2';
+const FILES = ['./', 'index.html', 'style.css', 'plan.js', 'app.js', 'manifest.json', 'icon.svg'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)));
