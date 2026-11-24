@@ -44,6 +44,12 @@ const PRESET_ITEMS = [
   ['22:40', 'noite', 'Rosto + dormir às 23h (segunda começa às 6h)', [0]],
 ];
 
+// Lembretes de água (calendário agua.ics): [dias, horários]. Evita o horário do treino e da moto.
+const WATER_TIMES = [
+  [WEEKDAYS, ['08:30', '10:30', '12:00', '14:00', '15:30', '17:00', '18:30', '20:00', '21:30']],
+  [[0, 6], ['09:00', '11:00', '13:00', '15:00', '17:00', '19:00', '21:00']],
+];
+
 function presetItems() {
   return PRESET_ITEMS.map(([time, period, title, days]) => ({ id: uid(), title, period, time, days }));
 }

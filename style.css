@@ -175,3 +175,8 @@ legend { font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
 .route ol { padding-left: 20px; }
 .btn.maps { display: block; text-decoration: none; margin-bottom: 6px; }
 .version-row { justify-content: space-between; align-items: center; margin-top: 14px; }
+
+.cal-link { text-decoration: none; }
+.cal-help { margin-top: 12px; }
+.cal-help summary { cursor: pointer; color: var(--accent); }
+.cal-help ol { padding-left: 20px; line-height: 1.5; }

@@ -17,3 +17,12 @@ python3 -m http.server 8000
 ```
 
 Para usar no celular, publique a pasta em qualquer hospedagem estática (por exemplo, GitHub Pages) e, no navegador do celular, use "Adicionar à tela inicial".
+
+## Lembretes (calendário)
+
+`rotina.ics` e `agua.ics` são gerados a partir de `plan.js`. O app oferece assinar esses calendários pelo link `webcal://`, e o iPhone avisa em cada horário. Sempre que mudar `PRESET_ITEMS` ou `WATER_TIMES`, rode:
+
+```bash
+node tools/gerar-calendario.js
+```
+

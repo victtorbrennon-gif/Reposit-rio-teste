@@ -101,6 +101,24 @@
         <button class="btn" id="share-summary" type="button" style="width:100%">Enviar resumo da semana</button>
         <textarea id="summary-box" rows="10" hidden aria-label="Resumo da semana"></textarea>
       </div>
+      <div class="card">
+        <h2>🔔 Lembretes no iPhone</h2>
+        <p class="muted small">Toque em cada botão e confirme <b>Assinar</b>. Os avisos chegam pelo app Calendário, mesmo com este app fechado.</p>
+        <div class="row">
+          <a class="btn grow cal-link" data-file="rotina.ics">📅 Rotina</a>
+          <a class="btn grow cal-link" data-file="agua.ics">💧 Água</a>
+        </div>
+        <details class="cal-help">
+          <summary class="small">Não está tocando? Veja como ligar os alertas</summary>
+          <ol class="small">
+            <li>Abra <b>Ajustes → Apps → Calendário → Contas</b> (em iPhones mais antigos: <b>Ajustes → Calendário → Contas</b>).</li>
+            <li>Toque em <b>Calendários Assinados</b> e depois em <b>Minha Rotina</b>.</li>
+            <li>Desligue <b>Remover Alertas</b>. Faça o mesmo em <b>Água</b>.</li>
+            <li>Em <b>Ajustes → Notificações → Calendário</b>, deixe as notificações ligadas.</li>
+          </ol>
+          <p class="small muted">Os lembretes seguem a rotina sugerida. Quando o Claude ajustar a rotina nas revisões de segunda, eles se atualizam sozinhos. Mudanças que você fizer à mão na aba Rotina não vão para o calendário.</p>
+        </details>
+      </div>
       <div class="stats">
         <div class="stat"><span id="st-streak">0</span><small>dias seguidos ≥ 80%</small></div>
         <div class="stat"><span id="st-week">0%</span><small>média 7 dias</small></div>

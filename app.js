@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '1.6';
+const APP_VERSION = '1.7';
 const PERIODS = { manha: '🌅 Manhã', tarde: '☀️ Tarde', noite: '🌙 Noite' };
 const DAY_NAMES = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
@@ -529,6 +529,10 @@ $('#f-cancel').addEventListener('click', resetForm);
 $('#export').addEventListener('click', exportData);
 $('#body-form').addEventListener('submit', onBodySubmit);
 $('#share-summary').addEventListener('click', shareSummary);
+document.querySelectorAll('.cal-link').forEach((link) => {
+  const base = location.host + location.pathname.replace(/[^/]*$/, '');
+  link.href = (location.protocol === 'https:' ? 'webcal://' : location.protocol + '//') + base + link.dataset.file;
+});
 $('#app-version').textContent = `Versão ${APP_VERSION}`;
 $('#update-app').addEventListener('click', async () => {
   $('#update-app').textContent = 'Atualizando…';
