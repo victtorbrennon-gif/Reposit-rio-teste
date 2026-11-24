@@ -11,6 +11,10 @@
   --ok: #16a34a;
   --danger: #dc2626;
   --radius: 16px;
+  --hero-night: #1b2a4a;
+  --hero-dawn: #c2410c;
+  --hero-sun: #fbbf24;
+  --hero-text: #fff8ec;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -24,6 +28,8 @@
     --accent-soft: #2a2c4a;
     --ok: #4ade80;
     --danger: #f87171;
+    --hero-night: #0b1326;
+    --hero-dawn: #9a3412;
     color-scheme: dark;
   }
 }
@@ -37,6 +43,8 @@
     --accent-soft: #2a2c4a;
     --ok: #4ade80;
     --danger: #f87171;
+    --hero-night: #0b1326;
+    --hero-dawn: #9a3412;
     color-scheme: dark;
 }
 
@@ -59,17 +67,42 @@ h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: 
 .muted { color: var(--muted); }
 .small { font-size: .8rem; }
 
-.topbar {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: calc(20px + env(safe-area-inset-top)) 16px 8px;
+.hero {
+  position: relative; overflow: hidden;
+  margin: 12px 16px 4px; padding: 20px 18px 16px; border-radius: 22px;
+  color: var(--hero-text);
+  background:
+    radial-gradient(120% 90% at 85% 115%, var(--hero-sun) 0%, transparent 45%),
+    linear-gradient(165deg, var(--hero-night) 0%, var(--hero-night) 35%, var(--hero-dawn) 100%);
 }
-.greeting { margin: 0 0 2px; color: var(--muted); font-size: .9rem; }
+body:not(.in-claude) .hero { margin-top: calc(12px + env(safe-area-inset-top, 0px)); }
+.hero::after { /* sol nascendo no canto */
+  content: ""; position: absolute; right: -40px; bottom: -70px; width: 180px; height: 180px; border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 236 179 / .55) 0%, rgb(255 236 179 / 0) 70%);
+  pointer-events: none;
+}
+.hero-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; position: relative; z-index: 1; }
+.hero-text { min-width: 0; }
+.greeting { margin: 0 0 6px; font-size: .85rem; opacity: .85; }
+.hero-day {
+  margin: 0 0 4px; font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--hero-sun);
+}
+.hero h1 { font-size: 1.35rem; line-height: 1.2; text-wrap: balance; }
+.quote {
+  position: relative; z-index: 1; margin: 16px 0 0; padding: 0 0 0 14px;
+  border-left: 3px solid var(--hero-sun);
+  font-size: 1.02rem; line-height: 1.45; font-weight: 600; text-wrap: pretty;
+}
+.hero .sync { position: relative; z-index: 1; margin: 12px 0 0; color: var(--hero-text); opacity: .8; }
+.hero .sync[data-state="offline"], .hero .sync[data-state="error"], .hero .sync[data-state="full"], .hero .sync[data-state="nodb"] { color: var(--hero-sun); opacity: 1; }
 
-.ring { position: relative; width: 60px; height: 60px; }
+.ring { position: relative; width: 60px; height: 60px; flex: none; }
 .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring circle { fill: none; stroke-width: 3.5; }
-.ring-bg { stroke: var(--line); }
-.ring-fg { stroke: var(--accent); stroke-linecap: round; stroke-dasharray: 100 100; stroke-dashoffset: 100; transition: stroke-dashoffset .4s; }
+.hero .ring-bg { stroke: rgb(255 255 255 / .22); }
+.hero .ring-fg { stroke: var(--hero-sun); }
+.ring-fg { stroke-linecap: round; stroke-dasharray: 100 100; stroke-dashoffset: 100; transition: stroke-dashoffset .4s; }
 .ring span { position: absolute; inset: 0; display: grid; place-items: center; font-size: .8rem; font-weight: 700; }
 
 main { padding: 0 16px; }
@@ -227,16 +260,20 @@ legend { font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
 button:focus-visible, a:focus-visible, .task:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 </style>
-<header class="topbar">
-    <div>
-      <p class="greeting" id="greeting">Olá!</p>
-      <p class="sync claude-only" id="sync" aria-live="polite"></p>
-      <h1 id="today-label">Hoje</h1>
+<header class="hero">
+    <div class="hero-head">
+      <div class="hero-text">
+        <p class="greeting" id="greeting">Olá!</p>
+        <p class="hero-day" id="hero-day">Dia 1 da virada</p>
+        <h1 id="today-label">Hoje</h1>
+      </div>
+      <div class="ring" id="ring" aria-label="Progresso do dia">
+        <svg viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="15.9"/><circle class="ring-fg" id="ring-fg" cx="18" cy="18" r="15.9"/></svg>
+        <span id="ring-text">0%</span>
+      </div>
     </div>
-    <div class="ring" id="ring" aria-label="Progresso do dia">
-      <svg viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="15.9"/><circle class="ring-fg" id="ring-fg" cx="18" cy="18" r="15.9"/></svg>
-      <span id="ring-text">0%</span>
-    </div>
+    <blockquote class="quote" id="quote"></blockquote>
+    <p class="sync claude-only" id="sync" aria-live="polite"></p>
   </header>
 
   <main>
@@ -617,6 +654,40 @@ ${ROUTES.map((r) => `
 </div>`).join('')}
 <p class="muted small">Pro trajeto ficar exato até a porta, me passe o endereço do trabalho da sua esposa e do seu.</p>`;
 
+// Frases da capa: uma por dia, em sequência
+const QUOTES = [
+  'Ninguém muda de vida num dia. Muda num dia de cada vez, e hoje é um deles.',
+  'Você acorda às 6h por quem você ama. Agora acorde também por quem você vai ser.',
+  'O corpo que você quer está do outro lado das manhãs que você não pulou.',
+  'Disciplina é lembrar do que você quer quando a cama parece mais importante.',
+  'Quem planta treino, sono e água colhe o espelho. Só não colhe no dia seguinte.',
+  'O cansaço passa. A vergonha de ter desistido fica.',
+  'Uma série a mais, um copo a mais, uma hora de sono a mais. A virada é feita de "a mais".',
+  'Você não precisa de motivação todo dia. Precisa de rotina nos dias sem motivação.',
+  'Seu salário paga as contas. Seu tempo livre decide se você sai delas.',
+  'Cada marmita pronta no domingo é dinheiro que fica e gordura que vai.',
+  'Ninguém vai fazer por você. E essa é a melhor notícia: só depende de você.',
+  'Você daqui a um ano está torcendo pelo que você faz hoje.',
+  'Constância bate talento quando o talento falta no treino.',
+  'Força não é levantar mais peso. É voltar amanhã depois de um dia ruim.',
+  'Você aguenta 9 horas de trabalho. Aguenta 60 minutos de treino.',
+  'Pequenas vitórias todo dia valem mais do que uma grande promessa na segunda.',
+  'A live acaba à meia-noite. O sono começa logo depois, e o músculo agradece.',
+  'O que você faz quando ninguém está vendo aparece no espelho de quem está.',
+  'Dinheiro curto pede plano longo. Comece pelo que está na sua mão hoje.',
+  'Não compare seu dia 10 com o dia 1000 de ninguém.',
+  'Sua família não precisa de um herói. Precisa de alguém presente, forte e em paz.',
+  'Errou ontem? Hoje o placar zerou. Joga de novo.',
+  'Cuidar da pele, do sono e do corpo também é respeito por você.',
+  'A mudança assusta. Ficar igual deveria assustar mais.',
+  'Os dias são longos, mas as semanas passam voando. Faça elas contarem.',
+  'Treino feito é treino que ninguém tira de você.',
+  'Quem controla a manhã controla o dia. Quem controla o dia muda a vida.',
+  'Seja o cara que cumpre o que combinou consigo mesmo.',
+  'A meta não é ser perfeito. É ser melhor do que na semana passada.',
+  'Você já começou. Agora o único jeito de perder é parar.',
+];
+
 // Lista de compras: [grupo, semanal?, itens]
 const SHOPPING = [
   ['🥩 Proteínas', true, [
@@ -751,7 +822,7 @@ const GUIDES = [
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.0';
+const APP_VERSION = '2.1';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -984,6 +1055,10 @@ function renderHeader() {
   const now = new Date();
   const h = now.getHours();
   $('#greeting').textContent = h < 12 ? 'Bom dia ☀️' : h < 18 ? 'Boa tarde 🌤️' : 'Boa noite 🌙';
+  const start = new Date((state.startDate || todayKey()) + 'T12:00:00');
+  const dayN = Math.max(1, Math.round((daysAgo(0) - start) / 86400000) + 1);
+  $('#hero-day').textContent = `Dia ${dayN} da virada`;
+  $('#quote').textContent = QUOTES[(dayN - 1) % QUOTES.length];
   const label = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
   $('#today-label').textContent = label.charAt(0).toUpperCase() + label.slice(1);
   const r = dayRatio(now);

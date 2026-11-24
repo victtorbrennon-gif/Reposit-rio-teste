@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.0';
+const APP_VERSION = '2.1';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -235,6 +235,10 @@ function renderHeader() {
   const now = new Date();
   const h = now.getHours();
   $('#greeting').textContent = h < 12 ? 'Bom dia ☀️' : h < 18 ? 'Boa tarde 🌤️' : 'Boa noite 🌙';
+  const start = new Date((state.startDate || todayKey()) + 'T12:00:00');
+  const dayN = Math.max(1, Math.round((daysAgo(0) - start) / 86400000) + 1);
+  $('#hero-day').textContent = `Dia ${dayN} da virada`;
+  $('#quote').textContent = QUOTES[(dayN - 1) % QUOTES.length];
   const label = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
   $('#today-label').textContent = label.charAt(0).toUpperCase() + label.slice(1);
   const r = dayRatio(now);

@@ -174,6 +174,40 @@ ${ROUTES.map((r) => `
 </div>`).join('')}
 <p class="muted small">Pro trajeto ficar exato até a porta, me passe o endereço do trabalho da sua esposa e do seu.</p>`;
 
+// Frases da capa: uma por dia, em sequência
+const QUOTES = [
+  'Ninguém muda de vida num dia. Muda num dia de cada vez, e hoje é um deles.',
+  'Você acorda às 6h por quem você ama. Agora acorde também por quem você vai ser.',
+  'O corpo que você quer está do outro lado das manhãs que você não pulou.',
+  'Disciplina é lembrar do que você quer quando a cama parece mais importante.',
+  'Quem planta treino, sono e água colhe o espelho. Só não colhe no dia seguinte.',
+  'O cansaço passa. A vergonha de ter desistido fica.',
+  'Uma série a mais, um copo a mais, uma hora de sono a mais. A virada é feita de "a mais".',
+  'Você não precisa de motivação todo dia. Precisa de rotina nos dias sem motivação.',
+  'Seu salário paga as contas. Seu tempo livre decide se você sai delas.',
+  'Cada marmita pronta no domingo é dinheiro que fica e gordura que vai.',
+  'Ninguém vai fazer por você. E essa é a melhor notícia: só depende de você.',
+  'Você daqui a um ano está torcendo pelo que você faz hoje.',
+  'Constância bate talento quando o talento falta no treino.',
+  'Força não é levantar mais peso. É voltar amanhã depois de um dia ruim.',
+  'Você aguenta 9 horas de trabalho. Aguenta 60 minutos de treino.',
+  'Pequenas vitórias todo dia valem mais do que uma grande promessa na segunda.',
+  'A live acaba à meia-noite. O sono começa logo depois, e o músculo agradece.',
+  'O que você faz quando ninguém está vendo aparece no espelho de quem está.',
+  'Dinheiro curto pede plano longo. Comece pelo que está na sua mão hoje.',
+  'Não compare seu dia 10 com o dia 1000 de ninguém.',
+  'Sua família não precisa de um herói. Precisa de alguém presente, forte e em paz.',
+  'Errou ontem? Hoje o placar zerou. Joga de novo.',
+  'Cuidar da pele, do sono e do corpo também é respeito por você.',
+  'A mudança assusta. Ficar igual deveria assustar mais.',
+  'Os dias são longos, mas as semanas passam voando. Faça elas contarem.',
+  'Treino feito é treino que ninguém tira de você.',
+  'Quem controla a manhã controla o dia. Quem controla o dia muda a vida.',
+  'Seja o cara que cumpre o que combinou consigo mesmo.',
+  'A meta não é ser perfeito. É ser melhor do que na semana passada.',
+  'Você já começou. Agora o único jeito de perder é parar.',
+];
+
 // Lista de compras: [grupo, semanal?, itens]
 const SHOPPING = [
   ['🥩 Proteínas', true, [

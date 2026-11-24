@@ -11,16 +11,20 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <p class="greeting" id="greeting">Olá!</p>
-      <p class="sync claude-only" id="sync" aria-live="polite"></p>
-      <h1 id="today-label">Hoje</h1>
+  <header class="hero">
+    <div class="hero-head">
+      <div class="hero-text">
+        <p class="greeting" id="greeting">Olá!</p>
+        <p class="hero-day" id="hero-day">Dia 1 da virada</p>
+        <h1 id="today-label">Hoje</h1>
+      </div>
+      <div class="ring" id="ring" aria-label="Progresso do dia">
+        <svg viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="15.9"/><circle class="ring-fg" id="ring-fg" cx="18" cy="18" r="15.9"/></svg>
+        <span id="ring-text">0%</span>
+      </div>
     </div>
-    <div class="ring" id="ring" aria-label="Progresso do dia">
-      <svg viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="15.9"/><circle class="ring-fg" id="ring-fg" cx="18" cy="18" r="15.9"/></svg>
-      <span id="ring-text">0%</span>
-    </div>
+    <blockquote class="quote" id="quote"></blockquote>
+    <p class="sync claude-only" id="sync" aria-live="polite"></p>
   </header>
 
   <main>
