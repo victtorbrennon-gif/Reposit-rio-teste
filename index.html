@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#4f46e5">
+  <title>Minha Rotina</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="greeting" id="greeting">Olá!</p>
+      <h1 id="today-label">Hoje</h1>
+    </div>
+    <div class="ring" id="ring" aria-label="Progresso do dia">
+      <svg viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="15.9"/><circle class="ring-fg" id="ring-fg" cx="18" cy="18" r="15.9"/></svg>
+      <span id="ring-text">0%</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOJE -->
+    <section class="view" id="view-hoje">
+      <div id="today-list"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>💧 Água</h2>
+          <span class="muted" id="water-label">0 / 8 copos</span>
+        </div>
+        <div class="water" id="water"></div>
+        <div class="row">
+          <button class="btn ghost" id="water-minus">− copo</button>
+          <button class="btn" id="water-plus">+ copo</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>📝 Nota do dia</h2>
+          <span class="muted small" id="note-saved"></span>
+        </div>
+        <textarea id="note" rows="4" placeholder="Como foi o dia? Algo pra lembrar?"></textarea>
+      </div>
+    </section>
+
+    <!-- ROTINA -->
+    <section class="view" id="view-rotina" hidden>
+      <div class="card">
+        <h2 id="form-title">Nova atividade</h2>
+        <form id="item-form">
+          <input type="hidden" id="f-id">
+          <label>Atividade
+            <input id="f-title" required maxlength="60" placeholder="Ex.: Academia, Ler 20 min…">
+          </label>
+          <div class="row">
+            <label class="grow">Período
+              <select id="f-period">
+                <option value="manha">🌅 Manhã</option>
+                <option value="tarde">☀️ Tarde</option>
+                <option value="noite">🌙 Noite</option>
+              </select>
+            </label>
+            <label class="grow">Horário (opcional)
+              <input id="f-time" type="time">
+            </label>
+          </div>
+          <fieldset>
+            <legend>Dias</legend>
+            <div class="days" id="f-days"></div>
+          </fieldset>
+          <div class="row">
+            <button type="button" class="btn ghost" id="f-cancel" hidden>Cancelar</button>
+            <button class="btn grow" type="submit" id="f-submit">Adicionar</button>
+          </div>
+        </form>
+      </div>
+      <div id="manage-list"></div>
+    </section>
+
+    <!-- PROGRESSO -->
+    <section class="view" id="view-progresso" hidden>
+      <div class="stats">
+        <div class="stat"><span id="st-streak">0</span><small>dias seguidos ≥ 80%</small></div>
+        <div class="stat"><span id="st-week">0%</span><small>média 7 dias</small></div>
+        <div class="stat"><span id="st-perfect">0</span><small>dias 100% (30d)</small></div>
+      </div>
+      <div class="card">
+        <h2>Últimos 7 dias</h2>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="card">
+        <h2>Últimos 30 dias</h2>
+        <div class="heat" id="heat"></div>
+      </div>
+      <div class="card">
+        <h2>Por atividade (30 dias)</h2>
+        <div id="per-item"></div>
+      </div>
+      <div class="card">
+        <h2>Backup</h2>
+        <p class="muted small">Os dados ficam só neste aparelho. Exporte para guardar uma cópia ou passar para outro celular.</p>
+        <div class="row">
+          <button class="btn ghost grow" id="export">Exportar</button>
+          <label class="btn ghost grow file">Importar<input type="file" id="import" accept="application/json"></label>
+        </div>
+        <label class="inline">Meta de água (copos/dia)
+          <input type="number" id="water-goal" min="1" max="30">
+        </label>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs">
+    <button data-view="hoje" class="active"><span>✅</span>Hoje</button>
+    <button data-view="rotina"><span>🗓️</span>Rotina</button>
+    <button data-view="progresso"><span>📈</span>Progresso</button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>
