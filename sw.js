@@ -1,5 +1,5 @@
 // Cache simples para o app funcionar offline.
-const CACHE = 'minha-rotina-v4';
+const CACHE = 'minha-rotina-v5';
 const FILES = ['./', 'index.html', 'style.css', 'plan.js', 'app.js', 'manifest.json', 'icon.svg'];
 
 self.addEventListener('install', (e) => {

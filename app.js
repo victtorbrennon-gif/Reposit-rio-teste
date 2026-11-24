@@ -2,6 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
+const APP_VERSION = '1.4';
 const PERIODS = { manha: '🌅 Manhã', tarde: '☀️ Tarde', noite: '🌙 Noite' };
 const DAY_NAMES = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
@@ -466,6 +467,17 @@ $('#item-form').addEventListener('submit', onSubmit);
 $('#f-cancel').addEventListener('click', resetForm);
 $('#export').addEventListener('click', exportData);
 $('#body-form').addEventListener('submit', onBodySubmit);
+$('#app-version').textContent = `Versão ${APP_VERSION}`;
+$('#update-app').addEventListener('click', async () => {
+  $('#update-app').textContent = 'Atualizando…';
+  try {
+    if ('serviceWorker' in navigator) {
+      for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+    }
+    if (window.caches) for (const k of await caches.keys()) await caches.delete(k);
+  } catch (e) { /* segue pro reload */ }
+  location.reload();
+});
 $('#import').addEventListener('change', importData);
 $('#water-goal').addEventListener('change', (e) => {
   state.waterGoal = Math.min(30, Math.max(1, parseInt(e.target.value, 10) || 8));

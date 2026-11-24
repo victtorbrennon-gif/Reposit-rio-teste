@@ -114,6 +114,60 @@ const TRAINING_TIPS = `
 <p><b>A cada 6–8 semanas:</b> faça uma semana mais leve (metade das séries) para recuperar.</p>
 <p><b>Tempo total:</b> cerca de 60 min de musculação + 10–15 min de cardio. Termina perto das 9h.</p>`;
 
+// Trajetos (calculados no OpenStreetMap; o tempo real já tem a margem do trânsito)
+const ROUTES = [
+  { title: 'Casa → Santa Etelvina (levar a esposa)', info: '15,6 km · 30–40 min de manhã', dest: 'Santa Etelvina, Manaus - AM', steps: [
+    'Saia de casa pelo seu caminho de sempre (Papoula → Girassol) até a <b>Av. Autaz Mirim</b> (Grande Circular).',
+    'Siga pela Autaz Mirim no sentido da Cidade de Deus / Rei Pelé · 1,6 km.',
+    'Na rotatória, pegue a 2ª saída e continue na avenida, que vira <b>Av. Nossa Senhora da Conceição</b> · 2 km.',
+    'Na próxima rotatória, pegue a 2ª saída na <b>Av. Margarita</b>, que continua como Av. Arquiteto José Henriques Bento Rodrigues · 1,3 km.',
+    'Vire à <b>direita</b> na <b>Rua Campos Sales</b> · 1,2 km.',
+    'Vire à <b>esquerda</b> na <b>Rua 1º de Janeiro</b>. Você já está no Santa Etelvina; siga até o trabalho dela.',
+  ] },
+  { title: 'Santa Etelvina → Live Academia', info: '14,4 km · 25–30 min', dest: 'Vitória Supermercado, Avenida Autaz Mirim, Manaus - AM', steps: [
+    'Saia pela <b>Rua Vicente Martins</b> e vire à <b>direita</b> na <b>Av. 7 de Maio</b> · 1,1 km.',
+    'Siga em frente: a avenida continua como <b>Av. das Flores</b> · 4,9 km.',
+    'No fim, siga pela <b>Rua Fênix</b> e vire à <b>direita</b> na <b>Av. Rouxinol</b> · 350 m.',
+    'Vire à <b>esquerda</b> na <b>Av. Noel Nutels</b> · 1 km.',
+    'Na rotatória, pegue a <b>3ª saída</b> na <b>Av. Camapuã</b>.',
+    'Mantenha-se à <b>direita</b> e entre na <b>Av. Autaz Mirim</b> descendo · 850 m. A academia (estacionamento do Vitória, antigo Rodrigues) fica do seu lado. <b>Não precisa fazer o retorno.</b>',
+  ] },
+  { title: 'Casa → Live Academia (sábado e dias saindo de casa)', info: '~3,4 km · 7–10 min', dest: 'Vitória Supermercado, Avenida Autaz Mirim, Manaus - AM', steps: [
+    'Desça pela <b>Rua Papoula</b> e vire à <b>direita</b> na <b>Rua Girassol</b> até a <b>Av. Autaz Mirim</b>.',
+    'Na Autaz Mirim, a academia fica do outro lado. Siga até perto da <b>Av. Rei Pelé</b>.',
+    'Faça o <b>retorno em frente à delegacia</b>.',
+    'Desça a Autaz Mirim até a academia, que fica do seu lado direito.',
+  ] },
+  { title: 'Live Academia → casa', info: '~1,8 km · 3–5 min', dest: 'Rua Batrum, Tancredo Neves, Manaus - AM', steps: [
+    'Saia do estacionamento virando à <b>direita</b> na <b>Av. Autaz Mirim</b> · 1,2 km.',
+    'Entre no bairro à direita (pela Rua Rio Napo ou pelo seu caminho de sempre) até a Batrum.',
+  ] },
+  { title: 'Casa → trabalho (Coroado)', info: '7,6 km · 15–20 min', dest: 'Coroado, Manaus - AM', steps: [
+    'Saia do bairro até a <b>Av. Autaz Mirim</b>.',
+    'Vire à <b>esquerda</b> na Autaz Mirim, no sentido Coroado · 2,3 km.',
+    'Siga em frente: a avenida continua como <b>Av. Cosme Ferreira</b> · 3,7 km.',
+    'Já no Coroado, vire à <b>direita</b> na <b>Rua Ouro Preto</b> e siga até o trabalho.',
+  ] },
+  { title: 'Trabalho (Coroado) → casa, às 22h', info: '7,1 km · 10–12 min', dest: 'Rua Batrum, Tancredo Neves, Manaus - AM', steps: [
+    'Saia pela <b>Rua Ouro Preto</b> até a <b>Av. Cosme Ferreira</b>.',
+    'Siga pela Cosme Ferreira no sentido Grande Circular · 3 km.',
+    'Passe pelo complexo viário e continue na <b>Av. Autaz Mirim</b> · 2,2 km.',
+    'Entre no bairro à direita até a Batrum.',
+  ] },
+];
+
+const mapsLink = (dest) => 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(dest);
+
+const ROUTES_HTML = `
+<p class="muted">O botão abre o Google Maps saindo de onde você estiver, com trânsito em tempo real.</p>
+${ROUTES.map((r) => `
+<div class="route">
+  <p><b>${r.title}</b><br><span class="muted">${r.info}</span></p>
+  <ol>${r.steps.map((s) => `<li>${s}</li>`).join('')}</ol>
+  <a class="btn ghost maps" href="${mapsLink(r.dest)}" target="_blank" rel="noopener">🗺️ Abrir no Google Maps</a>
+</div>`).join('')}
+<p class="muted small">Pro trajeto ficar exato até a porta, me passe o endereço do trabalho da sua esposa e do seu.</p>`;
+
 // Guias (conteúdo fixo do app)
 const GUIDES = [
   ['💊 Suplementos', `
@@ -163,18 +217,7 @@ const GUIDES = [
 <li><b>Acne, manchas ou espinhas que não passam:</b> procure um dermatologista. Dá para conseguir pelo SUS.</li>
 </ul>`],
 
-  ['🛵 Trajeto', `
-<p>Rotas calculadas no mapa (OpenStreetMap), saindo do começo da Rua Batrum. O tempo "livre" é sem trânsito; o outro já tem a margem do horário.</p>
-<ul>
-<li><b>Casa → Santa Etelvina:</b> 15,6 km · 20 min livre · <b>30–40 min</b> de manhã. Vai pela Autaz Mirim (Grande Circular). Saindo 06:35, você chega por volta de 07:10.</li>
-<li><b>Santa Etelvina → Live Academia:</b> 14,4 km · 19 min livre · <b>25–30 min</b>. Vai pela Noel Nutels e Camapuã e entra na Autaz Mirim descendo. Chega por volta de 07:45.</li>
-<li><b>Casa → academia</b> (Papoula, Girassol, Autaz Mirim, retorno em frente à delegacia perto da Rei Pelé): ~3,4 km · <b>7–10 min</b>. Esse caminho é para os dias em que você sai de casa, como no cardio de sábado.</li>
-<li><b>Academia → casa:</b> ~1,8 km · 3–5 min.</li>
-<li><b>Casa → Coroado:</b> 7,6 km · 11 min livre · <b>15–20 min</b>. Vai pela Autaz Mirim e Cosme Ferreira. Saindo 12:35, chega 12:50–12:55.</li>
-<li><b>Coroado → casa (22h):</b> 7,1 km · ~10–12 min. Chega por volta de 22:15.</li>
-</ul>
-<p><b>Dica:</b> de manhã, vindo do Santa Etelvina pela Camapuã, você entra na Autaz Mirim já descendo, do mesmo lado da academia. Não precisa fazer o retorno da delegacia.</p>
-<p>Se o seu tempo real for diferente, ajuste os horários na aba <b>Rotina</b>.</p>`],
+  ['🛵 Trajeto passo a passo', ROUTES_HTML],
 
   ['🔧 Moto (domingo, 09:00)', `
 <ul>
