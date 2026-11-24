@@ -174,6 +174,69 @@ ${ROUTES.map((r) => `
 </div>`).join('')}
 <p class="muted small">Pro trajeto ficar exato até a porta, me passe o endereço do trabalho da sua esposa e do seu.</p>`;
 
+// Lista de compras: [grupo, semanal?, itens]
+const SHOPPING = [
+  ['🥩 Proteínas', true, [
+    'Ovos: 1 bandeja de 30',
+    'Frango (peito ou sobrecoxa sem pele): 2 kg',
+    'Carne moída magra (patinho): 1 kg',
+    'Peixe (jaraqui, tambaqui ou matrinxã): 1 kg',
+    'Iogurte natural: 4 potes',
+    'Leite desnatado: 2 L',
+  ]],
+  ['🍚 Carboidratos', true, [
+    'Arroz: 2 kg',
+    'Feijão: 1 kg',
+    'Macaxeira: 2 kg',
+    'Batata-doce: 1 kg',
+    'Aveia em flocos: 500 g',
+    'Goma de tapioca ou pão integral: 1 kg ou 1 pacote',
+  ]],
+  ['🥦 Verduras e legumes', true, [
+    'Tomate: 1 kg',
+    'Cebola: 1 kg',
+    'Alho: 1 cabeça',
+    'Pepino: 4 un',
+    'Couve ou alface: 2 maços',
+    'Cenoura: 500 g',
+    'Jerimum (abóbora): 1 pedaço',
+    'Cheiro-verde: 2 maços',
+  ]],
+  ['🍌 Frutas', true, [
+    'Banana: 2 pencas (pré-treino e lanches)',
+    'Mamão: 1 un',
+    'Limão: 1 kg',
+  ]],
+  ['🧂 Despensa (quando acabar)', false, [
+    'Café em pó: 500 g (substitui o pré-treino)',
+    'Azeite ou óleo: 1 garrafa',
+    'Castanha-do-pará: 200 g (2 por dia)',
+    'Sal, colorau, pimenta-do-reino',
+  ]],
+  ['💊 Suplementos (por ordem)', false, [
+    'Creatina: ✅ já tem',
+    'Whey concentrado: 900 g (~30 doses). Prefira marca que publica laudo de análise',
+    'Opcional: cafeína em cápsula de 200 mg (mais barata que pré-treino)',
+  ]],
+  ['🧴 Pele (dura 1–2 meses)', false, [
+    'Sabonete facial em gel, para pele oleosa ou mista',
+    'Protetor solar facial FPS 50, toque seco',
+    'Hidratante facial em gel, oil-free',
+    'Balaclava para o capacete: 2 un (uma para lavar)',
+  ]],
+  ['🍱 Para as marmitas (uma vez)', false, [
+    'Potes com tampa que vão ao micro-ondas: 8 a 10',
+    'Bolsa térmica pequena',
+    'Garrafa de água de 1 L ou mais',
+  ]],
+  ['🛵 Moto (uma vez)', false, [
+    'Lubrificante de corrente em spray',
+    'Shampoo automotivo + pano de microfibra',
+  ]],
+];
+
+const SHOPPING_TIPS = 'Quantidades para 1 pessoa por 1 semana. Se a esposa comer junto, aumente arroz, feijão, legumes e frutas. Faça o mercado no sábado, depois do turno, para preparar as marmitas no domingo. Para economizar, compre frango e peixe na feira ou em promoção e congele em porções.';
+
 // Guias (conteúdo fixo do app)
 const GUIDES = [
   ['💊 Suplementos', `

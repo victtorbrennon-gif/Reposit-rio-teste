@@ -180,3 +180,7 @@ legend { font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
 .cal-help { margin-top: 12px; }
 .cal-help summary { cursor: pointer; color: var(--accent); }
 .cal-help ol { padding-left: 20px; line-height: 1.5; }
+
+.shop-item { display: flex; gap: 10px; align-items: flex-start; color: var(--text); font-size: .9rem; margin: 0; padding: 8px 2px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.shop-item input { width: 20px; height: 20px; margin: 0; flex: none; accent-color: var(--ok); }
+.shop-item.got span { text-decoration: line-through; color: var(--muted); }

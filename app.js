@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '1.7';
+const APP_VERSION = '1.8';
 const PERIODS = { manha: '🌅 Manhã', tarde: '☀️ Tarde', noite: '🌙 Noite' };
 const DAY_NAMES = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
@@ -15,6 +15,7 @@ const DEFAULT_STATE = {
   wk: {},     // { 'AAAA-MM-DD': [índices dos exercícios feitos] }
   loads: {},  // { 'nome do exercício': 'carga' }
   body: [],   // [{ d: 'AAAA-MM-DD', kg, cm }]
+  shop: {},   // { 'item da lista de compras': true }
   done: {},   // { 'AAAA-MM-DD': [ids] }
   water: {},  // { 'AAAA-MM-DD': n }
   notes: {},  // { 'AAAA-MM-DD': texto }
@@ -306,6 +307,7 @@ function renderPlan() {
     ));
   });
 
+  renderShopping();
   const g = $('#guides');
   if (!g.childElementCount) {
     const tips = el('details', { class: 'card guide' }, el('summary', {}, '🏋️ Como treinar e progredir'));
@@ -317,6 +319,36 @@ function renderPlan() {
       g.append(d);
     }
   }
+}
+
+// ---------- Lista de compras ----------
+function renderShopping() {
+  const box = $('#shopping');
+  const wasOpen = box.querySelector('details')?.open;
+  box.innerHTML = '';
+  state.shop = state.shop || {};
+  const total = SHOPPING.reduce((s, [, , items]) => s + items.length, 0);
+  const got = SHOPPING.reduce((s, [, , items]) => s + items.filter((i) => state.shop[i]).length, 0);
+  const d = el('details', { class: 'card guide' }, el('summary', {}, `🛒 Lista de compras (${got}/${total})`));
+  if (wasOpen) d.open = true;
+  d.append(el('p', { class: 'muted small' }, SHOPPING_TIPS));
+  for (const [group, weekly, items] of SHOPPING) {
+    d.append(el('h3', {}, group));
+    for (const item of items) {
+      const id = 'shop-' + item.replace(/\W+/g, '-');
+      const cb = el('input', { type: 'checkbox', id, onchange: (e) => {
+        if (e.target.checked) state.shop[item] = true; else delete state.shop[item];
+        save(); renderShopping();
+      } });
+      cb.checked = !!state.shop[item];
+      d.append(el('label', { class: 'shop-item' + (cb.checked ? ' got' : ''), for: id }, cb, el('span', {}, item)));
+    }
+  }
+  d.append(el('button', { class: 'btn ghost', type: 'button', style: 'width:100%;margin-top:12px', onclick: () => {
+    for (const [, weekly, items] of SHOPPING) if (weekly) items.forEach((i) => delete state.shop[i]);
+    save(); renderShopping();
+  } }, 'Desmarcar o mercado da semana'));
+  box.append(d);
 }
 
 // ---------- Peso e cintura ----------
