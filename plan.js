@@ -252,24 +252,90 @@ const SHOPPING = [
     'Whey concentrado: 900 g (~30 doses). Prefira marca que publica laudo de análise',
     'Opcional: cafeína em cápsula de 200 mg (mais barata que pré-treino)',
   ]],
-  ['🧴 Pele (dura 1–2 meses)', false, [
-    'Sabonete facial em gel, para pele oleosa ou mista',
-    'Protetor solar facial FPS 50, toque seco',
-    'Hidratante facial em gel, oil-free',
-    'Balaclava para o capacete: 2 un (uma para lavar)',
-  ]],
-  ['🍱 Para as marmitas (uma vez)', false, [
-    'Potes com tampa que vão ao micro-ondas: 8 a 10',
-    'Bolsa térmica pequena',
-    'Garrafa de água de 1 L ou mais',
-  ]],
-  ['🛵 Moto (uma vez)', false, [
-    'Lubrificante de corrente em spray',
-    'Shampoo automotivo + pano de microfibra',
-  ]],
 ];
 
 const SHOPPING_TIPS = 'Quantidades para 1 pessoa por 1 semana. Se a esposa comer junto, aumente arroz, feijão, legumes e frutas. Faça o mercado no sábado, depois do turno, para preparar as marmitas no domingo. Para economizar, compre frango e peixe na feira ou em promoção e congele em porções.';
+
+// Cardápio por dia da semana (0 = domingo). work = true leva marmita pro trabalho.
+const WEEK_MENU = {
+  1: { work: true,  almoco: 'frango grelhado, arroz, feijão e salada de tomate e pepino', jantar: 'carne moída com macaxeira e couve refogada', lanche: '3 ovos cozidos + banana' },
+  2: { work: true,  almoco: 'peixe assado (jaraqui ou tambaqui), arroz e legumes', jantar: 'frango desfiado, arroz, feijão e cenoura', lanche: 'iogurte com aveia + banana' },
+  3: { work: true,  almoco: 'carne moída com batata-doce e salada', jantar: 'frango com macaxeira e legumes refogados', lanche: 'tapioca com 2 ovos' },
+  4: { work: true,  almoco: 'omelete de 4 ovos com tomate, arroz e feijão', jantar: 'carne moída, arroz, feijão e couve (marmita que estava congelada)', lanche: 'pão com frango desfiado + fruta' },
+  5: { work: true,  almoco: 'peixe cozido com macaxeira e salada', jantar: 'frango com batata-doce e cenoura (marmita que estava congelada)', lanche: '3 ovos cozidos + banana' },
+  6: { work: false, almoco: 'se o turno for às 11h, coma antes de sair; se for às 8h, almoce em casa depois', jantar: 'jantar leve antes da live (19:30): frango ou ovos com arroz ou macaxeira, pouco volume', lanche: 'iogurte + banana antes do turno' },
+  0: { work: false, almoco: 'almoço em família: metade do prato de salada e uma boa porção de proteína', jantar: 'jantar leve: ovos mexidos com tapioca (live opcional das 18h às 22h)', lanche: 'fruta com iogurte' },
+};
+
+// Dica do momento, mostrada na tela Hoje
+function mealTip(now) {
+  const m = WEEK_MENU[now.getDay()];
+  const h = now.getHours() + now.getMinutes() / 60;
+  if (h < 9.5) return ['☕ Café da manhã', 'Pão ou tapioca com 2–3 ovos, banana e café. Coma leve: você vai de moto e treina logo depois.'];
+  if (h < 11) return ['🥤 Pós-treino', 'Whey com água ou leite, se você já tiver. Se não, 3 ovos mais uma banana. Beba água.'];
+  if (h < 13) return ['🍽️ Almoço', `Hoje: ${m.almoco}.` + (m.work ? ` Antes de sair, pegue na bolsa térmica: o jantar (${m.jantar}), o lanche (${m.lanche}), a garrafa de água e o gelo.` : '')];
+  if (h < 18) return ['🍎 Lanche', `Hoje: ${m.lanche}.${m.work ? ' Está na sua bolsa térmica.' : ''}`];
+  if (h < 21) return ['🍱 Jantar', `Hoje: ${m.jantar}. Beba água junto.`];
+  return ['🌙 Ceia leve', 'Iogurte com aveia, ou 2 ovos. Pouco volume, pra dormir bem às 23h.'];
+}
+
+// "Antes de começar": o que comprar e por quê. [nome, por quê, improviso]
+const STARTER = [
+  ['🔴 Compre antes de começar', [
+    ['Potes de marmita com tampa: 6 a 8 (vidro ou plástico próprio para micro-ondas)',
+     'Cada marmita pronta no domingo é uma refeição que você não compra na rua. São 5 jantares mais lanches, então comece com 6.',
+     'Enquanto não compra: potes de vidro de conserva bem lavados, ou marmitex descartável. Não esquente pote de sorvete ou margarina no micro-ondas.'],
+    ['Bolsa térmica pequena + 2 gelos reutilizáveis',
+     'Você sai às 12:35 e janta às 19h. São 6 horas no calor de Manaus. Sem gelo a comida estraga e dá intoxicação.',
+     'Enquanto não compra: garrafa PET de água congelada junto da marmita. Marmita congelada de manhã também serve de gelo.'],
+    ['Garrafa de água de 1 L ou mais', 'A meta é cerca de 3,5 L por dia. Com a garrafa na mão, você vê quanto já bebeu.', ''],
+    ['Café em pó', 'Um café coado forte antes de sair faz quase o mesmo que o pré-treino e custa muito menos.', ''],
+    ['Protetor solar facial FPS 50, toque seco',
+     'Moto e sol de Manaus todo dia. É o cuidado de pele que mais faz diferença: evita mancha e envelhecimento.', ''],
+    ['Sabonete facial em gel',
+     'Suor e sujeira do capacete entopem os poros e causam espinha. Sabonete de corpo resseca o rosto e piora a oleosidade.', ''],
+  ]],
+  ['🟡 Pode esperar 1 ou 2 semanas', [
+    ['Hidratante facial em gel, oil-free',
+     'Pele limpa sem hidratante compensa produzindo mais óleo. É importante, mas vem depois do sabonete e do protetor.', ''],
+    ['Balaclava para o capacete: 2 (uma para lavar)',
+     'O forro do capacete absorve suor e gordura e encosta no seu rosto por horas. A balaclava segura isso e lava fácil. Ela evita espinha na testa e no queixo.',
+     'Enquanto não compra: lave o forro do capacete a cada 15 dias e use uma bandana de algodão limpa por baixo.'],
+    ['Whey concentrado, 900 g',
+     'Só ajuda a bater a meta de proteína. Com ovos, frango e iogurte, você chega lá sem ele. Compre depois que a rotina estiver rodando.', ''],
+    ['Caneta e fita para escrever a data nas marmitas', 'Você vê o que está há mais de 3 dias na geladeira e descarta.', ''],
+    ['Lubrificante de corrente e shampoo automotivo', 'Para o domingo da moto. Pode comprar no mês que vem.', ''],
+  ]],
+];
+
+const MEALS_HTML = `
+<p><b>Como montar a marmita:</b> 1 proteína (uns 150 g cozida) + 1 carboidrato (1 concha de arroz ou 1 pedaço de macaxeira ou batata-doce) + feijão ou legume. Isso dá uns 35–40 g de proteína em cada uma.</p>
+<p><b>O que você come em cada hora:</b></p>
+<ul>
+<li><b>Almoço (11:30, em casa):</b> comida fresca do dia. Aqui entra o peixe, que não vai bem na marmita.</li>
+<li><b>Lanche (16h, levar):</b> algo que não estraga: ovos cozidos, banana, pão com frango, iogurte com aveia na bolsa gelada.</li>
+<li><b>Jantar (19h, levar):</b> a marmita do domingo.</li>
+<li><b>Ceia (22:30, em casa):</b> leve, para dormir bem.</li>
+</ul>
+<p><b>Cardápio da semana:</b></p>
+<ul>
+${[1, 2, 3, 4, 5].map((d) => {
+  const n = ['', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex'][d];
+  const m = WEEK_MENU[d];
+  return `<li><b>${n}:</b> almoço, ${m.almoco}. Levar: ${m.jantar}; lanche, ${m.lanche}.</li>`;
+}).join('')}
+</ul>
+<p><b>Preparo de domingo (10:30, cerca de 2 horas):</b></p>
+<ol>
+<li>Ponha arroz e feijão para cozinhar.</li>
+<li>Cozinhe 1,5 kg de frango e desfie ou corte em cubos.</li>
+<li>Refogue 1 kg de carne moída com cebola, alho e tomate.</li>
+<li>Cozinhe macaxeira e batata-doce, e 12 ovos.</li>
+<li>Deixe esfriar uns 30 minutos antes de fechar os potes. Fechar quente cria vapor e estraga mais rápido.</li>
+<li>Monte 5 jantares. Deixe 3 na geladeira (segunda a quarta) e <b>congele 2</b> (quinta e sexta).</li>
+</ol>
+<p><b>Segurança:</b> comida cozida dura até 3 dias na geladeira. A marmita que estava congelada vai congelada de manhã na bolsa: ela descongela até 19h e ainda ajuda a manter as outras geladas. Marmita que ficou mais de 2 horas fora do gelo no calor, descarte.</p>
+<p><b>Se o trabalho tiver geladeira e micro-ondas:</b> melhor ainda, guarde lá. Me conte para eu ajustar.</p>`;
 
 // Guias (conteúdo fixo do app)
 const GUIDES = [
@@ -295,6 +361,8 @@ const GUIDES = [
 </ul>
 <p><b>Como saber se está funcionando:</b> pese e meça a cintura todo domingo. Se a cintura cai e a força no treino se mantém ou sobe, está certo. Se nada mudou em 3 semanas, diminua um pouco o carboidrato da noite.</p>
 <p><b>Água:</b> com 100 kg, calor de Manaus e treino, a meta é ~3,5 L por dia (14 copos de 250 ml).</p>`],
+
+  ['🍱 Marmitas: o que levar e como preparar', MEALS_HTML],
 
   ['😴 Sono', `
 <p>Dormindo às 23h e acordando às 6h, você tem <b>7 horas</b>. É o mínimo para ganhar músculo e perder gordura, então cada minuto conta.</p>

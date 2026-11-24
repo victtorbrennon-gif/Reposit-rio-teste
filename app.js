@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.1';
+const APP_VERSION = '2.2';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -274,6 +274,8 @@ function renderToday() {
       ),
     ));
   }
+  const [tipTitle, tipText] = mealTip(new Date());
+  wrap.append(el('div', { class: 'card tip' }, el('b', {}, tipTitle), el('p', {}, tipText)));
   const items = itemsFor(new Date());
   const done = state.done[todayKey()] || [];
   if (!items.length) {
@@ -469,6 +471,7 @@ function renderPlan() {
     ));
   });
 
+  renderStarter();
   renderShopping();
   const g = $('#guides');
   if (!g.childElementCount) {
@@ -481,6 +484,33 @@ function renderPlan() {
       g.append(d);
     }
   }
+}
+
+// ---------- Antes de começar ----------
+function renderStarter() {
+  const box = $('#starter');
+  const wasOpen = box.querySelector('details')?.open;
+  box.innerHTML = '';
+  state.shop = state.shop || {};
+  const all = STARTER.flatMap(([, items]) => items);
+  const got = all.filter(([n]) => state.shop[n]).length;
+  const d = el('details', { class: 'card guide' }, el('summary', {}, `🚀 Antes de começar: o que comprar e por quê (${got}/${all.length})`));
+  if (wasOpen) d.open = true;
+  d.append(el('p', { class: 'muted small' }, 'Não precisa ter tudo para começar. Comece pelos itens vermelhos. Enquanto não compra, use o improviso que está embaixo de cada item.'));
+  for (const [group, items] of STARTER) {
+    d.append(el('h3', {}, group));
+    for (const [name, why, alt] of items) {
+      const id = 'st-' + name.replace(/\W+/g, '-').slice(0, 40);
+      const cb = el('input', { type: 'checkbox', id, onchange: (e) => {
+        if (e.target.checked) state.shop[name] = true; else delete state.shop[name];
+        save(); renderStarter();
+      } });
+      cb.checked = !!state.shop[name];
+      d.append(el('label', { class: 'shop-item starter' + (cb.checked ? ' got' : ''), for: id }, cb,
+        el('span', {}, el('span', { class: 'nm' }, name), el('small', { class: 'why' }, why), alt ? el('small', { class: 'why alt' }, alt) : null)));
+    }
+  }
+  box.append(d);
 }
 
 // ---------- Lista de compras ----------
