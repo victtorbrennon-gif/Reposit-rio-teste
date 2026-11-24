@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '1.5';
+const APP_VERSION = '1.6';
 const PERIODS = { manha: '🌅 Manhã', tarde: '☀️ Tarde', noite: '🌙 Noite' };
 const DAY_NAMES = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
@@ -418,6 +418,67 @@ function renderProgress() {
   renderBody();
 }
 
+// Resumo dos últimos 7 dias completos (até ontem), pra colar na conversa com o Claude
+function weeklySummary() {
+  const fmt = (d) => d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', '');
+  const days = [];
+  for (let i = 7; i >= 1; i--) days.push(daysAgo(i));
+  const L = [`RESUMO DA SEMANA (${fmt(days[0])} a ${fmt(days[6])})`, ''];
+
+  L.push('DIAS:');
+  const ratios = [];
+  for (const d of days) {
+    const r = dayRatio(d);
+    if (r !== null) ratios.push(r);
+    const k = dateKey(d);
+    const w = WORKOUTS[d.getDay()];
+    const wk = (state.wk[k] || []).length;
+    L.push(`- ${fmt(d)}: ${r === null ? 'sem registro' : Math.round(r * 100) + '%'} · treino ${wk}/${w.ex.length} (${w.title}) · água ${state.water[k] || 0}/${state.waterGoal}`);
+  }
+  if (ratios.length) L.push(`Média: ${Math.round(ratios.reduce((s, x) => s + x, 0) / ratios.length * 100)}%`);
+
+  L.push('', 'POR ATIVIDADE (feito/programado):');
+  const missed = [];
+  for (const it of state.items) {
+    let total = 0, ok = 0;
+    for (const d of days) {
+      if (dateKey(d) < state.startDate || !it.days.includes(d.getDay())) continue;
+      total++;
+      if ((state.done[dateKey(d)] || []).includes(it.id)) ok++;
+    }
+    if (!total) continue;
+    L.push(`- ${it.title}${it.time ? ' (' + it.time + ')' : ''}: ${ok}/${total}`);
+    if (ok / total < 0.5) missed.push(it.title);
+  }
+  if (missed.length) L.push('', 'MENOS DA METADE DAS VEZES:', ...missed.map((m) => '- ' + m));
+
+  const loads = Object.entries(state.loads);
+  if (loads.length) L.push('', 'CARGAS ATUAIS:', ...loads.map(([n, v]) => `- ${n}: ${v} kg`));
+
+  const body = [...state.body].sort((x, y) => x.d.localeCompare(y.d)).slice(-4);
+  if (body.length) L.push('', 'PESO/CINTURA (últimos registros):', ...body.map((b) => `- ${b.d.split('-').reverse().join('/')}: ${b.kg ?? '–'} kg · ${b.cm ?? '–'} cm`));
+
+  const notes = days.filter((d) => state.notes[dateKey(d)]).map((d) => `- ${fmt(d)}: ${state.notes[dateKey(d)].trim().replace(/\s+/g, ' ')}`);
+  if (notes.length) L.push('', 'NOTAS:', ...notes);
+
+  L.push('', 'Como me senti na semana (sono, energia, dores, fome): ');
+  return L.join('\n');
+}
+
+async function shareSummary() {
+  const text = weeklySummary();
+  try {
+    if (navigator.share) { await navigator.share({ text }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  try {
+    await navigator.clipboard.writeText(text);
+    alert('Resumo copiado ✓ Cole na conversa com o Claude.');
+  } catch (e) {
+    const box = $('#summary-box');
+    box.hidden = false; box.value = text; box.focus(); box.select();
+  }
+}
+
 function exportData() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   const a = el('a', { href: URL.createObjectURL(blob), download: `minha-rotina-${todayKey()}.json` });
@@ -467,6 +528,7 @@ $('#item-form').addEventListener('submit', onSubmit);
 $('#f-cancel').addEventListener('click', resetForm);
 $('#export').addEventListener('click', exportData);
 $('#body-form').addEventListener('submit', onBodySubmit);
+$('#share-summary').addEventListener('click', shareSummary);
 $('#app-version').textContent = `Versão ${APP_VERSION}`;
 $('#update-app').addEventListener('click', async () => {
   $('#update-app').textContent = 'Atualizando…';
