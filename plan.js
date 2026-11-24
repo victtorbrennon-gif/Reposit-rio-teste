@@ -164,14 +164,16 @@ const GUIDES = [
 </ul>`],
 
   ['🛵 Trajeto', `
-<p>Rotas calculadas no mapa (OpenStreetMap). O tempo "livre" é sem trânsito; o outro já tem a margem do horário.</p>
+<p>Rotas calculadas no mapa (OpenStreetMap), saindo do começo da Rua Batrum. O tempo "livre" é sem trânsito; o outro já tem a margem do horário.</p>
 <ul>
-<li><b>Casa → Santa Etelvina:</b> 15,6 km · 21 min livre · <b>30–40 min</b> de manhã. Vai pela Autaz Mirim (Grande Circular). Saindo 06:35, você chega por volta de 07:10–07:15.</li>
-<li><b>Santa Etelvina → Live Academia (Grande Circular):</b> 14,7 km · 19 min livre · <b>25–30 min</b>. Vai pela Noel Nutels e Camapuã. Chega por volta de 07:45.</li>
-<li><b>Academia → casa:</b> 2 km · 4 min.</li>
-<li><b>Casa → Coroado:</b> 8,1 km · 12 min livre · <b>15–20 min</b>. Vai pela Autaz Mirim e Cosme Ferreira. Saindo 12:35, chega 12:50–12:55.</li>
-<li><b>Coroado → casa (22h):</b> 8,1 km · ~12 min. Chega por volta de 22:15.</li>
+<li><b>Casa → Santa Etelvina:</b> 15,6 km · 20 min livre · <b>30–40 min</b> de manhã. Vai pela Autaz Mirim (Grande Circular). Saindo 06:35, você chega por volta de 07:10.</li>
+<li><b>Santa Etelvina → Live Academia:</b> 14,4 km · 19 min livre · <b>25–30 min</b>. Vai pela Noel Nutels e Camapuã e entra na Autaz Mirim descendo. Chega por volta de 07:45.</li>
+<li><b>Casa → academia</b> (Papoula, Girassol, Autaz Mirim, retorno em frente à delegacia perto da Rei Pelé): ~3,4 km · <b>7–10 min</b>. Esse caminho é para os dias em que você sai de casa, como no cardio de sábado.</li>
+<li><b>Academia → casa:</b> ~1,8 km · 3–5 min.</li>
+<li><b>Casa → Coroado:</b> 7,6 km · 11 min livre · <b>15–20 min</b>. Vai pela Autaz Mirim e Cosme Ferreira. Saindo 12:35, chega 12:50–12:55.</li>
+<li><b>Coroado → casa (22h):</b> 7,1 km · ~10–12 min. Chega por volta de 22:15.</li>
 </ul>
+<p><b>Dica:</b> de manhã, vindo do Santa Etelvina pela Camapuã, você entra na Autaz Mirim já descendo, do mesmo lado da academia. Não precisa fazer o retorno da delegacia.</p>
 <p>Se o seu tempo real for diferente, ajuste os horários na aba <b>Rotina</b>.</p>`],
 
   ['🔧 Moto (domingo, 09:00)', `
