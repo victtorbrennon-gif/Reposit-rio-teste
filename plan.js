@@ -2,7 +2,7 @@
 // Plano personalizado: rotina da semana, treinos e guias.
 // Ao mudar a rotina sugerida, aumente PRESET_VERSION para o app oferecer a atualização.
 
-const PRESET_VERSION = 1;
+const PRESET_VERSION = 2;
 const WEEKDAYS = [1, 2, 3, 4, 5];
 
 // [horário, período, título, dias]
@@ -11,7 +11,7 @@ const PRESET_ITEMS = [
   ['06:00', 'manha', 'Acordar + 1 copo d’água', WEEKDAYS],
   ['06:10', 'manha', 'Café da manhã + creatina (5 g)', WEEKDAYS],
   ['06:35', 'manha', 'Café/pré-treino e sair pra levar a esposa (Santa Etelvina)', WEEKDAYS],
-  ['07:40', 'manha', 'Treino do dia (aba Plano)', WEEKDAYS],
+  ['07:45', 'manha', 'Treino na Live Academia (aba Plano)', WEEKDAYS],
   ['09:00', 'manha', 'Pós-treino: whey ou refeição com proteína', WEEKDAYS],
   ['09:20', 'manha', 'Banho + rosto + protetor solar', WEEKDAYS],
   ['09:45', 'manha', 'Renda extra: bloco de foco (1h30)', WEEKDAYS],
@@ -28,18 +28,20 @@ const PRESET_ITEMS = [
   ['07:00', 'manha', 'Acordar + café da manhã + creatina', [6]],
   ['', 'manha', 'Trabalho de sábado (4h, ver o turno)', [6]],
   ['', 'tarde', 'Cardio + abdômen 30–40 min (antes ou depois do turno)', [6]],
-  ['', 'noite', 'Live', [6]],
-  ['', 'noite', 'Tempo com a esposa ou amigos', [6]],
-  ['23:30', 'noite', 'Rosto + dormir', [6]],
+  ['', 'tarde', 'Tempo com a esposa ou amigos', [6]],
+  ['19:30', 'noite', 'Jantar leve antes da live + garrafa d’água', [6]],
+  ['20:00', 'noite', 'Live (20h–0h)', [6]],
+  ['', 'noite', 'Depois da live: rosto + dormir até 00:30', [6]],
 
   // Domingo
-  ['07:30', 'manha', 'Acordar (no máx. 1h30 depois do normal) + creatina', [0]],
-  ['08:00', 'manha', 'Pesar e medir a cintura, em jejum (aba Progresso)', [0]],
-  ['09:00', 'manha', 'Lavar e revisar a moto (pneus, corrente, óleo, luzes)', [0]],
-  ['10:00', 'manha', 'Preparar as marmitas da semana', [0]],
+  ['08:00', 'manha', 'Acordar + creatina', [0]],
+  ['08:15', 'manha', 'Pesar e medir a cintura, em jejum (aba Progresso)', [0]],
+  ['09:30', 'manha', 'Lavar e revisar a moto (pneus, corrente, óleo, luzes)', [0]],
+  ['10:30', 'manha', 'Preparar as marmitas da semana', [0]],
   ['', 'tarde', 'Tempo com a esposa, família ou amigos', [0]],
-  ['18:00', 'noite', 'Planejar a semana + anotar os gastos', [0]],
-  ['22:40', 'noite', 'Rosto + dormir às 23h', [0]],
+  ['16:00', 'tarde', 'Planejar a semana + anotar os gastos', [0]],
+  ['18:00', 'noite', 'Live (opcional): 18h–22h pra dormir cedo', [0]],
+  ['22:40', 'noite', 'Rosto + dormir às 23h (segunda começa às 6h)', [0]],
 ];
 
 function presetItems() {
@@ -140,7 +142,9 @@ const GUIDES = [
   ['😴 Sono', `
 <p>Dormindo às 23h e acordando às 6h, você tem <b>7 horas</b>. É o mínimo para ganhar músculo e perder gordura, então cada minuto conta.</p>
 <ul>
-<li><b>Horário fixo</b>, inclusive no fim de semana: no máximo 1h30 a mais no domingo.</li>
+<li><b>Horário fixo</b> nos dias de semana. No fim de semana, o horário segue as lives (veja abaixo).</li>
+<li><b>Live de sábado (20h–0h):</b> dormir até 00:30 e acordar 08:00 no domingo dá 7h30. Tudo certo.</li>
+<li><b>Live de domingo:</b> se for das 20h à 0h, você dorme 00:30 e acorda 06:00 na segunda, só 5h30 de sono, e isso atrapalha a semana inteira de treino. Quando fizer, prefira <b>18h–22h</b> (ou no máximo 19h–23h).</li>
 <li><b>Ao chegar do trabalho:</b> ceia leve, banho morno, quarto escuro e fresco (ar ou ventilador).</li>
 <li><b>Celular fora da cama</b> 15 min antes de dormir. Se precisar, use o modo noturno.</li>
 <li><b>Nada de cafeína depois das 15h.</b></li>
@@ -159,14 +163,16 @@ const GUIDES = [
 <li><b>Acne, manchas ou espinhas que não passam:</b> procure um dermatologista. Dá para conseguir pelo SUS.</li>
 </ul>`],
 
-  ['🛵 Trajeto (estimativas de moto)', `
+  ['🛵 Trajeto', `
+<p>Rotas calculadas no mapa (OpenStreetMap). O tempo "livre" é sem trânsito; o outro já tem a margem do horário.</p>
 <ul>
-<li><b>Tancredo Neves → Santa Etelvina:</b> ~35–45 min no trânsito da manhã. Saindo 06:35, você chega por volta de 07:15–07:20.</li>
-<li><b>Santa Etelvina → academia (perto de casa):</b> ~20 min. Chega 07:40.</li>
-<li><b>Tancredo Neves → Coroado:</b> ~15–20 min. Saindo 12:35, sobra uma margem até as 13h.</li>
-<li><b>Coroado → casa (22h):</b> ~15–20 min. Chega por volta de 22:20.</li>
+<li><b>Casa → Santa Etelvina:</b> 15,6 km · 21 min livre · <b>30–40 min</b> de manhã. Vai pela Autaz Mirim (Grande Circular). Saindo 06:35, você chega por volta de 07:10–07:15.</li>
+<li><b>Santa Etelvina → Live Academia (Grande Circular):</b> 14,7 km · 19 min livre · <b>25–30 min</b>. Vai pela Noel Nutels e Camapuã. Chega por volta de 07:45.</li>
+<li><b>Academia → casa:</b> 2 km · 4 min.</li>
+<li><b>Casa → Coroado:</b> 8,1 km · 12 min livre · <b>15–20 min</b>. Vai pela Autaz Mirim e Cosme Ferreira. Saindo 12:35, chega 12:50–12:55.</li>
+<li><b>Coroado → casa (22h):</b> 8,1 km · ~12 min. Chega por volta de 22:15.</li>
 </ul>
-<p>Esses tempos são estimativas. Se o seu tempo real for diferente, ajuste os horários na aba <b>Rotina</b>.</p>`],
+<p>Se o seu tempo real for diferente, ajuste os horários na aba <b>Rotina</b>.</p>`],
 
   ['🔧 Moto (domingo, 09:00)', `
 <ul>

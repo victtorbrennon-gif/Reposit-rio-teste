@@ -98,7 +98,7 @@ function renderToday() {
   if ((state.presetVersion || 0) < PRESET_VERSION) {
     wrap.append(el('div', { class: 'card banner' },
       el('b', {}, '✨ Sua rotina personalizada está pronta'),
-      el('p', { class: 'muted small' }, 'Troca as atividades atuais pela rotina nova (trabalho, treino, sono e pele). O histórico de progresso é mantido.'),
+      el('p', { class: 'muted small' }, 'Troca as atividades atuais pela rotina sugerida (com rotas, horário da academia e lives). Se você editou alguma atividade, vai precisar refazer. O histórico de progresso é mantido.'),
       el('div', { class: 'row' },
         el('button', { class: 'btn ghost', onclick: () => { state.presetVersion = PRESET_VERSION; save(); renderToday(); } }, 'Agora não'),
         el('button', { class: 'btn grow', onclick: () => {
