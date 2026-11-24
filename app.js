@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.2';
+const APP_VERSION = '2.3';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -262,11 +262,11 @@ function renderToday() {
   if ((state.presetVersion || 0) < PRESET_VERSION) {
     wrap.append(el('div', { class: 'card banner' },
       el('b', {}, '✨ Sua rotina personalizada está pronta'),
-      el('p', { class: 'muted small' }, 'Troca as atividades atuais pela rotina sugerida (com rotas, horário da academia e lives). Se você editou alguma atividade, vai precisar refazer. O histórico de progresso é mantido.'),
+      el('p', { class: 'muted small' }, 'Troca as atividades atuais pela rotina sugerida, agora com o intervalo das 14h e o micro-ondas. Se você editou alguma atividade, ela volta ao padrão. O histórico das atividades que continuam iguais é mantido.'),
       el('div', { class: 'row' },
         el('button', { class: 'btn ghost', onclick: () => { state.presetVersion = PRESET_VERSION; save(); renderToday(); } }, 'Agora não'),
         el('button', { class: 'btn grow', onclick: () => {
-          state.items = presetItems();
+          state.items = presetItemsKeeping(state.items);
           state.presetVersion = PRESET_VERSION;
           state.waterGoal = Math.max(state.waterGoal, 14);
           save(); renderToday();

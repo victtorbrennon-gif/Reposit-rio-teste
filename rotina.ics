@@ -121,16 +121,18 @@ TRIGGER:PT0M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:rotina-12345-1215-mochila-marmita-lanche-garrafa-protetor@minha-rotina
+UID:rotina-12345-1215-mochila-marmita-intervalo-das-14h-lanche@minha-rotina
 DTSTAMP:20261124T120000Z
 DTSTART:20261123T121500
 DTEND:20261123T122500
 RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR
-SUMMARY:Mochila: marmita\, lanche\, garrafa\, protetor
+SUMMARY:Mochila: marmita (intervalo das 14h)\, lanche\, gelo\, garrafa\, pr
+ otetor
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Mochila: marmita\, lanche\, garrafa\, protetor
+DESCRIPTION:Mochila: marmita (intervalo das 14h)\, lanche\, gelo\, garrafa\
+ , protetor
 TRIGGER:PT0M
 END:VALARM
 END:VEVENT
@@ -149,30 +151,31 @@ TRIGGER:PT0M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:rotina-12345-1600-lanche-com-proteina@minha-rotina
+UID:rotina-12345-1400-intervalo-esquentar-a-marmita-no-micro-o@minha-rotina
 DTSTAMP:20261124T120000Z
-DTSTART:20261123T160000
-DTEND:20261123T161000
+DTSTART:20261123T140000
+DTEND:20261123T141000
 RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR
-SUMMARY:Lanche com proteína
+SUMMARY:Intervalo: esquentar a marmita no micro-ondas e comer sem pressa
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Lanche com proteína
+DESCRIPTION:Intervalo: esquentar a marmita no micro-ondas e comer sem press
+ a
 TRIGGER:PT0M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:rotina-12345-1900-refeicao-no-trabalho-marmita@minha-rotina
+UID:rotina-12345-1800-lanche-rapido-no-posto-banana-ovos-ou-ca@minha-rotina
 DTSTAMP:20261124T120000Z
-DTSTART:20261123T190000
-DTEND:20261123T191000
+DTSTART:20261123T180000
+DTEND:20261123T181000
 RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR
-SUMMARY:Refeição no trabalho (marmita)
+SUMMARY:Lanche rápido no posto (banana\, ovos ou castanhas)
 TRANSP:TRANSPARENT
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Refeição no trabalho (marmita)
+DESCRIPTION:Lanche rápido no posto (banana\, ovos ou castanhas)
 TRIGGER:PT0M
 END:VALARM
 END:VEVENT

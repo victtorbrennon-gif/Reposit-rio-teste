@@ -494,7 +494,7 @@ button:focus-visible, a:focus-visible, .task:focus-visible, summary:focus-visibl
 // Plano personalizado: rotina da semana, treinos e guias.
 // Ao mudar a rotina sugerida, aumente PRESET_VERSION para o app oferecer a atualização.
 
-const PRESET_VERSION = 2;
+const PRESET_VERSION = 3;
 const WEEKDAYS = [1, 2, 3, 4, 5];
 
 // [horário, período, título, dias]
@@ -508,10 +508,10 @@ const PRESET_ITEMS = [
   ['09:20', 'manha', 'Banho + rosto + protetor solar', WEEKDAYS],
   ['09:45', 'manha', 'Renda extra: bloco de foco (1h30)', WEEKDAYS],
   ['11:30', 'manha', 'Almoço', WEEKDAYS],
-  ['12:15', 'tarde', 'Mochila: marmita, lanche, garrafa, protetor', WEEKDAYS],
+  ['12:15', 'tarde', 'Mochila: marmita (intervalo das 14h), lanche, gelo, garrafa, protetor', WEEKDAYS],
   ['12:35', 'tarde', 'Sair pro trabalho (Coroado)', WEEKDAYS],
-  ['16:00', 'tarde', 'Lanche com proteína', WEEKDAYS],
-  ['19:00', 'noite', 'Refeição no trabalho (marmita)', WEEKDAYS],
+  ['14:00', 'tarde', 'Intervalo: esquentar a marmita no micro-ondas e comer sem pressa', WEEKDAYS],
+  ['18:00', 'noite', 'Lanche rápido no posto (banana, ovos ou castanhas)', WEEKDAYS],
   ['22:30', 'noite', 'Ceia leve com proteína', WEEKDAYS],
   ['22:40', 'noite', 'Lavar o rosto + hidratante', WEEKDAYS],
   ['23:00', 'noite', 'Dormir (celular longe 15 min antes)', WEEKDAYS],
@@ -544,6 +544,14 @@ const WATER_TIMES = [
 
 function presetItems() {
   return PRESET_ITEMS.map(([time, period, title, days]) => ({ id: uid(), title, period, time, days }));
+}
+// Reaplica a rotina sugerida reaproveitando o id de quem tem o mesmo título e dias,
+// pra não perder o histórico das atividades que continuam iguais.
+function presetItemsKeeping(old) {
+  return presetItems().map((n) => {
+    const m = old.find((o) => o.title === n.title && String(o.days) === String(n.days));
+    return m ? { ...n, id: m.id } : n;
+  });
 }
 
 // Treinos por dia da semana (0 = domingo). [exercício, séries×reps, descanso]
@@ -753,8 +761,8 @@ const WEEK_MENU = {
   1: { work: true,  almoco: 'frango grelhado, arroz, feijão e salada de tomate e pepino', jantar: 'carne moída com macaxeira e couve refogada', lanche: '3 ovos cozidos + banana' },
   2: { work: true,  almoco: 'peixe assado (jaraqui ou tambaqui), arroz e legumes', jantar: 'frango desfiado, arroz, feijão e cenoura', lanche: 'iogurte com aveia + banana' },
   3: { work: true,  almoco: 'carne moída com batata-doce e salada', jantar: 'frango com macaxeira e legumes refogados', lanche: 'tapioca com 2 ovos' },
-  4: { work: true,  almoco: 'omelete de 4 ovos com tomate, arroz e feijão', jantar: 'carne moída, arroz, feijão e couve (marmita que estava congelada)', lanche: 'pão com frango desfiado + fruta' },
-  5: { work: true,  almoco: 'peixe cozido com macaxeira e salada', jantar: 'frango com batata-doce e cenoura (marmita que estava congelada)', lanche: '3 ovos cozidos + banana' },
+  4: { work: true,  almoco: 'omelete de 4 ovos com tomate, arroz e feijão', jantar: 'carne moída, arroz, feijão e couve (marmita que estava congelada, descongelada na geladeira)', lanche: 'pão com frango desfiado + fruta' },
+  5: { work: true,  almoco: 'peixe cozido com macaxeira e salada', jantar: 'frango com batata-doce e cenoura (marmita que estava congelada, descongelada na geladeira)', lanche: '3 ovos cozidos + banana' },
   6: { work: false, almoco: 'se o turno for às 11h, coma antes de sair; se for às 8h, almoce em casa depois', jantar: 'jantar leve antes da live (19:30): frango ou ovos com arroz ou macaxeira, pouco volume', lanche: 'iogurte + banana antes do turno' },
   0: { work: false, almoco: 'almoço em família: metade do prato de salada e uma boa porção de proteína', jantar: 'jantar leve: ovos mexidos com tapioca (live opcional das 18h às 22h)', lanche: 'fruta com iogurte' },
 };
@@ -765,9 +773,14 @@ function mealTip(now) {
   const h = now.getHours() + now.getMinutes() / 60;
   if (h < 9.5) return ['☕ Café da manhã', 'Pão ou tapioca com 2–3 ovos, banana e café. Coma leve: você vai de moto e treina logo depois.'];
   if (h < 11) return ['🥤 Pós-treino', 'Whey com água ou leite, se você já tiver. Se não, 3 ovos mais uma banana. Beba água.'];
-  if (h < 13) return ['🍽️ Almoço', `Hoje: ${m.almoco}.` + (m.work ? ` Antes de sair, pegue na bolsa térmica: o jantar (${m.jantar}), o lanche (${m.lanche}), a garrafa de água e o gelo.` : '')];
-  if (h < 18) return ['🍎 Lanche', `Hoje: ${m.lanche}.${m.work ? ' Está na sua bolsa térmica.' : ''}`];
-  if (h < 21) return ['🍱 Jantar', `Hoje: ${m.jantar}. Beba água junto.`];
+  if (h < 13.5) return ['🍽️ Almoço', `Hoje: ${m.almoco}.` + (m.work ? ` Antes de sair, pegue: a marmita do intervalo das 14h (${m.jantar}), o lanche (${m.lanche}), a garrafa de água e o gelo.` : '')];
+  if (h < 15) return m.work
+    ? ['🍱 Intervalo das 14h', `Sua marmita de hoje: ${m.jantar}. Esquente no micro-ondas e coma devagar, sem celular na mão.`]
+    : ['🍎 Lanche', `Hoje: ${m.lanche}.`];
+  if (h < 19) return ['🍎 Lanche rápido', `Hoje: ${m.lanche}.${m.work ? ' Dá pra comer no posto, sem precisar de pausa.' : ''}`];
+  if (h < 21) return m.work
+    ? ['💧 Reta final', 'Falta pouco pra sair. Beba água. Em casa, ceia leve e cama no horário.']
+    : ['🍽️ Jantar', `Hoje: ${m.jantar}. Beba água junto.`];
   return ['🌙 Ceia leve', 'Iogurte com aveia, ou 2 ovos. Pouco volume, pra dormir bem às 23h.'];
 }
 
@@ -778,8 +791,8 @@ const STARTER = [
      'Cada marmita pronta no domingo é uma refeição que você não compra na rua. São 5 jantares mais lanches, então comece com 6.',
      'Enquanto não compra: potes de vidro de conserva bem lavados, ou marmitex descartável. Não esquente pote de sorvete ou margarina no micro-ondas.'],
     ['Bolsa térmica pequena + 2 gelos reutilizáveis',
-     'Você sai às 12:35 e janta às 19h. São 6 horas no calor de Manaus. Sem gelo a comida estraga e dá intoxicação.',
-     'Enquanto não compra: garrafa PET de água congelada junto da marmita. Marmita congelada de manhã também serve de gelo.'],
+     'Você sai às 12:35 e come a marmita às 14h, e o lanche só às 18h. São horas no calor de Manaus. Com o gelo, a comida chega boa até a hora de comer.',
+     'Enquanto não compra: garrafa PET de água congelada junto da marmita e do lanche.'],
     ['Garrafa de água de 1 L ou mais', 'A meta é cerca de 3,5 L por dia. Com a garrafa na mão, você vê quanto já bebeu.', ''],
     ['Café em pó', 'Um café coado forte antes de sair faz quase o mesmo que o pré-treino e custa muito menos.', ''],
     ['Protetor solar facial FPS 50, toque seco',
@@ -805,8 +818,8 @@ const MEALS_HTML = `
 <p><b>O que você come em cada hora:</b></p>
 <ul>
 <li><b>Almoço (11:30, em casa):</b> comida fresca do dia. Aqui entra o peixe, que não vai bem na marmita.</li>
-<li><b>Lanche (16h, levar):</b> algo que não estraga: ovos cozidos, banana, pão com frango, iogurte com aveia na bolsa gelada.</li>
-<li><b>Jantar (19h, levar):</b> a marmita do domingo.</li>
+<li><b>Marmita (14h, intervalo):</b> a do domingo, esquentada no micro-ondas. É a sua refeição principal no trabalho.</li>
+<li><b>Lanche (18h, no posto):</b> algo que não precisa de pausa e não estraga: ovos cozidos, banana, castanhas, pão com frango.</li>
 <li><b>Ceia (22:30, em casa):</b> leve, para dormir bem.</li>
 </ul>
 <p><b>Cardápio da semana:</b></p>
@@ -814,7 +827,7 @@ const MEALS_HTML = `
 ${[1, 2, 3, 4, 5].map((d) => {
   const n = ['', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex'][d];
   const m = WEEK_MENU[d];
-  return `<li><b>${n}:</b> almoço, ${m.almoco}. Levar: ${m.jantar}; lanche, ${m.lanche}.</li>`;
+  return `<li><b>${n}:</b> almoço, ${m.almoco}. Marmita: ${m.jantar}; lanche, ${m.lanche}.</li>`;
 }).join('')}
 </ul>
 <p><b>Preparo de domingo (10:30, cerca de 2 horas):</b></p>
@@ -824,10 +837,11 @@ ${[1, 2, 3, 4, 5].map((d) => {
 <li>Refogue 1 kg de carne moída com cebola, alho e tomate.</li>
 <li>Cozinhe macaxeira e batata-doce, e 12 ovos.</li>
 <li>Deixe esfriar uns 30 minutos antes de fechar os potes. Fechar quente cria vapor e estraga mais rápido.</li>
-<li>Monte 5 jantares. Deixe 3 na geladeira (segunda a quarta) e <b>congele 2</b> (quinta e sexta).</li>
+<li>Monte 5 marmitas. Deixe 3 na geladeira (segunda a quarta) e <b>congele 2</b> (quinta e sexta).</li>
+<li>Na noite anterior, passe a marmita congelada do congelador para a geladeira. Ela amanhece descongelada, pronta pro micro-ondas.</li>
 </ol>
-<p><b>Segurança:</b> comida cozida dura até 3 dias na geladeira. A marmita que estava congelada vai congelada de manhã na bolsa: ela descongela até 19h e ainda ajuda a manter as outras geladas. Marmita que ficou mais de 2 horas fora do gelo no calor, descarte.</p>
-<p><b>Se o trabalho tiver geladeira e micro-ondas:</b> melhor ainda, guarde lá. Me conte para eu ajustar.</p>`;
+<p><b>Segurança:</b> comida cozida dura até 3 dias na geladeira. Leve a marmita na bolsa térmica com gelo e esquente bem, até ficar quente no meio, que é o que mata os germes. Se sobrar, não guarde para o dia seguinte: descarte.</p>
+<p><b>Se o trabalho tiver geladeira:</b> guarde a bolsa lá logo que chegar. Se tiver, me conte para eu ajustar.</p>`;
 
 // Guias (conteúdo fixo do app)
 const GUIDES = [
@@ -902,7 +916,7 @@ const GUIDES = [
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.2';
+const APP_VERSION = '2.3';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -1162,11 +1176,11 @@ function renderToday() {
   if ((state.presetVersion || 0) < PRESET_VERSION) {
     wrap.append(el('div', { class: 'card banner' },
       el('b', {}, '✨ Sua rotina personalizada está pronta'),
-      el('p', { class: 'muted small' }, 'Troca as atividades atuais pela rotina sugerida (com rotas, horário da academia e lives). Se você editou alguma atividade, vai precisar refazer. O histórico de progresso é mantido.'),
+      el('p', { class: 'muted small' }, 'Troca as atividades atuais pela rotina sugerida, agora com o intervalo das 14h e o micro-ondas. Se você editou alguma atividade, ela volta ao padrão. O histórico das atividades que continuam iguais é mantido.'),
       el('div', { class: 'row' },
         el('button', { class: 'btn ghost', onclick: () => { state.presetVersion = PRESET_VERSION; save(); renderToday(); } }, 'Agora não'),
         el('button', { class: 'btn grow', onclick: () => {
-          state.items = presetItems();
+          state.items = presetItemsKeeping(state.items);
           state.presetVersion = PRESET_VERSION;
           state.waterGoal = Math.max(state.waterGoal, 14);
           save(); renderToday();
