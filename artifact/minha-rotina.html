@@ -1,0 +1,1537 @@
+<title>Minha Rotina</title>
+<style>
+:root {
+  --bg: #f5f6fb;
+  --card: #ffffff;
+  --text: #1c1d29;
+  --muted: #6b6f85;
+  --line: #e4e6f0;
+  --accent: #4f46e5;
+  --accent-soft: #e0e7ff;
+  --ok: #16a34a;
+  --danger: #dc2626;
+  --radius: 16px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1018;
+    --card: #1a1b26;
+    --text: #ebecf5;
+    --muted: #9599b3;
+    --line: #2b2d3d;
+    --accent: #818cf8;
+    --accent-soft: #2a2c4a;
+    --ok: #4ade80;
+    --danger: #f87171;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+    --bg: #0f1018;
+    --card: #1a1b26;
+    --text: #ebecf5;
+    --muted: #9599b3;
+    --line: #2b2d3d;
+    --accent: #818cf8;
+    --accent-soft: #2a2c4a;
+    --ok: #4ade80;
+    --danger: #f87171;
+    color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  -webkit-tap-highlight-color: transparent;
+}
+h1 { font-size: 1.5rem; margin: 0; }
+h2 { font-size: 1rem; margin: 0 0 12px; }
+h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 20px 4px 8px; }
+.muted { color: var(--muted); }
+.small { font-size: .8rem; }
+
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: calc(20px + env(safe-area-inset-top)) 16px 8px;
+}
+.greeting { margin: 0 0 2px; color: var(--muted); font-size: .9rem; }
+
+.ring { position: relative; width: 60px; height: 60px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 3.5; }
+.ring-bg { stroke: var(--line); }
+.ring-fg { stroke: var(--accent); stroke-linecap: round; stroke-dasharray: 100 100; stroke-dashoffset: 100; transition: stroke-dashoffset .4s; }
+.ring span { position: absolute; inset: 0; display: grid; place-items: center; font-size: .8rem; font-weight: 700; }
+
+main { padding: 0 16px; }
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px; margin: 12px 0;
+}
+.card-head { display: flex; justify-content: space-between; align-items: baseline; }
+
+/* lista de hoje */
+.task {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px; margin-bottom: 8px; cursor: pointer; user-select: none;
+  transition: opacity .2s;
+}
+.task .check {
+  flex: none; width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--line); display: grid; place-items: center; color: #fff; font-size: .9rem;
+}
+.task.done .check { background: var(--ok); border-color: var(--ok); }
+.task.done .t-title { text-decoration: line-through; color: var(--muted); }
+.task .t-title { flex: 1; }
+.task .t-time { color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
+.empty { text-align: center; color: var(--muted); padding: 32px 16px; }
+
+/* água */
+.water { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
+.water i { width: 22px; height: 28px; border-radius: 3px 3px 8px 8px; border: 2px solid var(--accent); font-style: normal; }
+.water i.full { background: var(--accent); }
+
+textarea, input, select {
+  width: 100%; font: inherit; color: var(--text); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+}
+textarea { resize: vertical; }
+label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 10px; }
+label input, label select { margin-top: 4px; }
+label.inline { margin-top: 14px; }
+fieldset { border: 0; padding: 0; margin: 0 0 12px; }
+legend { font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
+
+.row { display: flex; gap: 8px; }
+.grow { flex: 1; }
+
+.btn {
+  font: inherit; font-weight: 600; border: 0; border-radius: 10px; padding: 11px 16px;
+  background: var(--accent); color: #fff; cursor: pointer; text-align: center;
+}
+.btn.ghost { background: var(--accent-soft); color: var(--accent); }
+.btn.file { position: relative; overflow: hidden; margin: 0; }
+.btn.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+.days { display: flex; gap: 6px; }
+.days button {
+  flex: 1; font: inherit; font-size: .8rem; padding: 8px 0; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--bg); color: var(--muted);
+}
+.days button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.manage-item {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 6px;
+}
+.manage-item .info { flex: 1; min-width: 0; }
+.manage-item .info div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.manage-item small { color: var(--muted); }
+.icon-btn { border: 0; background: none; font-size: 1.1rem; padding: 6px; cursor: pointer; color: var(--muted); }
+
+/* progresso */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 8px; text-align: center; }
+.stat span { display: block; font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+.stat small { color: var(--muted); font-size: .72rem; }
+.bars { display: flex; align-items: flex-end; gap: 8px; height: 140px; }
+.bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
+.bar .fill { width: 100%; background: var(--accent); border-radius: 6px 6px 2px 2px; min-height: 3px; }
+.bar small { color: var(--muted); font-size: .7rem; }
+.heat { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.heat div { aspect-ratio: 1; border-radius: 4px; background: var(--line); }
+.per-item { margin-bottom: 10px; }
+.per-item .lbl { display: flex; justify-content: space-between; font-size: .85rem; margin-bottom: 4px; }
+.per-item .track { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.per-item .track div { height: 100%; background: var(--accent); }
+
+/* navegação */
+.tabs {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 560px; display: flex;
+  background: var(--card); border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tabs button {
+  flex: 1; border: 0; background: none; color: var(--muted); font: inherit; font-size: .75rem;
+  padding: 10px 0 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.tabs button span { font-size: 1.3rem; filter: grayscale(1); opacity: .6; }
+.tabs button.active { color: var(--accent); font-weight: 600; }
+.tabs button.active span { filter: none; opacity: 1; }
+
+/* plano */
+.banner { border-color: var(--accent); }
+.banner p { margin: 6px 0 12px; }
+.chips { margin: 12px 0 4px; }
+.plan-head { margin: 16px 4px 10px; }
+.plan-head h2 { margin: 0; }
+.task.ex .t-title small { display: block; color: var(--muted); font-size: .8rem; margin-top: 2px; text-decoration: none; }
+.task.readonly { cursor: default; }
+.task .load { width: 64px; flex: none; text-align: center; padding: 8px 6px; }
+.guide summary { font-weight: 600; cursor: pointer; }
+.guide p, .guide li { font-size: .9rem; line-height: 1.5; }
+.guide ul, .guide ol { padding-left: 20px; margin: 8px 0; }
+.guide li { margin-bottom: 6px; }
+#body-form input { min-width: 0; }
+.body-row { display: grid; grid-template-columns: 48px 1fr 1fr 28px; gap: 6px; align-items: center; font-size: .85rem; padding: 6px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+
+.route { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 12px; }
+.route ol { padding-left: 20px; }
+.btn.maps { display: block; text-decoration: none; margin-bottom: 6px; }
+.version-row { justify-content: space-between; align-items: center; margin-top: 14px; }
+
+.cal-link { text-decoration: none; }
+.cal-help { margin-top: 12px; }
+.cal-help summary { cursor: pointer; color: var(--accent); }
+.cal-help ol { padding-left: 20px; line-height: 1.5; }
+
+.shop-item { display: flex; gap: 10px; align-items: flex-start; color: var(--text); font-size: .9rem; margin: 0; padding: 8px 2px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.shop-item input { width: 20px; height: 20px; margin: 0; flex: none; accent-color: var(--ok); }
+.shop-item.got span { text-decoration: line-through; color: var(--muted); }
+
+/* app novo (artifact) x app antigo */
+.claude-only { display: none; }
+.in-claude .claude-only { display: block; }
+.in-claude .web-only { display: none !important; }
+.sync { margin: 2px 0 0; font-size: .75rem; color: var(--muted); }
+.sync[data-state="offline"], .sync[data-state="error"], .sync[data-state="full"], .sync[data-state="nodb"] { color: var(--danger); }
+.selectable { user-select: all; word-break: break-all; color: var(--text); }
+#move ol, .ob-import ol { padding-left: 20px; line-height: 1.5; }
+#move-link { text-decoration: none; }
+.ob-import { margin-top: 12px; }
+.ob-import summary { cursor: pointer; color: var(--accent); }
+.ob-import textarea, #move-box, #cal-url-box { margin: 8px 0; }
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px;
+  font-size: .9rem; max-width: calc(100% - 32px); box-shadow: 0 4px 16px rgb(0 0 0 / .2);
+}
+.ask-backdrop {
+  position: fixed; inset: 0; z-index: 40; background: rgb(0 0 0 / .45);
+  display: grid; place-items: center; padding: 16px;
+}
+.ask { width: 100%; max-width: 360px; margin: 0; }
+.ask p { margin: 0 0 14px; }
+button:focus-visible, a:focus-visible, .task:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+</style>
+<header class="topbar">
+    <div>
+      <p class="greeting" id="greeting">Olá!</p>
+      <p class="sync claude-only" id="sync" aria-live="polite"></p>
+      <h1 id="today-label">Hoje</h1>
+    </div>
+    <div class="ring" id="ring" aria-label="Progresso do dia">
+      <svg viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="15.9"/><circle class="ring-fg" id="ring-fg" cx="18" cy="18" r="15.9"/></svg>
+      <span id="ring-text">0%</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOJE -->
+    <section class="view" id="view-hoje">
+      <div class="card banner web-only" id="move">
+        <b>📦 O app mudou de endereço</b>
+        <p class="muted small">O app novo salva seus dados online e o Claude acompanha sua semana direto. Este app antigo não recebe mais atualizações.</p>
+        <ol class="small">
+          <li>Toque em <b>Copiar meus dados</b>.</li>
+          <li>Abra o app novo e, no primeiro acesso, toque em <b>Trazer os dados do app antigo</b> e cole.</li>
+        </ol>
+        <div class="row">
+          <button class="btn ghost grow" id="move-copy" type="button">Copiar meus dados</button>
+          <a class="btn grow" id="move-link" target="_blank" rel="noopener">Abrir app novo</a>
+        </div>
+        <p class="small muted">Link do app novo: <span class="selectable" id="move-url"></span></p>
+        <textarea id="move-box" rows="4" hidden aria-label="Seus dados"></textarea>
+      </div>
+
+      <div class="card banner" id="onboarding" hidden>
+        <b>👋 Bem-vindo ao app novo</b>
+        <p class="muted small">Agora seus dados ficam salvos online, na sua conta do Claude. Nas revisões de segunda, o Claude já vê sua semana sem você precisar colar nada.</p>
+        <button class="btn" id="ob-fresh" type="button" style="width:100%">Começar com a rotina sugerida</button>
+        <details class="ob-import">
+          <summary class="small">Trazer os dados do app antigo</summary>
+          <ol class="small">
+            <li>Abra o app antigo (o ícone que está na tela inicial).</li>
+            <li>Na aba <b>Hoje</b>, toque em <b>Copiar meus dados</b>.</li>
+            <li>Volte aqui, cole no campo abaixo e toque em <b>Trazer dados</b>.</li>
+          </ol>
+          <textarea id="ob-paste" rows="4" placeholder="Cole aqui os dados copiados" aria-label="Dados do app antigo"></textarea>
+          <div class="row">
+            <label class="btn ghost grow file">Escolher arquivo<input type="file" id="ob-file" accept="application/json"></label>
+            <button class="btn grow" id="ob-import" type="button">Trazer dados</button>
+          </div>
+        </details>
+      </div>
+
+      <div id="today-list"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>💧 Água</h2>
+          <span class="muted" id="water-label">0 / 8 copos</span>
+        </div>
+        <div class="water" id="water"></div>
+        <div class="row">
+          <button class="btn ghost" id="water-minus">− copo</button>
+          <button class="btn" id="water-plus">+ copo</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>📝 Nota do dia</h2>
+          <span class="muted small" id="note-saved"></span>
+        </div>
+        <textarea id="note" rows="4" placeholder="Como foi o dia? Algo pra lembrar?"></textarea>
+      </div>
+    </section>
+
+    <!-- PLANO -->
+    <section class="view" id="view-plano" hidden>
+      <div class="days chips" id="plan-days"></div>
+      <div class="card-head plan-head">
+        <h2 id="plan-title">Treino</h2>
+        <span class="muted small" id="plan-sub"></span>
+      </div>
+      <div id="plan-list"></div>
+      <div id="shopping"></div>
+      <div id="guides"></div>
+    </section>
+
+    <!-- ROTINA -->
+    <section class="view" id="view-rotina" hidden>
+      <div class="card">
+        <h2 id="form-title">Nova atividade</h2>
+        <form id="item-form">
+          <input type="hidden" id="f-id">
+          <label>Atividade
+            <input id="f-title" required maxlength="60" placeholder="Ex.: Academia, Ler 20 min…">
+          </label>
+          <div class="row">
+            <label class="grow">Período
+              <select id="f-period">
+                <option value="manha">🌅 Manhã</option>
+                <option value="tarde">☀️ Tarde</option>
+                <option value="noite">🌙 Noite</option>
+              </select>
+            </label>
+            <label class="grow">Horário (opcional)
+              <input id="f-time" type="time">
+            </label>
+          </div>
+          <fieldset>
+            <legend>Dias</legend>
+            <div class="days" id="f-days"></div>
+          </fieldset>
+          <div class="row">
+            <button type="button" class="btn ghost" id="f-cancel" hidden>Cancelar</button>
+            <button class="btn grow" type="submit" id="f-submit">Adicionar</button>
+          </div>
+        </form>
+      </div>
+      <div id="manage-list"></div>
+    </section>
+
+    <!-- PROGRESSO -->
+    <section class="view" id="view-progresso" hidden>
+      <div class="card banner">
+        <b>📤 Revisão de segunda</b>
+        <p class="muted small">Toda segunda, mande o resumo da semana na conversa com o Claude. Ele analisa o que você fez e ajusta a rotina.</p>
+        <button class="btn" id="share-summary" type="button" style="width:100%">Enviar resumo da semana</button>
+        <textarea id="summary-box" rows="10" hidden aria-label="Resumo da semana"></textarea>
+      </div>
+      <div class="card">
+        <h2>🔔 Lembretes no iPhone</h2>
+        <p class="muted small">Toque em cada botão e confirme <b>Assinar</b>. Os avisos chegam pelo app Calendário, mesmo com este app fechado.</p>
+        <div class="row">
+          <a class="btn grow cal-link" data-file="rotina.ics">📅 Rotina</a>
+          <a class="btn grow cal-link" data-file="agua.ics">💧 Água</a>
+        </div>
+        <details class="cal-help">
+          <summary class="small">Não está tocando? Veja como ligar os alertas</summary>
+          <ol class="small">
+            <li>Abra <b>Ajustes → Apps → Calendário → Contas</b> (em iPhones mais antigos: <b>Ajustes → Calendário → Contas</b>).</li>
+            <li>Toque em <b>Calendários Assinados</b> e depois em <b>Minha Rotina</b>.</li>
+            <li>Desligue <b>Remover Alertas</b>. Faça o mesmo em <b>Água</b>.</li>
+            <li>Em <b>Ajustes → Notificações → Calendário</b>, deixe as notificações ligadas.</li>
+          </ol>
+          <p class="small">Se o botão não abrir o Calendário: em <b>Ajustes → Apps → Calendário → Contas → Adicionar Conta → Outra → Adicionar Calendário Assinado</b>, cole o link:</p>
+          <div class="row">
+            <button class="btn ghost grow cal-copy" type="button" data-file="rotina.ics">Copiar link da Rotina</button>
+            <button class="btn ghost grow cal-copy" type="button" data-file="agua.ics">Copiar link da Água</button>
+          </div>
+          <textarea id="cal-url-box" rows="2" hidden aria-label="Link do calendário"></textarea>
+          <p class="small muted">Os lembretes seguem a rotina sugerida. Quando o Claude ajustar a rotina nas revisões de segunda, eles se atualizam sozinhos. Mudanças que você fizer à mão na aba Rotina não vão para o calendário.</p>
+        </details>
+      </div>
+      <div class="stats">
+        <div class="stat"><span id="st-streak">0</span><small>dias seguidos ≥ 80%</small></div>
+        <div class="stat"><span id="st-week">0%</span><small>média 7 dias</small></div>
+        <div class="stat"><span id="st-perfect">0</span><small>dias 100% (30d)</small></div>
+      </div>
+      <div class="card">
+        <h2>Últimos 7 dias</h2>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="card">
+        <h2>Últimos 30 dias</h2>
+        <div class="heat" id="heat"></div>
+      </div>
+      <div class="card">
+        <h2>Por atividade (30 dias)</h2>
+        <div id="per-item"></div>
+      </div>
+      <div class="card">
+        <h2>⚖️ Peso e cintura</h2>
+        <form id="body-form" class="row">
+          <input id="b-kg" inputmode="decimal" placeholder="Peso (kg)" aria-label="Peso em kg">
+          <input id="b-cm" inputmode="decimal" placeholder="Cintura (cm)" aria-label="Cintura em cm">
+          <button class="btn" type="submit">Salvar</button>
+        </form>
+        <p class="muted small">Meça a cintura na altura do umbigo, sem encolher a barriga.</p>
+        <div id="body-list"></div>
+      </div>
+      <div class="card">
+        <h2>Backup</h2>
+        <p class="muted small">Os dados ficam só neste aparelho. Exporte para guardar uma cópia ou passar para outro celular.</p>
+        <div class="row">
+          <button class="btn ghost grow web-only" id="export">Exportar</button>
+          <label class="btn ghost grow file">Importar<input type="file" id="import" accept="application/json"></label>
+        </div>
+        <label class="inline">Meta de água (copos/dia)
+          <input type="number" id="water-goal" min="1" max="30">
+        </label>
+        <div class="row version-row web-only">
+          <span class="muted small" id="app-version"></span>
+          <button class="btn ghost" id="update-app" type="button">🔄 Atualizar app</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+  <div class="ask-backdrop" id="ask" hidden>
+    <div class="ask card" role="dialog" aria-modal="true" aria-labelledby="ask-text">
+      <p id="ask-text"></p>
+      <div class="row">
+        <button class="btn ghost grow" id="ask-cancel" type="button">Cancelar</button>
+        <button class="btn grow" id="ask-ok" type="button">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <button data-view="hoje" class="active"><span>✅</span>Hoje</button>
+    <button data-view="plano"><span>🏋️</span>Plano</button>
+    <button data-view="rotina"><span>🗓️</span>Rotina</button>
+    <button data-view="progresso"><span>📈</span>Progresso</button>
+  </nav>
+
+  <script>
+'use strict';
+// Plano personalizado: rotina da semana, treinos e guias.
+// Ao mudar a rotina sugerida, aumente PRESET_VERSION para o app oferecer a atualização.
+
+const PRESET_VERSION = 2;
+const WEEKDAYS = [1, 2, 3, 4, 5];
+
+// [horário, período, título, dias]
+const PRESET_ITEMS = [
+  // Segunda a sexta
+  ['06:00', 'manha', 'Acordar + 1 copo d’água', WEEKDAYS],
+  ['06:10', 'manha', 'Café da manhã + creatina (5 g)', WEEKDAYS],
+  ['06:35', 'manha', 'Café/pré-treino e sair pra levar a esposa (Santa Etelvina)', WEEKDAYS],
+  ['07:45', 'manha', 'Treino na Live Academia (aba Plano)', WEEKDAYS],
+  ['09:00', 'manha', 'Pós-treino: whey ou refeição com proteína', WEEKDAYS],
+  ['09:20', 'manha', 'Banho + rosto + protetor solar', WEEKDAYS],
+  ['09:45', 'manha', 'Renda extra: bloco de foco (1h30)', WEEKDAYS],
+  ['11:30', 'manha', 'Almoço', WEEKDAYS],
+  ['12:15', 'tarde', 'Mochila: marmita, lanche, garrafa, protetor', WEEKDAYS],
+  ['12:35', 'tarde', 'Sair pro trabalho (Coroado)', WEEKDAYS],
+  ['16:00', 'tarde', 'Lanche com proteína', WEEKDAYS],
+  ['19:00', 'noite', 'Refeição no trabalho (marmita)', WEEKDAYS],
+  ['22:30', 'noite', 'Ceia leve com proteína', WEEKDAYS],
+  ['22:40', 'noite', 'Lavar o rosto + hidratante', WEEKDAYS],
+  ['23:00', 'noite', 'Dormir (celular longe 15 min antes)', WEEKDAYS],
+
+  // Sábado (turno alternado: 8h–12h ou 11h–15h)
+  ['07:00', 'manha', 'Acordar + café da manhã + creatina', [6]],
+  ['', 'manha', 'Trabalho de sábado (4h, ver o turno)', [6]],
+  ['', 'tarde', 'Cardio + abdômen 30–40 min (antes ou depois do turno)', [6]],
+  ['', 'tarde', 'Tempo com a esposa ou amigos', [6]],
+  ['19:30', 'noite', 'Jantar leve antes da live + garrafa d’água', [6]],
+  ['20:00', 'noite', 'Live (20h–0h)', [6]],
+  ['', 'noite', 'Depois da live: rosto + dormir até 00:30', [6]],
+
+  // Domingo
+  ['08:00', 'manha', 'Acordar + creatina', [0]],
+  ['08:15', 'manha', 'Pesar e medir a cintura, em jejum (aba Progresso)', [0]],
+  ['09:30', 'manha', 'Lavar e revisar a moto (pneus, corrente, óleo, luzes)', [0]],
+  ['10:30', 'manha', 'Preparar as marmitas da semana', [0]],
+  ['', 'tarde', 'Tempo com a esposa, família ou amigos', [0]],
+  ['16:00', 'tarde', 'Planejar a semana + anotar os gastos', [0]],
+  ['18:00', 'noite', 'Live (opcional): 18h–22h pra dormir cedo', [0]],
+  ['22:40', 'noite', 'Rosto + dormir às 23h (segunda começa às 6h)', [0]],
+];
+
+// Lembretes de água (calendário agua.ics): [dias, horários]. Evita o horário do treino e da moto.
+const WATER_TIMES = [
+  [WEEKDAYS, ['08:30', '10:30', '12:00', '14:00', '15:30', '17:00', '18:30', '20:00', '21:30']],
+  [[0, 6], ['09:00', '11:00', '13:00', '15:00', '17:00', '19:00', '21:00']],
+];
+
+function presetItems() {
+  return PRESET_ITEMS.map(([time, period, title, days]) => ({ id: uid(), title, period, time, days }));
+}
+
+// Treinos por dia da semana (0 = domingo). [exercício, séries×reps, descanso]
+const WORKOUTS = {
+  1: { title: 'Peito, ombro e tríceps', ex: [
+    ['Supino reto (barra ou halter)', '4 × 6–8', '2 min'],
+    ['Supino inclinado com halter', '3 × 8–10', '90 s'],
+    ['Desenvolvimento com halter sentado', '3 × 8–10', '90 s'],
+    ['Elevação lateral', '4 × 12–15', '60 s'],
+    ['Crucifixo ou peck deck', '3 × 12', '60 s'],
+    ['Tríceps na polia com corda', '3 × 10–12', '60 s'],
+    ['Tríceps francês', '2 × 10–12', '60 s'],
+    ['Cardio: esteira inclinada, ritmo de caminhada', '15 min', ''],
+  ] },
+  2: { title: 'Costas e bíceps', ex: [
+    ['Puxada frente (ou barra fixa)', '4 × 8–10', '90 s'],
+    ['Remada curvada com barra', '4 × 8', '2 min'],
+    ['Remada unilateral (serrote)', '3 × 10 cada lado', '60 s'],
+    ['Face pull na polia', '3 × 12–15', '60 s'],
+    ['Rosca direta', '3 × 8–10', '60 s'],
+    ['Rosca martelo', '3 × 10–12', '60 s'],
+    ['Cardio: bicicleta moderada', '15 min', ''],
+  ] },
+  3: { title: 'Pernas (foco em quadríceps)', ex: [
+    ['Agachamento livre ou hack', '4 × 6–8', '2–3 min'],
+    ['Leg press', '3 × 10–12', '2 min'],
+    ['Cadeira extensora', '3 × 12–15', '60 s'],
+    ['Stiff', '3 × 8–10', '90 s'],
+    ['Panturrilha em pé', '4 × 12–15', '60 s'],
+    ['Prancha', '3 × 40 s', '45 s'],
+    ['Cardio: caminhada leve', '10 min', ''],
+  ] },
+  4: { title: 'Superior (volume)', ex: [
+    ['Supino inclinado com barra', '3 × 8', '2 min'],
+    ['Puxada com pegada fechada', '3 × 8–10', '90 s'],
+    ['Remada na máquina', '3 × 10', '90 s'],
+    ['Desenvolvimento na máquina', '3 × 10', '90 s'],
+    ['Elevação lateral', '3 × 15', '60 s'],
+    ['Rosca + tríceps na polia (em sequência)', '3 × 12', '60 s'],
+    ['Cardio HIIT na bike: 30 s forte / 60 s leve', '10 min', ''],
+  ] },
+  5: { title: 'Inferior (posterior e glúteo)', ex: [
+    ['Levantamento terra romeno', '4 × 8', '2 min'],
+    ['Agachamento búlgaro', '3 × 10 cada perna', '90 s'],
+    ['Mesa flexora', '3 × 10–12', '60 s'],
+    ['Elevação pélvica', '3 × 10', '90 s'],
+    ['Cadeira abdutora', '2 × 15', '60 s'],
+    ['Panturrilha sentado', '3 × 15', '60 s'],
+    ['Cardio: esteira inclinada', '15 min', ''],
+  ] },
+  6: { title: 'Cardio + abdômen (horário livre)', ex: [
+    ['Caminhada rápida, bike, pelada ou natação', '30–40 min', ''],
+    ['Prancha', '3 × 45 s', '45 s'],
+    ['Abdominal infra (elevação de pernas)', '3 × 12', '45 s'],
+    ['Prancha lateral', '2 × 30 s cada lado', '30 s'],
+  ] },
+  0: { title: 'Descanso', ex: [
+    ['Caminhada leve (opcional)', '20–30 min', ''],
+    ['Alongamento / mobilidade', '10 min', ''],
+  ] },
+};
+
+const TRAINING_TIPS = `
+<p><b>Como progredir:</b> use uma carga em que você chegue ao fim da faixa de repetições com 1–2 repetições ainda "sobrando". Quando fizer o número máximo de repetições em <b>todas</b> as séries, aumente a carga na próxima vez (2–5 kg nas pernas, 1–2 kg nos braços). Anote a carga no campo "kg".</p>
+<p><b>Aquecimento:</b> 5 min de bike + 1–2 séries leves do primeiro exercício.</p>
+<p><b>A cada 6–8 semanas:</b> faça uma semana mais leve (metade das séries) para recuperar.</p>
+<p><b>Tempo total:</b> cerca de 60 min de musculação + 10–15 min de cardio. Termina perto das 9h.</p>`;
+
+// Trajetos (calculados no OpenStreetMap; o tempo real já tem a margem do trânsito)
+const ROUTES = [
+  { title: 'Casa → Santa Etelvina (levar a esposa)', info: '15,6 km · 30–40 min de manhã', dest: 'Santa Etelvina, Manaus - AM', steps: [
+    'Saia de casa pelo seu caminho de sempre (Papoula → Girassol) até a <b>Av. Autaz Mirim</b> (Grande Circular).',
+    'Siga pela Autaz Mirim no sentido da Cidade de Deus / Rei Pelé · 1,6 km.',
+    'Na rotatória, pegue a 2ª saída e continue na avenida, que vira <b>Av. Nossa Senhora da Conceição</b> · 2 km.',
+    'Na próxima rotatória, pegue a 2ª saída na <b>Av. Margarita</b>, que continua como Av. Arquiteto José Henriques Bento Rodrigues · 1,3 km.',
+    'Vire à <b>direita</b> na <b>Rua Campos Sales</b> · 1,2 km.',
+    'Vire à <b>esquerda</b> na <b>Rua 1º de Janeiro</b>. Você já está no Santa Etelvina; siga até o trabalho dela.',
+  ] },
+  { title: 'Santa Etelvina → Live Academia', info: '14,4 km · 25–30 min', dest: 'Live Academia Autaz Mirim, Manaus', steps: [
+    'Saia pela <b>Rua Vicente Martins</b> e vire à <b>direita</b> na <b>Av. 7 de Maio</b> · 1,1 km.',
+    'Siga em frente: a avenida continua como <b>Av. das Flores</b> · 4,9 km.',
+    'No fim, siga pela <b>Rua Fênix</b> e vire à <b>direita</b> na <b>Av. Rouxinol</b> · 350 m.',
+    'Vire à <b>esquerda</b> na <b>Av. Noel Nutels</b> · 1 km.',
+    'Na rotatória, pegue a <b>3ª saída</b> na <b>Av. Camapuã</b>.',
+    'Mantenha-se à <b>direita</b> e entre na <b>Av. Autaz Mirim</b> descendo · 850 m. A academia (estacionamento do Vitória, antigo Rodrigues) fica do seu lado. <b>Não precisa fazer o retorno.</b>',
+  ] },
+  { title: 'Casa → Live Academia (sábado e dias saindo de casa)', info: '~3,4 km · 7–10 min', dest: 'Live Academia Autaz Mirim, Manaus', steps: [
+    'Desça pela <b>Rua Papoula</b> e vire à <b>direita</b> na <b>Rua Girassol</b> até a <b>Av. Autaz Mirim</b>.',
+    'Na Autaz Mirim, a academia fica do outro lado. Siga até perto da <b>Av. Rei Pelé</b>.',
+    'Faça o <b>retorno em frente à delegacia</b>.',
+    'Desça a Autaz Mirim até a academia, que fica do seu lado direito.',
+  ] },
+  { title: 'Live Academia → casa', info: '~1,8 km · 3–5 min', dest: 'Rua Batrum, Tancredo Neves, Manaus - AM', steps: [
+    'Saia do estacionamento virando à <b>direita</b> na <b>Av. Autaz Mirim</b> · 1,2 km.',
+    'Entre no bairro à direita (pela Rua Rio Napo ou pelo seu caminho de sempre) até a Batrum.',
+  ] },
+  { title: 'Casa → trabalho (Coroado)', info: '7,6 km · 15–20 min', dest: 'Coroado, Manaus - AM', steps: [
+    'Saia do bairro até a <b>Av. Autaz Mirim</b>.',
+    'Vire à <b>esquerda</b> na Autaz Mirim, no sentido Coroado · 2,3 km.',
+    'Siga em frente: a avenida continua como <b>Av. Cosme Ferreira</b> · 3,7 km.',
+    'Já no Coroado, vire à <b>direita</b> na <b>Rua Ouro Preto</b> e siga até o trabalho.',
+  ] },
+  { title: 'Trabalho (Coroado) → casa, às 22h', info: '7,1 km · 10–12 min', dest: 'Rua Batrum, Tancredo Neves, Manaus - AM', steps: [
+    'Saia pela <b>Rua Ouro Preto</b> até a <b>Av. Cosme Ferreira</b>.',
+    'Siga pela Cosme Ferreira no sentido Grande Circular · 3 km.',
+    'Passe pelo complexo viário e continue na <b>Av. Autaz Mirim</b> · 2,2 km.',
+    'Entre no bairro à direita até a Batrum.',
+  ] },
+];
+
+const mapsLink = (dest) => 'https://waze.com/ul?navigate=yes&q=' + encodeURIComponent(dest);
+
+const ROUTES_HTML = `
+<p class="muted">O botão abre o Waze já navegando, saindo de onde você estiver, com o trânsito do momento.</p>
+${ROUTES.map((r) => `
+<div class="route">
+  <p><b>${r.title}</b><br><span class="muted">${r.info}</span></p>
+  <ol>${r.steps.map((s) => `<li>${s}</li>`).join('')}</ol>
+  <a class="btn ghost maps" href="${mapsLink(r.dest)}" target="_blank" rel="noopener">🚦 Abrir no Waze</a>
+</div>`).join('')}
+<p class="muted small">Pro trajeto ficar exato até a porta, me passe o endereço do trabalho da sua esposa e do seu.</p>`;
+
+// Lista de compras: [grupo, semanal?, itens]
+const SHOPPING = [
+  ['🥩 Proteínas', true, [
+    'Ovos: 1 bandeja de 30',
+    'Frango (peito ou sobrecoxa sem pele): 2 kg',
+    'Carne moída magra (patinho): 1 kg',
+    'Peixe (jaraqui, tambaqui ou matrinxã): 1 kg',
+    'Iogurte natural: 4 potes',
+    'Leite desnatado: 2 L',
+  ]],
+  ['🍚 Carboidratos', true, [
+    'Arroz: 2 kg',
+    'Feijão: 1 kg',
+    'Macaxeira: 2 kg',
+    'Batata-doce: 1 kg',
+    'Aveia em flocos: 500 g',
+    'Goma de tapioca ou pão integral: 1 kg ou 1 pacote',
+  ]],
+  ['🥦 Verduras e legumes', true, [
+    'Tomate: 1 kg',
+    'Cebola: 1 kg',
+    'Alho: 1 cabeça',
+    'Pepino: 4 un',
+    'Couve ou alface: 2 maços',
+    'Cenoura: 500 g',
+    'Jerimum (abóbora): 1 pedaço',
+    'Cheiro-verde: 2 maços',
+  ]],
+  ['🍌 Frutas', true, [
+    'Banana: 2 pencas (pré-treino e lanches)',
+    'Mamão: 1 un',
+    'Limão: 1 kg',
+  ]],
+  ['🧂 Despensa (quando acabar)', false, [
+    'Café em pó: 500 g (substitui o pré-treino)',
+    'Azeite ou óleo: 1 garrafa',
+    'Castanha-do-pará: 200 g (2 por dia)',
+    'Sal, colorau, pimenta-do-reino',
+  ]],
+  ['💊 Suplementos (por ordem)', false, [
+    'Creatina: ✅ já tem',
+    'Whey concentrado: 900 g (~30 doses). Prefira marca que publica laudo de análise',
+    'Opcional: cafeína em cápsula de 200 mg (mais barata que pré-treino)',
+  ]],
+  ['🧴 Pele (dura 1–2 meses)', false, [
+    'Sabonete facial em gel, para pele oleosa ou mista',
+    'Protetor solar facial FPS 50, toque seco',
+    'Hidratante facial em gel, oil-free',
+    'Balaclava para o capacete: 2 un (uma para lavar)',
+  ]],
+  ['🍱 Para as marmitas (uma vez)', false, [
+    'Potes com tampa que vão ao micro-ondas: 8 a 10',
+    'Bolsa térmica pequena',
+    'Garrafa de água de 1 L ou mais',
+  ]],
+  ['🛵 Moto (uma vez)', false, [
+    'Lubrificante de corrente em spray',
+    'Shampoo automotivo + pano de microfibra',
+  ]],
+];
+
+const SHOPPING_TIPS = 'Quantidades para 1 pessoa por 1 semana. Se a esposa comer junto, aumente arroz, feijão, legumes e frutas. Faça o mercado no sábado, depois do turno, para preparar as marmitas no domingo. Para economizar, compre frango e peixe na feira ou em promoção e congele em porções.';
+
+// Guias (conteúdo fixo do app)
+const GUIDES = [
+  ['💊 Suplementos', `
+<p><b>Ordem de prioridade (pra gastar bem):</b></p>
+<ol>
+<li><b>Creatina:</b> a mais estudada e a mais barata. <b>3–5 g todo dia</b>, inclusive nos dias sem treino, em qualquer horário (deixei no café da manhã). Não precisa fazer "saturação". Pode inchar um pouco no começo, porque é água dentro do músculo.</li>
+<li><b>Whey:</b> não é obrigatório. Serve para bater a meta de proteína quando a comida não alcança. 1 dose (≈25–30 g de proteína) no pós-treino ou no lanche das 16h.</li>
+<li><b>Cafeína:</b> um <b>café coado forte</b> faz quase o mesmo que o pré-treino e custa bem menos. Tome por volta de 06:35, antes de sair: o efeito chega no treino das 07:40. Fique em 150–200 mg nessa dose e não passe de 400 mg no dia todo.</li>
+</ol>
+<p><b>Sem cafeína depois das 15h:</b> você dorme às 23h e ela atrapalha o sono por muitas horas. No trabalho à noite, prefira água, chá sem cafeína ou café descafeinado.</p>
+<p>Se você tiver pressão alta, problema no coração ou nos rins, ou tomar algum remédio, confirme com um médico antes de usar pré-treino ou creatina.</p>`],
+
+  ['🍽️ Alimentação', `
+<p><b>Objetivo:</b> perder gordura sem perder músculo. Isso pede um déficit pequeno (comer um pouco menos do que gasta) e <b>proteína alta</b>.</p>
+<ul>
+<li><b>Proteína:</b> cerca de <b>180 g por dia</b>, divididos em 5 refeições de 30–40 g. Fontes: ovos, frango, peixe (jaraqui, tambaqui, matrinxã), carne magra, iogurte, whey.</li>
+<li><b>Prato do almoço e da marmita:</b> metade de salada ou legumes, um quarto de proteína, um quarto de arroz, macaxeira, batata ou feijão.</li>
+<li><b>Café da manhã (06:10):</b> algo leve antes da moto e do treino, como pão ou tapioca com 2–3 ovos, banana e café.</li>
+<li><b>Ceia (22:30):</b> leve e com proteína: ovos, iogurte, whey com leite. Evite fritura e muito volume à noite, porque atrapalham o sono.</li>
+<li><b>Corte primeiro:</b> refrigerante, suco de caixinha, lanche da rua à noite e açaí com açúcar ou leite condensado.</li>
+<li><b>Marmitas no domingo:</b> economizam dinheiro e evitam comida de rua no trabalho.</li>
+</ul>
+<p><b>Como saber se está funcionando:</b> pese e meça a cintura todo domingo. Se a cintura cai e a força no treino se mantém ou sobe, está certo. Se nada mudou em 3 semanas, diminua um pouco o carboidrato da noite.</p>
+<p><b>Água:</b> com 100 kg, calor de Manaus e treino, a meta é ~3,5 L por dia (14 copos de 250 ml).</p>`],
+
+  ['😴 Sono', `
+<p>Dormindo às 23h e acordando às 6h, você tem <b>7 horas</b>. É o mínimo para ganhar músculo e perder gordura, então cada minuto conta.</p>
+<ul>
+<li><b>Horário fixo</b> nos dias de semana. No fim de semana, o horário segue as lives (veja abaixo).</li>
+<li><b>Live de sábado (20h–0h):</b> dormir até 00:30 e acordar 08:00 no domingo dá 7h30. Tudo certo.</li>
+<li><b>Live de domingo:</b> se for das 20h à 0h, você dorme 00:30 e acorda 06:00 na segunda, só 5h30 de sono, e isso atrapalha a semana inteira de treino. Quando fizer, prefira <b>18h–22h</b> (ou no máximo 19h–23h).</li>
+<li><b>Ao chegar do trabalho:</b> ceia leve, banho morno, quarto escuro e fresco (ar ou ventilador).</li>
+<li><b>Celular fora da cama</b> 15 min antes de dormir. Se precisar, use o modo noturno.</li>
+<li><b>Nada de cafeína depois das 15h.</b></li>
+<li><b>Se estiver muito cansado:</b> um cochilo de 20 min por volta das 11h, antes do almoço, ajuda. Mais que isso atrapalha a noite.</li>
+<li><b>Ronco forte ou acordar cansado mesmo dormindo bem:</b> vale falar com um médico, porque é comum com peso alto e prejudica tudo.</li>
+</ul>`],
+
+  ['🧴 Pele', `
+<p>Moto, sol forte, capacete e suor são os maiores inimigos da pele aqui.</p>
+<ul>
+<li><b>Manhã (depois do banho das 09:20):</b> lave o rosto com sabonete facial suave e passe <b>protetor solar FPS 50</b>. Reaplique antes de sair às 12:35, porque são vários minutos de sol na moto.</li>
+<li><b>Noite (22:40):</b> lave o rosto para tirar o suor e a sujeira do capacete, e passe um hidratante leve (oil-free).</li>
+<li><b>Capacete:</b> lave o forro ou use balaclava e lave toda semana.</li>
+<li><b>Fronha:</b> troque 2× por semana.</li>
+<li><b>Ajudam muito:</b> água, sono e menos açúcar.</li>
+<li><b>Acne, manchas ou espinhas que não passam:</b> procure um dermatologista. Dá para conseguir pelo SUS.</li>
+</ul>`],
+
+  ['🛵 Trajeto passo a passo', ROUTES_HTML],
+
+  ['🔧 Moto (domingo, 09:00)', `
+<ul>
+<li><b>Pneus:</b> calibre toda semana e veja se há desgaste ou prego.</li>
+<li><b>Corrente:</b> limpe e lubrifique a cada ~500 km ou depois de pegar chuva.</li>
+<li><b>Óleo:</b> confira o nível e troque no prazo do manual.</li>
+<li><b>Luzes, freios e buzina:</b> teste tudo.</li>
+<li><b>Lavagem:</b> uma vez por semana, ou a cada 15 dias se estiver sem tempo.</li>
+</ul>`],
+
+  ['💰 Renda extra', `
+<p>Reservei <b>1h30 de segunda a sexta (09:45–11:15)</b>, ou seja, 7h30 por semana de foco, e o domingo à noite para planejar.</p>
+<p>Quando você mandar seus ganhos e gastos, a gente decide o que fazer nesse bloco, por exemplo aproveitar as lives que você já faz. Até lá, use o tempo para listar o que você sabe fazer e o que as pessoas já te pedem.</p>`],
+];
+
+</script>
+  <script>
+'use strict';
+
+// ---------- Estado e armazenamento ----------
+const KEY = 'minha-rotina-v1';
+const APP_VERSION = '2.0';
+// Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
+const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
+const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
+const ICS_BASE = 'victtorbrennon-gif.github.io/Reposit-rio-teste/';
+const CONFIG_FIELDS = ['items', 'presetVersion', 'loads', 'body', 'shop', 'waterGoal', 'startDate'];
+const PERIODS = { manha: '🌅 Manhã', tarde: '☀️ Tarde', noite: '🌙 Noite' };
+const DAY_NAMES = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
+
+const uid = () => Math.random().toString(36).slice(2, 10);
+
+const DEFAULT_STATE = {
+  items: presetItems(),
+  presetVersion: 0, // versão da rotina sugerida (plan.js) já aplicada ou recusada
+  wk: {},     // { 'AAAA-MM-DD': [índices dos exercícios feitos] }
+  loads: {},  // { 'nome do exercício': 'carga' }
+  body: [],   // [{ d: 'AAAA-MM-DD', kg, cm }]
+  shop: {},   // { 'item da lista de compras': true }
+  done: {},   // { 'AAAA-MM-DD': [ids] }
+  water: {},  // { 'AAAA-MM-DD': n }
+  notes: {},  // { 'AAAA-MM-DD': texto }
+  waterGoal: 14,
+  startDate: null, // primeiro dia de uso; dias anteriores não contam nas estatísticas
+};
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) return { ...structuredClone(DEFAULT_STATE), ...JSON.parse(raw) };
+  } catch (e) { /* armazenamento indisponível */ }
+  return { ...structuredClone(DEFAULT_STATE), presetVersion: PRESET_VERSION };
+}
+function saveLocal() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignora */ }
+}
+
+// ---------- Sincronização com o banco do artifact ----------
+// app/config guarda a configuração; days/AAAA-MM-DD guarda o que foi feito em cada dia.
+let db = null;
+let dbReady = false;
+let saveTimer = null;
+let writing = false;
+let pendingSave = false;
+let written = {}; // caminho -> JSON já gravado, pra só escrever o que mudou
+let remoteConfig;  // undefined: ainda não chegou; null: não existe
+let remoteDays = {};
+
+function save() {
+  saveLocal();
+  if (db && dbReady) {
+    clearTimeout(saveTimer);
+    setSync('saving');
+    saveTimer = setTimeout(() => { saveTimer = null; flush(); }, 500);
+  }
+}
+
+function docsFromState() {
+  const out = { 'app/config': Object.fromEntries(CONFIG_FIELDS.map((f) => [f, state[f] ?? null])) };
+  const keys = new Set([...Object.keys(state.done), ...Object.keys(state.water), ...Object.keys(state.notes), ...Object.keys(state.wk)]);
+  for (const k of keys) {
+    out['days/' + k] = { done: state.done[k] || [], water: state.water[k] || 0, note: state.notes[k] || '', wk: state.wk[k] || [] };
+  }
+  return out;
+}
+
+async function flush() {
+  if (writing) { pendingSave = true; return; }
+  writing = true;
+  setSync('saving');
+  try {
+    for (const [path, body] of Object.entries(docsFromState())) {
+      const json = JSON.stringify(body);
+      if (written[path] === json) continue;
+      await db.doc(path).set(body);
+      written[path] = json;
+    }
+    setSync('ok');
+  } catch (e) {
+    setSync(e && e.code === 'quota_exceeded' ? 'full' : 'error');
+  }
+  writing = false;
+  if (pendingSave) { pendingSave = false; flush(); }
+}
+
+function applyRemote() {
+  if (saveTimer || writing || !remoteConfig) return; // edição local em andamento tem prioridade
+  const next = { ...structuredClone(DEFAULT_STATE), done: {}, water: {}, notes: {}, wk: {} };
+  for (const f of CONFIG_FIELDS) if (remoteConfig[f] != null) next[f] = structuredClone(remoteConfig[f]);
+  for (const [k, d] of Object.entries(remoteDays)) {
+    if (d.done && d.done.length) next.done[k] = [...d.done];
+    if (d.water) next.water[k] = d.water;
+    if (d.note) next.notes[k] = d.note;
+    if (d.wk && d.wk.length) next.wk[k] = [...d.wk];
+  }
+  if (!next.startDate) next.startDate = todayKey();
+  state = next;
+  written = Object.fromEntries(Object.entries(docsFromState()).map(([p, b]) => [p, JSON.stringify(b)]));
+  saveLocal();
+  renderAll();
+}
+
+const SYNC_TEXT = {
+  loading: 'Conectando…', saving: 'Salvando…', ok: '☁️ Salvo online',
+  offline: '⚠️ Sem conexão: mostrando dados salvos neste aparelho',
+  error: '⚠️ Não consegui salvar. Tente de novo em instantes.',
+  full: '⚠️ Espaço do app cheio. Avise o Claude.',
+  nodb: '⚠️ Entre na sua conta do Claude para salvar online.',
+};
+function setSync(s) {
+  const n = document.getElementById('sync');
+  if (!n || !IN_CLAUDE) return;
+  n.textContent = SYNC_TEXT[s] || '';
+  n.dataset.state = s;
+}
+
+async function connectDb() {
+  setSync('loading');
+  const timer = setTimeout(() => { if (!dbReady) setSync('offline'); }, 10000);
+  try { db = await window.claude.use('db'); } catch (e) { db = null; }
+  if (!db) { clearTimeout(timer); setSync('nodb'); return; }
+  let gotConfig = false;
+  let gotDays = false;
+  const update = () => {
+    if (gotConfig && gotDays && !dbReady) { dbReady = true; clearTimeout(timer); setSync('ok'); }
+    if (gotConfig && remoteConfig === null) showOnboarding();
+    else if (remoteConfig) { hideOnboarding(); applyRemote(); }
+  };
+  const onErr = () => { clearTimeout(timer); setSync('offline'); };
+  db.doc('app/config').onSnapshot((snap) => {
+    remoteConfig = snap.exists ? snap.data() : null;
+    if (!snap.metadata.fromCache) gotConfig = true;
+    update();
+  }, onErr);
+  db.collection('days').onSnapshot((snap) => {
+    remoteDays = Object.fromEntries(snap.docs.map((d) => [d.id, d.data()]));
+    if (!snap.metadata.fromCache) gotDays = true;
+    update();
+  }, onErr);
+}
+
+// Primeiro acesso ao app novo: começar do zero ou trazer os dados do app antigo
+function showOnboarding() {
+  const box = $('#onboarding');
+  if (!box || !box.hidden) return;
+  box.hidden = false;
+  $('#today-list').hidden = true;
+}
+function hideOnboarding() {
+  const box = $('#onboarding');
+  if (box) box.hidden = true;
+  $('#today-list').hidden = false;
+}
+function startFresh(data) {
+  state = data ? { ...structuredClone(DEFAULT_STATE), ...data } : { ...structuredClone(DEFAULT_STATE), presetVersion: PRESET_VERSION };
+  if (!state.startDate) state.startDate = todayKey();
+  remoteConfig = Object.fromEntries(CONFIG_FIELDS.map((f) => [f, state[f]]));
+  dbReady = true;
+  hideOnboarding();
+  saveLocal();
+  flush();
+  renderAll();
+}
+function parseBackup(txt) {
+  const data = JSON.parse(txt);
+  if (!data || !Array.isArray(data.items)) throw new Error('formato inválido');
+  return data;
+}
+
+// ---------- Diálogos dentro da página ----------
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.hidden = false;
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => { t.hidden = true; }, 3000);
+}
+function ask(msg, okLabel = 'Confirmar') {
+  return new Promise((resolve) => {
+    const box = $('#ask');
+    $('#ask-text').textContent = msg;
+    $('#ask-ok').textContent = okLabel;
+    box.hidden = false;
+    $('#ask-ok').focus();
+    const done = (v) => { box.hidden = true; $('#ask-ok').onclick = $('#ask-cancel').onclick = null; resolve(v); };
+    $('#ask-ok').onclick = () => done(true);
+    $('#ask-cancel').onclick = () => done(false);
+  });
+}
+
+let state = load();
+
+// ---------- Datas ----------
+const pad = (n) => String(n).padStart(2, '0');
+const dateKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const daysAgo = (n) => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - n); return d; };
+const todayKey = () => dateKey(new Date());
+if (!state.startDate) state.startDate = todayKey();
+
+function itemsFor(date) {
+  const wd = date.getDay();
+  return state.items
+    .filter((i) => i.days.includes(wd))
+    .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+}
+
+function dayRatio(date) {
+  if (dateKey(date) < state.startDate) return null;
+  const items = itemsFor(date);
+  if (!items.length) return null;
+  const done = state.done[dateKey(date)] || [];
+  return items.filter((i) => done.includes(i.id)).length / items.length;
+}
+
+// ---------- Utilidades de DOM ----------
+const $ = (s) => document.querySelector(s);
+function el(tag, attrs = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') node.className = v;
+    else if (k.startsWith('on')) node.addEventListener(k.slice(2), v);
+    else if (k === 'style') node.style.cssText = v;
+    else node.setAttribute(k, v);
+  }
+  for (const c of children.flat()) if (c != null) node.append(c);
+  return node;
+}
+
+// ---------- Aba Hoje ----------
+function renderHeader() {
+  const now = new Date();
+  const h = now.getHours();
+  $('#greeting').textContent = h < 12 ? 'Bom dia ☀️' : h < 18 ? 'Boa tarde 🌤️' : 'Boa noite 🌙';
+  const label = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  $('#today-label').textContent = label.charAt(0).toUpperCase() + label.slice(1);
+  const r = dayRatio(now);
+  const pct = Math.round((r ?? 0) * 100);
+  $('#ring-fg').style.strokeDashoffset = 100 - pct;
+  $('#ring-text').textContent = `${pct}%`;
+}
+
+function toggleDone(id) {
+  const k = todayKey();
+  const list = state.done[k] || [];
+  state.done[k] = list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
+  save();
+  renderToday();
+}
+
+function renderToday() {
+  renderHeader();
+  const wrap = $('#today-list');
+  wrap.innerHTML = '';
+  if ((state.presetVersion || 0) < PRESET_VERSION) {
+    wrap.append(el('div', { class: 'card banner' },
+      el('b', {}, '✨ Sua rotina personalizada está pronta'),
+      el('p', { class: 'muted small' }, 'Troca as atividades atuais pela rotina sugerida (com rotas, horário da academia e lives). Se você editou alguma atividade, vai precisar refazer. O histórico de progresso é mantido.'),
+      el('div', { class: 'row' },
+        el('button', { class: 'btn ghost', onclick: () => { state.presetVersion = PRESET_VERSION; save(); renderToday(); } }, 'Agora não'),
+        el('button', { class: 'btn grow', onclick: () => {
+          state.items = presetItems();
+          state.presetVersion = PRESET_VERSION;
+          state.waterGoal = Math.max(state.waterGoal, 14);
+          save(); renderToday();
+        } }, 'Aplicar rotina'),
+      ),
+    ));
+  }
+  const items = itemsFor(new Date());
+  const done = state.done[todayKey()] || [];
+  if (!items.length) {
+    wrap.append(el('div', { class: 'empty' }, 'Nada programado pra hoje. Adicione atividades na aba Rotina 🗓️'));
+  }
+  for (const [p, label] of Object.entries(PERIODS)) {
+    const group = items.filter((i) => i.period === p);
+    if (!group.length) continue;
+    wrap.append(el('h3', {}, label));
+    for (const it of group) {
+      const isDone = done.includes(it.id);
+      wrap.append(el('div', {
+        class: 'task' + (isDone ? ' done' : ''), role: 'checkbox', 'aria-checked': String(isDone), tabindex: '0',
+        onclick: () => toggleDone(it.id),
+        onkeydown: (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleDone(it.id); } },
+      },
+        el('span', { class: 'check' }, isDone ? '✓' : ''),
+        el('span', { class: 't-title' }, it.title),
+        it.time ? el('span', { class: 't-time' }, it.time) : null,
+      ));
+    }
+  }
+
+  // água
+  const n = state.water[todayKey()] || 0;
+  const goal = state.waterGoal;
+  $('#water-label').textContent = `${n} / ${goal} copos`;
+  const w = $('#water');
+  w.innerHTML = '';
+  for (let i = 0; i < Math.max(goal, n); i++) w.append(el('i', { class: i < n ? 'full' : '' }));
+
+  // nota
+  const note = $('#note');
+  if (document.activeElement !== note) note.value = state.notes[todayKey()] || '';
+}
+
+function changeWater(delta) {
+  const k = todayKey();
+  state.water[k] = Math.max(0, (state.water[k] || 0) + delta);
+  save();
+  renderToday();
+}
+
+let noteTimer;
+function onNoteInput(e) {
+  clearTimeout(noteTimer);
+  $('#note-saved').textContent = '…';
+  noteTimer = setTimeout(() => {
+    const v = e.target.value.trim();
+    if (v) state.notes[todayKey()] = e.target.value; else delete state.notes[todayKey()];
+    save();
+    $('#note-saved').textContent = 'salvo ✓';
+  }, 400);
+}
+
+// ---------- Aba Rotina ----------
+let formDays = new Set(ALL_DAYS);
+
+function renderDayPicker() {
+  const wrap = $('#f-days');
+  wrap.innerHTML = '';
+  DAY_NAMES.forEach((name, i) => {
+    wrap.append(el('button', {
+      type: 'button', class: formDays.has(i) ? 'on' : '', 'aria-pressed': String(formDays.has(i)),
+      onclick: () => { formDays.has(i) ? formDays.delete(i) : formDays.add(i); renderDayPicker(); },
+    }, name));
+  });
+}
+
+function describeDays(days) {
+  if (days.length === 7) return 'Todos os dias';
+  const s = [...days].sort().join(',');
+  if (s === '1,2,3,4,5') return 'Seg a sex';
+  if (s === '0,6') return 'Fim de semana';
+  const full = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  return [...days].sort().map((d) => full[d]).join(', ');
+}
+
+function resetForm() {
+  $('#item-form').reset();
+  $('#f-id').value = '';
+  formDays = new Set(ALL_DAYS);
+  $('#form-title').textContent = 'Nova atividade';
+  $('#f-submit').textContent = 'Adicionar';
+  $('#f-cancel').hidden = true;
+  renderDayPicker();
+}
+
+function editItem(it) {
+  $('#f-id').value = it.id;
+  $('#f-title').value = it.title;
+  $('#f-period').value = it.period;
+  $('#f-time').value = it.time || '';
+  formDays = new Set(it.days);
+  $('#form-title').textContent = 'Editar atividade';
+  $('#f-submit').textContent = 'Salvar';
+  $('#f-cancel').hidden = false;
+  renderDayPicker();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  $('#f-title').focus();
+}
+
+function onSubmit(e) {
+  e.preventDefault();
+  const title = $('#f-title').value.trim();
+  if (!title) return;
+  if (!formDays.size) { toast('Escolha pelo menos um dia.'); return; }
+  const data = { title, period: $('#f-period').value, time: $('#f-time').value, days: [...formDays].sort() };
+  const id = $('#f-id').value;
+  if (id) Object.assign(state.items.find((i) => i.id === id), data);
+  else state.items.push({ id: uid(), ...data });
+  save();
+  resetForm();
+  renderManage();
+}
+
+async function deleteItem(it) {
+  if (!(await ask(`Remover "${it.title}"?`, 'Remover'))) return;
+  state.items = state.items.filter((i) => i.id !== it.id);
+  save();
+  renderManage();
+}
+
+function renderManage() {
+  const wrap = $('#manage-list');
+  wrap.innerHTML = '';
+  for (const [p, label] of Object.entries(PERIODS)) {
+    const group = state.items.filter((i) => i.period === p)
+      .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+    if (!group.length) continue;
+    wrap.append(el('h3', {}, label));
+    for (const it of group) {
+      wrap.append(el('div', { class: 'manage-item' },
+        el('div', { class: 'info' },
+          el('div', {}, it.title),
+          el('small', {}, [it.time, describeDays(it.days)].filter(Boolean).join(' · ')),
+        ),
+        el('button', { class: 'icon-btn', 'aria-label': 'Editar', onclick: () => editItem(it) }, '✏️'),
+        el('button', { class: 'icon-btn', 'aria-label': 'Remover', onclick: () => deleteItem(it) }, '🗑️'),
+      ));
+    }
+  }
+  if (!state.items.length) wrap.append(el('div', { class: 'empty' }, 'Nenhuma atividade ainda.'));
+}
+
+// ---------- Aba Plano ----------
+let planDay = new Date().getDay();
+
+function renderPlan() {
+  const chips = $('#plan-days');
+  chips.innerHTML = '';
+  const names = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  [1, 2, 3, 4, 5, 6, 0].forEach((d) => {
+    chips.append(el('button', {
+      type: 'button', class: d === planDay ? 'on' : '', 'aria-pressed': String(d === planDay),
+      onclick: () => { planDay = d; renderPlan(); },
+    }, names[d]));
+  });
+
+  const w = WORKOUTS[planDay];
+  const isToday = planDay === new Date().getDay();
+  const k = todayKey();
+  const doneList = (isToday && state.wk[k]) || [];
+  $('#plan-title').textContent = w.title;
+  $('#plan-sub').textContent = isToday ? `Hoje · ${doneList.length}/${w.ex.length} feitos` : 'Toque em hoje para marcar';
+
+  const list = $('#plan-list');
+  list.innerHTML = '';
+  w.ex.forEach(([name, sets, rest], i) => {
+    const done = doneList.includes(i);
+    const toggle = () => {
+      if (!isToday) return;
+      const cur = state.wk[k] || [];
+      state.wk[k] = cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i];
+      save(); renderPlan();
+    };
+    const load = el('input', {
+      class: 'load', inputmode: 'decimal', placeholder: 'kg', 'aria-label': `Carga de ${name}`,
+      onclick: (e) => e.stopPropagation(),
+      onchange: (e) => { const v = e.target.value.trim(); if (v) state.loads[name] = v; else delete state.loads[name]; save(); },
+    });
+    load.value = state.loads[name] || '';
+    const isCardio = !rest || /cardio|caminhada|alongamento/i.test(name);
+    list.append(el('div', {
+      class: 'task ex' + (done ? ' done' : '') + (isToday ? '' : ' readonly'),
+      role: 'checkbox', 'aria-checked': String(done), tabindex: isToday ? '0' : '-1',
+      onclick: toggle,
+      onkeydown: (e) => { if (e.target === e.currentTarget && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); toggle(); } },
+    },
+      el('span', { class: 'check' }, done ? '✓' : ''),
+      el('span', { class: 't-title' }, name, el('small', {}, [sets, rest && `descanso ${rest}`].filter(Boolean).join(' · '))),
+      isCardio ? null : load,
+    ));
+  });
+
+  renderShopping();
+  const g = $('#guides');
+  if (!g.childElementCount) {
+    const tips = el('details', { class: 'card guide' }, el('summary', {}, '🏋️ Como treinar e progredir'));
+    tips.insertAdjacentHTML('beforeend', TRAINING_TIPS);
+    g.append(tips);
+    for (const [title, html] of GUIDES) {
+      const d = el('details', { class: 'card guide' }, el('summary', {}, title));
+      d.insertAdjacentHTML('beforeend', html);
+      g.append(d);
+    }
+  }
+}
+
+// ---------- Lista de compras ----------
+function renderShopping() {
+  const box = $('#shopping');
+  const wasOpen = box.querySelector('details')?.open;
+  box.innerHTML = '';
+  state.shop = state.shop || {};
+  const total = SHOPPING.reduce((s, [, , items]) => s + items.length, 0);
+  const got = SHOPPING.reduce((s, [, , items]) => s + items.filter((i) => state.shop[i]).length, 0);
+  const d = el('details', { class: 'card guide' }, el('summary', {}, `🛒 Lista de compras (${got}/${total})`));
+  if (wasOpen) d.open = true;
+  d.append(el('p', { class: 'muted small' }, SHOPPING_TIPS));
+  for (const [group, weekly, items] of SHOPPING) {
+    d.append(el('h3', {}, group));
+    for (const item of items) {
+      const id = 'shop-' + item.replace(/\W+/g, '-');
+      const cb = el('input', { type: 'checkbox', id, onchange: (e) => {
+        if (e.target.checked) state.shop[item] = true; else delete state.shop[item];
+        save(); renderShopping();
+      } });
+      cb.checked = !!state.shop[item];
+      d.append(el('label', { class: 'shop-item' + (cb.checked ? ' got' : ''), for: id }, cb, el('span', {}, item)));
+    }
+  }
+  d.append(el('button', { class: 'btn ghost', type: 'button', style: 'width:100%;margin-top:12px', onclick: () => {
+    for (const [, weekly, items] of SHOPPING) if (weekly) items.forEach((i) => delete state.shop[i]);
+    save(); renderShopping();
+  } }, 'Desmarcar o mercado da semana'));
+  box.append(d);
+}
+
+// ---------- Peso e cintura ----------
+function renderBody() {
+  const list = $('#body-list');
+  list.innerHTML = '';
+  const rows = [...state.body].sort((a, b) => b.d.localeCompare(a.d)).slice(0, 8);
+  if (!rows.length) list.append(el('p', { class: 'muted small' }, 'Nenhum registro ainda. Meça todo domingo, em jejum.'));
+  rows.forEach((r, idx) => {
+    const prev = rows[idx + 1];
+    const diff = (v, p, unit) => (p == null || v == null ? '' : ` (${v - p > 0 ? '+' : ''}${(v - p).toFixed(1).replace('.', ',')}${unit})`);
+    list.append(el('div', { class: 'body-row' },
+      el('span', {}, r.d.split('-').reverse().slice(0, 2).join('/')),
+      el('span', {}, r.kg != null ? `${String(r.kg).replace('.', ',')} kg${diff(r.kg, prev && prev.kg, '')}` : '–'),
+      el('span', {}, r.cm != null ? `${String(r.cm).replace('.', ',')} cm${diff(r.cm, prev && prev.cm, '')}` : '–'),
+      el('button', { class: 'icon-btn', 'aria-label': 'Apagar registro', onclick: async () => {
+        if (!(await ask('Apagar este registro?', 'Apagar'))) return;
+        state.body = state.body.filter((x) => x !== r); save(); renderBody();
+      } }, '✕'),
+    ));
+  });
+}
+
+function onBodySubmit(e) {
+  e.preventDefault();
+  const num = (s) => { const v = parseFloat(String(s).replace(',', '.')); return Number.isFinite(v) ? v : null; };
+  const kg = num($('#b-kg').value), cm = num($('#b-cm').value);
+  if (kg == null && cm == null) return;
+  const d = todayKey();
+  state.body = state.body.filter((x) => x.d !== d);
+  state.body.push({ d, kg, cm });
+  save();
+  e.target.reset();
+  renderBody();
+}
+
+// ---------- Aba Progresso ----------
+function renderProgress() {
+  // sequência: dias consecutivos (contando de ontem, ou de hoje se já ≥80%) com ≥80%
+  let streak = 0;
+  const todayR = dayRatio(daysAgo(0));
+  for (let i = todayR !== null && todayR >= 0.8 ? 0 : 1; i < 365; i++) {
+    const r = dayRatio(daysAgo(i));
+    if (r === null) continue; // dia sem atividades não quebra a sequência
+    if (r >= 0.8) streak++; else break;
+  }
+  $('#st-streak').textContent = streak;
+
+  const week = [];
+  for (let i = 6; i >= 0; i--) week.push({ d: daysAgo(i), r: dayRatio(daysAgo(i)) });
+  const valid = week.filter((x) => x.r !== null);
+  const avg = valid.length ? valid.reduce((s, x) => s + x.r, 0) / valid.length : 0;
+  $('#st-week').textContent = `${Math.round(avg * 100)}%`;
+
+  let perfect = 0;
+  for (let i = 0; i < 30; i++) if (dayRatio(daysAgo(i)) === 1) perfect++;
+  $('#st-perfect').textContent = perfect;
+
+  const bars = $('#bars');
+  bars.innerHTML = '';
+  for (const { d, r } of week) {
+    const pct = Math.round((r ?? 0) * 100);
+    bars.append(el('div', { class: 'bar', title: `${pct}%` },
+      el('small', {}, r === null ? '–' : `${pct}%`),
+      el('div', { class: 'fill', style: `height:${pct}%` }),
+      el('small', {}, d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')),
+    ));
+  }
+
+  const heat = $('#heat');
+  heat.innerHTML = '';
+  for (let i = 29; i >= 0; i--) {
+    const d = daysAgo(i);
+    const r = dayRatio(d);
+    const cell = el('div', { title: `${d.toLocaleDateString('pt-BR')}: ${r === null ? 'sem atividades' : Math.round(r * 100) + '%'}` });
+    if (r) cell.style.background = `color-mix(in srgb, var(--accent) ${Math.round(20 + r * 80)}%, transparent)`;
+    heat.append(cell);
+  }
+
+  const per = $('#per-item');
+  per.innerHTML = '';
+  for (const it of state.items) {
+    let total = 0, ok = 0;
+    for (let i = 0; i < 30; i++) {
+      const d = daysAgo(i);
+      if (dateKey(d) < state.startDate || !it.days.includes(d.getDay())) continue;
+      total++;
+      if ((state.done[dateKey(d)] || []).includes(it.id)) ok++;
+    }
+    const pct = total ? Math.round((ok / total) * 100) : 0;
+    per.append(el('div', { class: 'per-item' },
+      el('div', { class: 'lbl' }, el('span', {}, it.title), el('span', { class: 'muted' }, `${ok}/${total}`)),
+      el('div', { class: 'track' }, el('div', { style: `width:${pct}%` })),
+    ));
+  }
+  if (!state.items.length) per.append(el('div', { class: 'empty' }, 'Sem atividades.'));
+
+  $('#water-goal').value = state.waterGoal;
+  renderBody();
+}
+
+// Resumo dos últimos 7 dias completos (até ontem), pra colar na conversa com o Claude
+function weeklySummary() {
+  const fmt = (d) => d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', '');
+  const days = [];
+  for (let i = 7; i >= 1; i--) days.push(daysAgo(i));
+  const L = [`RESUMO DA SEMANA (${fmt(days[0])} a ${fmt(days[6])})`, ''];
+
+  L.push('DIAS:');
+  const ratios = [];
+  for (const d of days) {
+    const r = dayRatio(d);
+    if (r !== null) ratios.push(r);
+    const k = dateKey(d);
+    const w = WORKOUTS[d.getDay()];
+    const wk = (state.wk[k] || []).length;
+    L.push(`- ${fmt(d)}: ${r === null ? 'sem registro' : Math.round(r * 100) + '%'} · treino ${wk}/${w.ex.length} (${w.title}) · água ${state.water[k] || 0}/${state.waterGoal}`);
+  }
+  if (ratios.length) L.push(`Média: ${Math.round(ratios.reduce((s, x) => s + x, 0) / ratios.length * 100)}%`);
+
+  L.push('', 'POR ATIVIDADE (feito/programado):');
+  const missed = [];
+  for (const it of state.items) {
+    let total = 0, ok = 0;
+    for (const d of days) {
+      if (dateKey(d) < state.startDate || !it.days.includes(d.getDay())) continue;
+      total++;
+      if ((state.done[dateKey(d)] || []).includes(it.id)) ok++;
+    }
+    if (!total) continue;
+    L.push(`- ${it.title}${it.time ? ' (' + it.time + ')' : ''}: ${ok}/${total}`);
+    if (ok / total < 0.5) missed.push(it.title);
+  }
+  if (missed.length) L.push('', 'MENOS DA METADE DAS VEZES:', ...missed.map((m) => '- ' + m));
+
+  const loads = Object.entries(state.loads);
+  if (loads.length) L.push('', 'CARGAS ATUAIS:', ...loads.map(([n, v]) => `- ${n}: ${v} kg`));
+
+  const body = [...state.body].sort((x, y) => x.d.localeCompare(y.d)).slice(-4);
+  if (body.length) L.push('', 'PESO/CINTURA (últimos registros):', ...body.map((b) => `- ${b.d.split('-').reverse().join('/')}: ${b.kg ?? '–'} kg · ${b.cm ?? '–'} cm`));
+
+  const notes = days.filter((d) => state.notes[dateKey(d)]).map((d) => `- ${fmt(d)}: ${state.notes[dateKey(d)].trim().replace(/\s+/g, ' ')}`);
+  if (notes.length) L.push('', 'NOTAS:', ...notes);
+
+  L.push('', 'Como me senti na semana (sono, energia, dores, fome): ');
+  return L.join('\n');
+}
+
+async function shareSummary() {
+  const text = weeklySummary();
+  if (!IN_CLAUDE) {
+    try {
+      if (navigator.share) { await navigator.share({ text }); return; }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Resumo copiado ✓ Cole na conversa com o Claude.');
+  } catch (e) {
+    const box = $('#summary-box');
+    box.hidden = false; box.value = text; box.focus(); box.select();
+  }
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = el('a', { href: URL.createObjectURL(blob), download: `minha-rotina-${todayKey()}.json` });
+  document.body.append(a);
+  a.click();
+  a.remove();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  file.text().then(async (txt) => {
+    const data = parseBackup(txt);
+    if (!(await ask('Substituir os dados atuais pelos do arquivo?', 'Substituir'))) return;
+    state = { ...structuredClone(DEFAULT_STATE), ...data };
+    save();
+    renderAll();
+    toast('Dados importados ✓');
+  }).catch(() => toast('Não consegui ler esse arquivo.'))
+    .finally(() => { e.target.value = ''; });
+}
+
+async function copyText(text, okMsg, fallbackBox) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast(okMsg);
+  } catch (e) {
+    if (fallbackBox) { fallbackBox.hidden = false; fallbackBox.value = text; fallbackBox.focus(); fallbackBox.select(); }
+  }
+}
+
+// ---------- Navegação ----------
+let currentView = 'hoje';
+function show(view) {
+  currentView = view;
+  document.querySelectorAll('.view').forEach((v) => { v.hidden = v.id !== `view-${view}`; });
+  document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+  renderAll();
+  window.scrollTo(0, 0);
+}
+function renderAll() {
+  renderHeader();
+  if (currentView === 'hoje') renderToday();
+  if (currentView === 'plano') renderPlan();
+  if (currentView === 'rotina') renderManage();
+  if (currentView === 'progresso') renderProgress();
+}
+
+// ---------- Inicialização ----------
+document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
+$('#water-plus').addEventListener('click', () => changeWater(1));
+$('#water-minus').addEventListener('click', () => changeWater(-1));
+$('#note').addEventListener('input', onNoteInput);
+$('#item-form').addEventListener('submit', onSubmit);
+$('#f-cancel').addEventListener('click', resetForm);
+$('#export').addEventListener('click', exportData);
+$('#body-form').addEventListener('submit', onBodySubmit);
+$('#share-summary').addEventListener('click', shareSummary);
+document.querySelectorAll('.cal-link').forEach((link) => { link.href = 'webcal://' + ICS_BASE + link.dataset.file; });
+document.querySelectorAll('.cal-copy').forEach((b) => b.addEventListener('click', () =>
+  copyText('https://' + ICS_BASE + b.dataset.file, 'Link copiado ✓', $('#cal-url-box'))));
+$('#app-version').textContent = `Versão ${APP_VERSION}`;
+$('#update-app').addEventListener('click', async () => {
+  $('#update-app').textContent = 'Atualizando…';
+  try {
+    if ('serviceWorker' in navigator) {
+      for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+    }
+    if (window.caches) for (const k of await caches.keys()) await caches.delete(k);
+  } catch (e) { /* segue pro reload */ }
+  location.reload();
+});
+$('#import').addEventListener('change', importData);
+$('#ob-fresh').addEventListener('click', () => startFresh());
+$('#ob-import').addEventListener('click', async () => {
+  try {
+    const data = parseBackup($('#ob-paste').value);
+    if (!(await ask('Trazer estes dados para o app novo?', 'Trazer dados'))) return;
+    startFresh(data);
+    toast('Dados importados ✓');
+  } catch (e) { toast('Não reconheci esse texto. Copie de novo no app antigo.'); }
+});
+$('#ob-file').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  file.text().then((txt) => { startFresh(parseBackup(txt)); toast('Dados importados ✓'); })
+    .catch(() => toast('Não consegui ler esse arquivo.'))
+    .finally(() => { e.target.value = ''; });
+});
+$('#move-copy').addEventListener('click', () =>
+  copyText(JSON.stringify(state), 'Dados copiados ✓ Agora abra o app novo e cole.', $('#move-box')));
+$('#move-link').href = NEW_APP_URL;
+$('#move-url').textContent = NEW_APP_URL;
+$('#water-goal').addEventListener('change', (e) => {
+  state.waterGoal = Math.min(30, Math.max(1, parseInt(e.target.value, 10) || 8));
+  save();
+});
+
+// Atualiza quando o dia vira ou o app volta ao primeiro plano
+let lastDay = todayKey();
+setInterval(() => { if (todayKey() !== lastDay) { lastDay = todayKey(); renderAll(); } }, 60_000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) renderAll(); });
+
+document.body.classList.toggle('in-claude', IN_CLAUDE);
+resetForm();
+saveLocal();
+renderAll();
+
+if (IN_CLAUDE) {
+  connectDb();
+} else if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+</script>

@@ -14,6 +14,7 @@
   <header class="topbar">
     <div>
       <p class="greeting" id="greeting">Olá!</p>
+      <p class="sync claude-only" id="sync" aria-live="polite"></p>
       <h1 id="today-label">Hoje</h1>
     </div>
     <div class="ring" id="ring" aria-label="Progresso do dia">
@@ -25,6 +26,40 @@
   <main>
     <!-- HOJE -->
     <section class="view" id="view-hoje">
+      <div class="card banner web-only" id="move">
+        <b>📦 O app mudou de endereço</b>
+        <p class="muted small">O app novo salva seus dados online e o Claude acompanha sua semana direto. Este app antigo não recebe mais atualizações.</p>
+        <ol class="small">
+          <li>Toque em <b>Copiar meus dados</b>.</li>
+          <li>Abra o app novo e, no primeiro acesso, toque em <b>Trazer os dados do app antigo</b> e cole.</li>
+        </ol>
+        <div class="row">
+          <button class="btn ghost grow" id="move-copy" type="button">Copiar meus dados</button>
+          <a class="btn grow" id="move-link" target="_blank" rel="noopener">Abrir app novo</a>
+        </div>
+        <p class="small muted">Link do app novo: <span class="selectable" id="move-url"></span></p>
+        <textarea id="move-box" rows="4" hidden aria-label="Seus dados"></textarea>
+      </div>
+
+      <div class="card banner" id="onboarding" hidden>
+        <b>👋 Bem-vindo ao app novo</b>
+        <p class="muted small">Agora seus dados ficam salvos online, na sua conta do Claude. Nas revisões de segunda, o Claude já vê sua semana sem você precisar colar nada.</p>
+        <button class="btn" id="ob-fresh" type="button" style="width:100%">Começar com a rotina sugerida</button>
+        <details class="ob-import">
+          <summary class="small">Trazer os dados do app antigo</summary>
+          <ol class="small">
+            <li>Abra o app antigo (o ícone que está na tela inicial).</li>
+            <li>Na aba <b>Hoje</b>, toque em <b>Copiar meus dados</b>.</li>
+            <li>Volte aqui, cole no campo abaixo e toque em <b>Trazer dados</b>.</li>
+          </ol>
+          <textarea id="ob-paste" rows="4" placeholder="Cole aqui os dados copiados" aria-label="Dados do app antigo"></textarea>
+          <div class="row">
+            <label class="btn ghost grow file">Escolher arquivo<input type="file" id="ob-file" accept="application/json"></label>
+            <button class="btn grow" id="ob-import" type="button">Trazer dados</button>
+          </div>
+        </details>
+      </div>
+
       <div id="today-list"></div>
 
       <div class="card">
@@ -117,6 +152,12 @@
             <li>Desligue <b>Remover Alertas</b>. Faça o mesmo em <b>Água</b>.</li>
             <li>Em <b>Ajustes → Notificações → Calendário</b>, deixe as notificações ligadas.</li>
           </ol>
+          <p class="small">Se o botão não abrir o Calendário: em <b>Ajustes → Apps → Calendário → Contas → Adicionar Conta → Outra → Adicionar Calendário Assinado</b>, cole o link:</p>
+          <div class="row">
+            <button class="btn ghost grow cal-copy" type="button" data-file="rotina.ics">Copiar link da Rotina</button>
+            <button class="btn ghost grow cal-copy" type="button" data-file="agua.ics">Copiar link da Água</button>
+          </div>
+          <textarea id="cal-url-box" rows="2" hidden aria-label="Link do calendário"></textarea>
           <p class="small muted">Os lembretes seguem a rotina sugerida. Quando o Claude ajustar a rotina nas revisões de segunda, eles se atualizam sozinhos. Mudanças que você fizer à mão na aba Rotina não vão para o calendário.</p>
         </details>
       </div>
@@ -151,19 +192,30 @@
         <h2>Backup</h2>
         <p class="muted small">Os dados ficam só neste aparelho. Exporte para guardar uma cópia ou passar para outro celular.</p>
         <div class="row">
-          <button class="btn ghost grow" id="export">Exportar</button>
+          <button class="btn ghost grow web-only" id="export">Exportar</button>
           <label class="btn ghost grow file">Importar<input type="file" id="import" accept="application/json"></label>
         </div>
         <label class="inline">Meta de água (copos/dia)
           <input type="number" id="water-goal" min="1" max="30">
         </label>
-        <div class="row version-row">
+        <div class="row version-row web-only">
           <span class="muted small" id="app-version"></span>
           <button class="btn ghost" id="update-app" type="button">🔄 Atualizar app</button>
         </div>
       </div>
     </section>
   </main>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+  <div class="ask-backdrop" id="ask" hidden>
+    <div class="ask card" role="dialog" aria-modal="true" aria-labelledby="ask-text">
+      <p id="ask-text"></p>
+      <div class="row">
+        <button class="btn ghost grow" id="ask-cancel" type="button">Cancelar</button>
+        <button class="btn grow" id="ask-ok" type="button">Confirmar</button>
+      </div>
+    </div>
+  </div>
 
   <nav class="tabs">
     <button data-view="hoje" class="active"><span>✅</span>Hoje</button>

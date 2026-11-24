@@ -12,7 +12,7 @@
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0f1018;
     --card: #1a1b26;
     --text: #ebecf5;
@@ -25,8 +25,21 @@
     color-scheme: dark;
   }
 }
+:root[data-theme="dark"] {
+    --bg: #0f1018;
+    --card: #1a1b26;
+    --text: #ebecf5;
+    --muted: #9599b3;
+    --line: #2b2d3d;
+    --accent: #818cf8;
+    --accent-soft: #2a2c4a;
+    --ok: #4ade80;
+    --danger: #f87171;
+    color-scheme: dark;
+}
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; }
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -184,3 +197,29 @@ legend { font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
 .shop-item { display: flex; gap: 10px; align-items: flex-start; color: var(--text); font-size: .9rem; margin: 0; padding: 8px 2px; border-bottom: 1px solid var(--line); cursor: pointer; }
 .shop-item input { width: 20px; height: 20px; margin: 0; flex: none; accent-color: var(--ok); }
 .shop-item.got span { text-decoration: line-through; color: var(--muted); }
+
+/* app novo (artifact) x app antigo */
+.claude-only { display: none; }
+.in-claude .claude-only { display: block; }
+.in-claude .web-only { display: none !important; }
+.sync { margin: 2px 0 0; font-size: .75rem; color: var(--muted); }
+.sync[data-state="offline"], .sync[data-state="error"], .sync[data-state="full"], .sync[data-state="nodb"] { color: var(--danger); }
+.selectable { user-select: all; word-break: break-all; color: var(--text); }
+#move ol, .ob-import ol { padding-left: 20px; line-height: 1.5; }
+#move-link { text-decoration: none; }
+.ob-import { margin-top: 12px; }
+.ob-import summary { cursor: pointer; color: var(--accent); }
+.ob-import textarea, #move-box, #cal-url-box { margin: 8px 0; }
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px;
+  font-size: .9rem; max-width: calc(100% - 32px); box-shadow: 0 4px 16px rgb(0 0 0 / .2);
+}
+.ask-backdrop {
+  position: fixed; inset: 0; z-index: 40; background: rgb(0 0 0 / .45);
+  display: grid; place-items: center; padding: 16px;
+}
+.ask { width: 100%; max-width: 360px; margin: 0; }
+.ask p { margin: 0 0 14px; }
+button:focus-visible, a:focus-visible, .task:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

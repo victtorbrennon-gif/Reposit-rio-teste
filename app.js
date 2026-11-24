@@ -2,7 +2,12 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '1.8';
+const APP_VERSION = '2.0';
+// Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
+const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
+const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
+const ICS_BASE = 'victtorbrennon-gif.github.io/Reposit-rio-teste/';
+const CONFIG_FIELDS = ['items', 'presetVersion', 'loads', 'body', 'shop', 'waterGoal', 'startDate'];
 const PERIODS = { manha: '🌅 Manhã', tarde: '☀️ Tarde', noite: '🌙 Noite' };
 const DAY_NAMES = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
@@ -30,8 +35,161 @@ function load() {
   } catch (e) { /* armazenamento indisponível */ }
   return { ...structuredClone(DEFAULT_STATE), presetVersion: PRESET_VERSION };
 }
-function save() {
+function saveLocal() {
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignora */ }
+}
+
+// ---------- Sincronização com o banco do artifact ----------
+// app/config guarda a configuração; days/AAAA-MM-DD guarda o que foi feito em cada dia.
+let db = null;
+let dbReady = false;
+let saveTimer = null;
+let writing = false;
+let pendingSave = false;
+let written = {}; // caminho -> JSON já gravado, pra só escrever o que mudou
+let remoteConfig;  // undefined: ainda não chegou; null: não existe
+let remoteDays = {};
+
+function save() {
+  saveLocal();
+  if (db && dbReady) {
+    clearTimeout(saveTimer);
+    setSync('saving');
+    saveTimer = setTimeout(() => { saveTimer = null; flush(); }, 500);
+  }
+}
+
+function docsFromState() {
+  const out = { 'app/config': Object.fromEntries(CONFIG_FIELDS.map((f) => [f, state[f] ?? null])) };
+  const keys = new Set([...Object.keys(state.done), ...Object.keys(state.water), ...Object.keys(state.notes), ...Object.keys(state.wk)]);
+  for (const k of keys) {
+    out['days/' + k] = { done: state.done[k] || [], water: state.water[k] || 0, note: state.notes[k] || '', wk: state.wk[k] || [] };
+  }
+  return out;
+}
+
+async function flush() {
+  if (writing) { pendingSave = true; return; }
+  writing = true;
+  setSync('saving');
+  try {
+    for (const [path, body] of Object.entries(docsFromState())) {
+      const json = JSON.stringify(body);
+      if (written[path] === json) continue;
+      await db.doc(path).set(body);
+      written[path] = json;
+    }
+    setSync('ok');
+  } catch (e) {
+    setSync(e && e.code === 'quota_exceeded' ? 'full' : 'error');
+  }
+  writing = false;
+  if (pendingSave) { pendingSave = false; flush(); }
+}
+
+function applyRemote() {
+  if (saveTimer || writing || !remoteConfig) return; // edição local em andamento tem prioridade
+  const next = { ...structuredClone(DEFAULT_STATE), done: {}, water: {}, notes: {}, wk: {} };
+  for (const f of CONFIG_FIELDS) if (remoteConfig[f] != null) next[f] = structuredClone(remoteConfig[f]);
+  for (const [k, d] of Object.entries(remoteDays)) {
+    if (d.done && d.done.length) next.done[k] = [...d.done];
+    if (d.water) next.water[k] = d.water;
+    if (d.note) next.notes[k] = d.note;
+    if (d.wk && d.wk.length) next.wk[k] = [...d.wk];
+  }
+  if (!next.startDate) next.startDate = todayKey();
+  state = next;
+  written = Object.fromEntries(Object.entries(docsFromState()).map(([p, b]) => [p, JSON.stringify(b)]));
+  saveLocal();
+  renderAll();
+}
+
+const SYNC_TEXT = {
+  loading: 'Conectando…', saving: 'Salvando…', ok: '☁️ Salvo online',
+  offline: '⚠️ Sem conexão: mostrando dados salvos neste aparelho',
+  error: '⚠️ Não consegui salvar. Tente de novo em instantes.',
+  full: '⚠️ Espaço do app cheio. Avise o Claude.',
+  nodb: '⚠️ Entre na sua conta do Claude para salvar online.',
+};
+function setSync(s) {
+  const n = document.getElementById('sync');
+  if (!n || !IN_CLAUDE) return;
+  n.textContent = SYNC_TEXT[s] || '';
+  n.dataset.state = s;
+}
+
+async function connectDb() {
+  setSync('loading');
+  const timer = setTimeout(() => { if (!dbReady) setSync('offline'); }, 10000);
+  try { db = await window.claude.use('db'); } catch (e) { db = null; }
+  if (!db) { clearTimeout(timer); setSync('nodb'); return; }
+  let gotConfig = false;
+  let gotDays = false;
+  const update = () => {
+    if (gotConfig && gotDays && !dbReady) { dbReady = true; clearTimeout(timer); setSync('ok'); }
+    if (gotConfig && remoteConfig === null) showOnboarding();
+    else if (remoteConfig) { hideOnboarding(); applyRemote(); }
+  };
+  const onErr = () => { clearTimeout(timer); setSync('offline'); };
+  db.doc('app/config').onSnapshot((snap) => {
+    remoteConfig = snap.exists ? snap.data() : null;
+    if (!snap.metadata.fromCache) gotConfig = true;
+    update();
+  }, onErr);
+  db.collection('days').onSnapshot((snap) => {
+    remoteDays = Object.fromEntries(snap.docs.map((d) => [d.id, d.data()]));
+    if (!snap.metadata.fromCache) gotDays = true;
+    update();
+  }, onErr);
+}
+
+// Primeiro acesso ao app novo: começar do zero ou trazer os dados do app antigo
+function showOnboarding() {
+  const box = $('#onboarding');
+  if (!box || !box.hidden) return;
+  box.hidden = false;
+  $('#today-list').hidden = true;
+}
+function hideOnboarding() {
+  const box = $('#onboarding');
+  if (box) box.hidden = true;
+  $('#today-list').hidden = false;
+}
+function startFresh(data) {
+  state = data ? { ...structuredClone(DEFAULT_STATE), ...data } : { ...structuredClone(DEFAULT_STATE), presetVersion: PRESET_VERSION };
+  if (!state.startDate) state.startDate = todayKey();
+  remoteConfig = Object.fromEntries(CONFIG_FIELDS.map((f) => [f, state[f]]));
+  dbReady = true;
+  hideOnboarding();
+  saveLocal();
+  flush();
+  renderAll();
+}
+function parseBackup(txt) {
+  const data = JSON.parse(txt);
+  if (!data || !Array.isArray(data.items)) throw new Error('formato inválido');
+  return data;
+}
+
+// ---------- Diálogos dentro da página ----------
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.hidden = false;
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => { t.hidden = true; }, 3000);
+}
+function ask(msg, okLabel = 'Confirmar') {
+  return new Promise((resolve) => {
+    const box = $('#ask');
+    $('#ask-text').textContent = msg;
+    $('#ask-ok').textContent = okLabel;
+    box.hidden = false;
+    $('#ask-ok').focus();
+    const done = (v) => { box.hidden = true; $('#ask-ok').onclick = $('#ask-cancel').onclick = null; resolve(v); };
+    $('#ask-ok').onclick = () => done(true);
+    $('#ask-cancel').onclick = () => done(false);
+  });
 }
 
 let state = load();
@@ -218,7 +376,7 @@ function onSubmit(e) {
   e.preventDefault();
   const title = $('#f-title').value.trim();
   if (!title) return;
-  if (!formDays.size) { alert('Escolha pelo menos um dia.'); return; }
+  if (!formDays.size) { toast('Escolha pelo menos um dia.'); return; }
   const data = { title, period: $('#f-period').value, time: $('#f-time').value, days: [...formDays].sort() };
   const id = $('#f-id').value;
   if (id) Object.assign(state.items.find((i) => i.id === id), data);
@@ -228,8 +386,8 @@ function onSubmit(e) {
   renderManage();
 }
 
-function deleteItem(it) {
-  if (!confirm(`Remover "${it.title}"?`)) return;
+async function deleteItem(it) {
+  if (!(await ask(`Remover "${it.title}"?`, 'Remover'))) return;
   state.items = state.items.filter((i) => i.id !== it.id);
   save();
   renderManage();
@@ -364,8 +522,8 @@ function renderBody() {
       el('span', {}, r.d.split('-').reverse().slice(0, 2).join('/')),
       el('span', {}, r.kg != null ? `${String(r.kg).replace('.', ',')} kg${diff(r.kg, prev && prev.kg, '')}` : '–'),
       el('span', {}, r.cm != null ? `${String(r.cm).replace('.', ',')} cm${diff(r.cm, prev && prev.cm, '')}` : '–'),
-      el('button', { class: 'icon-btn', 'aria-label': 'Apagar registro', onclick: () => {
-        if (!confirm('Apagar este registro?')) return;
+      el('button', { class: 'icon-btn', 'aria-label': 'Apagar registro', onclick: async () => {
+        if (!(await ask('Apagar este registro?', 'Apagar'))) return;
         state.body = state.body.filter((x) => x !== r); save(); renderBody();
       } }, '✕'),
     ));
@@ -499,12 +657,14 @@ function weeklySummary() {
 
 async function shareSummary() {
   const text = weeklySummary();
-  try {
-    if (navigator.share) { await navigator.share({ text }); return; }
-  } catch (e) { if (e && e.name === 'AbortError') return; }
+  if (!IN_CLAUDE) {
+    try {
+      if (navigator.share) { await navigator.share({ text }); return; }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+  }
   try {
     await navigator.clipboard.writeText(text);
-    alert('Resumo copiado ✓ Cole na conversa com o Claude.');
+    toast('Resumo copiado ✓ Cole na conversa com o Claude.');
   } catch (e) {
     const box = $('#summary-box');
     box.hidden = false; box.value = text; box.focus(); box.select();
@@ -522,16 +682,24 @@ function exportData() {
 function importData(e) {
   const file = e.target.files[0];
   if (!file) return;
-  file.text().then((txt) => {
-    const data = JSON.parse(txt);
-    if (!Array.isArray(data.items)) throw new Error('formato inválido');
-    if (!confirm('Substituir os dados atuais pelos do arquivo?')) return;
+  file.text().then(async (txt) => {
+    const data = parseBackup(txt);
+    if (!(await ask('Substituir os dados atuais pelos do arquivo?', 'Substituir'))) return;
     state = { ...structuredClone(DEFAULT_STATE), ...data };
     save();
     renderAll();
-    alert('Dados importados ✓');
-  }).catch(() => alert('Não consegui ler esse arquivo.'))
+    toast('Dados importados ✓');
+  }).catch(() => toast('Não consegui ler esse arquivo.'))
     .finally(() => { e.target.value = ''; });
+}
+
+async function copyText(text, okMsg, fallbackBox) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast(okMsg);
+  } catch (e) {
+    if (fallbackBox) { fallbackBox.hidden = false; fallbackBox.value = text; fallbackBox.focus(); fallbackBox.select(); }
+  }
 }
 
 // ---------- Navegação ----------
@@ -561,10 +729,9 @@ $('#f-cancel').addEventListener('click', resetForm);
 $('#export').addEventListener('click', exportData);
 $('#body-form').addEventListener('submit', onBodySubmit);
 $('#share-summary').addEventListener('click', shareSummary);
-document.querySelectorAll('.cal-link').forEach((link) => {
-  const base = location.host + location.pathname.replace(/[^/]*$/, '');
-  link.href = (location.protocol === 'https:' ? 'webcal://' : location.protocol + '//') + base + link.dataset.file;
-});
+document.querySelectorAll('.cal-link').forEach((link) => { link.href = 'webcal://' + ICS_BASE + link.dataset.file; });
+document.querySelectorAll('.cal-copy').forEach((b) => b.addEventListener('click', () =>
+  copyText('https://' + ICS_BASE + b.dataset.file, 'Link copiado ✓', $('#cal-url-box'))));
 $('#app-version').textContent = `Versão ${APP_VERSION}`;
 $('#update-app').addEventListener('click', async () => {
   $('#update-app').textContent = 'Atualizando…';
@@ -577,6 +744,26 @@ $('#update-app').addEventListener('click', async () => {
   location.reload();
 });
 $('#import').addEventListener('change', importData);
+$('#ob-fresh').addEventListener('click', () => startFresh());
+$('#ob-import').addEventListener('click', async () => {
+  try {
+    const data = parseBackup($('#ob-paste').value);
+    if (!(await ask('Trazer estes dados para o app novo?', 'Trazer dados'))) return;
+    startFresh(data);
+    toast('Dados importados ✓');
+  } catch (e) { toast('Não reconheci esse texto. Copie de novo no app antigo.'); }
+});
+$('#ob-file').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  file.text().then((txt) => { startFresh(parseBackup(txt)); toast('Dados importados ✓'); })
+    .catch(() => toast('Não consegui ler esse arquivo.'))
+    .finally(() => { e.target.value = ''; });
+});
+$('#move-copy').addEventListener('click', () =>
+  copyText(JSON.stringify(state), 'Dados copiados ✓ Agora abra o app novo e cole.', $('#move-box')));
+$('#move-link').href = NEW_APP_URL;
+$('#move-url').textContent = NEW_APP_URL;
 $('#water-goal').addEventListener('change', (e) => {
   state.waterGoal = Math.min(30, Math.max(1, parseInt(e.target.value, 10) || 8));
   save();
@@ -587,10 +774,13 @@ let lastDay = todayKey();
 setInterval(() => { if (todayKey() !== lastDay) { lastDay = todayKey(); renderAll(); } }, 60_000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) renderAll(); });
 
+document.body.classList.toggle('in-claude', IN_CLAUDE);
 resetForm();
-save();
+saveLocal();
 renderAll();
 
-if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+if (IN_CLAUDE) {
+  connectDb();
+} else if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }

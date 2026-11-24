@@ -1,6 +1,10 @@
 # Minha Rotina
 
-App pessoal (PWA) para acompanhar a rotina diária. Funciona no navegador do celular, pode ser instalado na tela inicial e funciona offline. Não precisa de servidor nem conta: os dados ficam salvos no próprio aparelho.
+App pessoal para acompanhar a rotina diária.
+
+**App atual:** https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH, publicado como artifact do Claude. Os dados ficam salvos online, no banco do artifact (`app/config` e `days/AAAA-MM-DD`), e o Claude consegue ler para as revisões semanais. Para gerar o arquivo publicado: `node tools/build-artifact.js` (sai em `artifact/minha-rotina.html`).
+
+A versão do GitHub Pages (PWA, dados só no aparelho) continua no ar só para mover os dados para o app novo e para servir os calendários `.ics`.
 
 ## O que tem
 
