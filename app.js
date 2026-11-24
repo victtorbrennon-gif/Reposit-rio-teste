@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '1.4';
+const APP_VERSION = '1.5';
 const PERIODS = { manha: '🌅 Manhã', tarde: '☀️ Tarde', noite: '🌙 Noite' };
 const DAY_NAMES = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];

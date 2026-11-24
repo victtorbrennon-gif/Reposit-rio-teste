@@ -124,7 +124,7 @@ const ROUTES = [
     'Vire à <b>direita</b> na <b>Rua Campos Sales</b> · 1,2 km.',
     'Vire à <b>esquerda</b> na <b>Rua 1º de Janeiro</b>. Você já está no Santa Etelvina; siga até o trabalho dela.',
   ] },
-  { title: 'Santa Etelvina → Live Academia', info: '14,4 km · 25–30 min', dest: 'Vitória Supermercado, Avenida Autaz Mirim, Manaus - AM', steps: [
+  { title: 'Santa Etelvina → Live Academia', info: '14,4 km · 25–30 min', dest: 'Live Academia Autaz Mirim, Manaus', steps: [
     'Saia pela <b>Rua Vicente Martins</b> e vire à <b>direita</b> na <b>Av. 7 de Maio</b> · 1,1 km.',
     'Siga em frente: a avenida continua como <b>Av. das Flores</b> · 4,9 km.',
     'No fim, siga pela <b>Rua Fênix</b> e vire à <b>direita</b> na <b>Av. Rouxinol</b> · 350 m.',
@@ -132,7 +132,7 @@ const ROUTES = [
     'Na rotatória, pegue a <b>3ª saída</b> na <b>Av. Camapuã</b>.',
     'Mantenha-se à <b>direita</b> e entre na <b>Av. Autaz Mirim</b> descendo · 850 m. A academia (estacionamento do Vitória, antigo Rodrigues) fica do seu lado. <b>Não precisa fazer o retorno.</b>',
   ] },
-  { title: 'Casa → Live Academia (sábado e dias saindo de casa)', info: '~3,4 km · 7–10 min', dest: 'Vitória Supermercado, Avenida Autaz Mirim, Manaus - AM', steps: [
+  { title: 'Casa → Live Academia (sábado e dias saindo de casa)', info: '~3,4 km · 7–10 min', dest: 'Live Academia Autaz Mirim, Manaus', steps: [
     'Desça pela <b>Rua Papoula</b> e vire à <b>direita</b> na <b>Rua Girassol</b> até a <b>Av. Autaz Mirim</b>.',
     'Na Autaz Mirim, a academia fica do outro lado. Siga até perto da <b>Av. Rei Pelé</b>.',
     'Faça o <b>retorno em frente à delegacia</b>.',
@@ -156,15 +156,15 @@ const ROUTES = [
   ] },
 ];
 
-const mapsLink = (dest) => 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(dest);
+const mapsLink = (dest) => 'https://waze.com/ul?navigate=yes&q=' + encodeURIComponent(dest);
 
 const ROUTES_HTML = `
-<p class="muted">O botão abre o Google Maps saindo de onde você estiver, com trânsito em tempo real.</p>
+<p class="muted">O botão abre o Waze já navegando, saindo de onde você estiver, com o trânsito do momento.</p>
 ${ROUTES.map((r) => `
 <div class="route">
   <p><b>${r.title}</b><br><span class="muted">${r.info}</span></p>
   <ol>${r.steps.map((s) => `<li>${s}</li>`).join('')}</ol>
-  <a class="btn ghost maps" href="${mapsLink(r.dest)}" target="_blank" rel="noopener">🗺️ Abrir no Google Maps</a>
+  <a class="btn ghost maps" href="${mapsLink(r.dest)}" target="_blank" rel="noopener">🚦 Abrir no Waze</a>
 </div>`).join('')}
 <p class="muted small">Pro trajeto ficar exato até a porta, me passe o endereço do trabalho da sua esposa e do seu.</p>`;
 
