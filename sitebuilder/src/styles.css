@@ -108,8 +108,21 @@ nav a:hover{color:var(--ink);background:color-mix(in srgb,var(--ink) 7%,transpar
 @media (min-width:760px){.fixo{left:auto;right:24px;bottom:24px;padding:0 24px}}
 
 /* ================= animações ================= */
-.cortina{position:fixed;inset:0;z-index:var(--z-cortina);background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;pointer-events:none}
-.cortina span{font-family:var(--f-display);font-size:clamp(2rem,7vw,4.5rem);font-weight:var(--h-weight);text-transform:var(--h1-case);padding:0 20px;text-align:center}
+.corte{position:fixed;inset:0;z-index:var(--z-cortina);pointer-events:none;overflow:hidden}
+.corte-metade{position:absolute;left:0;right:0;height:50.5%;background:var(--accent)}
+.corte-metade.cima{top:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:clamp(28px,6vh,64px)}
+.corte-metade.baixo{bottom:0}
+.corte-nome{font-family:var(--f-display);font-size:clamp(2rem,7vw,4.5rem);font-weight:var(--h-weight);text-transform:var(--h1-case);color:var(--accent-ink);padding:0 20px;text-align:center;line-height:1}
+.corte-linha{position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px}
+.corte-tracejado{position:absolute;inset:0;background:repeating-linear-gradient(90deg,var(--accent-ink) 0 10px,transparent 10px 20px);opacity:.45}
+.corte-feito{position:absolute;inset:0;background:var(--accent-ink);transform-origin:left;box-shadow:0 0 12px var(--accent-ink)}
+.corte-tesoura{position:absolute;left:0;top:50%;width:clamp(96px,14vw,150px);margin-top:calc(clamp(96px,14vw,150px) * -.25);color:var(--accent-ink);overflow:visible;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+.tes-sup,.tes-inf{transform-box:view-box;transform-origin:60px 30px}
+.tes-sup{animation:snip-sup .22s ease-in-out infinite alternate}
+.tes-inf{animation:snip-inf .22s ease-in-out infinite alternate}
+@keyframes snip-sup{from{transform:rotate(-18deg)}to{transform:rotate(1deg)}}
+@keyframes snip-inf{from{transform:rotate(18deg)}to{transform:rotate(-1deg)}}
+.tes-pino{fill:var(--accent)}
 
 .magnetico{display:inline-flex}
 .brilha{position:relative;overflow:hidden;isolation:isolate}

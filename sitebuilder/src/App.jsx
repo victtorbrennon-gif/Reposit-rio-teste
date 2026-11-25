@@ -91,7 +91,9 @@ function BotaoWA() {
   );
 }
 
-const DEPOIS = 1.25;
+// espera a tesoura cortar e a cortina abrir (só na primeira visita da sessão)
+const VIU_ABERTURA = (() => { try { return !!sessionStorage.getItem("abertura-vista"); } catch { return false; } })();
+const DEPOIS = VIU_ABERTURA ? 0.15 : 1.35;
 
 /* imagem com zoom suave e leve parallax dentro da moldura */
 function Parallax({ src }) {
@@ -100,7 +102,7 @@ function Parallax({ src }) {
   const y = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.25, 1.12, 1.2]);
   return <motion.img ref={ref} src={src} alt="" loading="lazy" decoding="async" style={{ y, scale }} />;
-} // espera a cortina abrir
+}
 
 export default function App() {
   const { scrollY, scrollYProgress } = useScroll();

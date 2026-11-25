@@ -1,5 +1,5 @@
 // Efeitos de animação reutilizáveis + a animação assinatura de cada tema.
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useAnimationFrame,
@@ -23,18 +23,49 @@ const rgba = (hex, a) => {
 };
 const finoPonteiro = (e) => e.pointerType === "mouse" || e.pointerType === "pen";
 
-/* Cortina de abertura: painel da cor do tema sobe revelando o site. */
+/* Abertura: tesoura atravessa a tela cortando a linha e a cortina se parte em duas.
+   Aparece uma vez por visita (sessionStorage) e some com "reduzir movimento". */
+export const T_CORTE = 0.25, D_CORTE = 0.85, D_ABRE = 0.75;
 export function Cortina({ nome }) {
   const reduce = useReducedMotion();
-  if (reduce) return null;
+  const [mostrar] = useState(() => {
+    try { if (sessionStorage.getItem("abertura-vista")) return false; sessionStorage.setItem("abertura-vista", "1"); } catch {}
+    return true;
+  });
+  const [fim, setFim] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setFim(true), (T_CORTE + D_CORTE + D_ABRE + 0.2) * 1000);
+    return () => clearTimeout(t);
+  }, []);
+  if (reduce || !mostrar || fim) return null;
+  const abre = { duration: D_ABRE, ease: [0.76, 0, 0.24, 1], delay: T_CORTE + D_CORTE };
   return (
-    <motion.div className="cortina" aria-hidden="true" initial={{ y: "0%" }} animate={{ y: "-100%" }}
-      transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1], delay: 0.55 }}>
-      <motion.span initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: [0, 1, 1, 0], scale: [0.9, 1, 1, 1.04] }}
-        transition={{ duration: 1.1, times: [0, 0.3, 0.75, 1] }}>
-        {nome}
-      </motion.span>
-    </motion.div>
+    <div className="corte" aria-hidden="true">
+      <motion.div className="corte-metade cima" animate={{ y: "-100%" }} transition={abre}>
+        <motion.span className="corte-nome" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
+          {nome}
+        </motion.span>
+      </motion.div>
+      <motion.div className="corte-metade baixo" animate={{ y: "100%" }} transition={abre} />
+      <motion.div className="corte-linha" animate={{ opacity: 0 }} transition={{ duration: 0.2, delay: T_CORTE + D_CORTE }}>
+        <span className="corte-tracejado" />
+        <motion.span className="corte-feito" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: D_CORTE, ease: "linear", delay: T_CORTE }} />
+      </motion.div>
+      <motion.svg className="corte-tesoura" viewBox="0 0 120 60" initial={{ x: "-20vw" }} animate={{ x: "112vw" }}
+        transition={{ duration: D_CORTE * 1.12, ease: "linear", delay: T_CORTE - 0.08 }}>
+        <g className="tes-sup">
+          <path d="M55 27.5 L113 19 Q119 21.5 114 25.5 L63 33 Z" fill="currentColor" />
+          <path d="M57 28 L31 18" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+          <circle cx="22" cy="15" r="9" fill="none" stroke="currentColor" strokeWidth="4.5" />
+        </g>
+        <g className="tes-inf">
+          <path d="M55 32.5 L113 41 Q119 38.5 114 34.5 L63 27 Z" fill="currentColor" />
+          <path d="M57 32 L31 42" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+          <circle cx="22" cy="45" r="9" fill="none" stroke="currentColor" strokeWidth="4.5" />
+        </g>
+        <circle cx="60" cy="30" r="3" className="tes-pino" />
+      </motion.svg>
+    </div>
   );
 }
 
