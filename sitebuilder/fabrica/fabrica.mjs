@@ -17,6 +17,8 @@ const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const SB = path.resolve(AQUI, "..");                 // sitebuilder/
 const RAIZ = path.resolve(SB, "..");                 // repositório
 const CLIENTES = path.join(RAIZ, "clientes");
+// Python: "python3" no Mac/Linux; no Windows costuma ser "python" ou "py"
+const PYTHON = process.env.PYTHON || ["python3", "python", "py"].find((c) => spawnSync(c, ["--version"], { encoding: "utf8" }).status === 0);
 const ok = (t) => console.log("  ✓ " + t);
 const aviso = (t) => console.log("  ! " + t);
 const titulo = (t) => console.log("\n▶ " + t);
@@ -83,7 +85,7 @@ function gerarIndice() {
 }
 
 function rodar(cmd, args, opts = {}) {
-  const r = spawnSync(cmd, args, { cwd: SB, encoding: "utf8", ...opts });
+  const r = spawnSync(cmd === "node" ? process.execPath : cmd, args, { cwd: SB, encoding: "utf8", ...opts });
   if (r.status !== 0) throw new Error(`${cmd} ${args.join(" ")} falhou:\n${(r.stderr || r.stdout || "").slice(-2000)}`);
   return r.stdout;
 }
@@ -104,7 +106,8 @@ async function fabricar(slug, { previa = true, video = false } = {}) {
 
   titulo("2. Logo e fotos");
   const saidaImg = path.join(SB, "public-imgs", slug);
-  const img = JSON.parse(execFileSync("python3", [path.join(AQUI, "imagens.py"), pasta, saidaImg], { encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] }));
+  if (!PYTHON) { console.error("Python não encontrado. Instale o Python 3 (veja COMO-USAR-NO-PC.md)."); process.exit(1); }
+  const img = JSON.parse(execFileSync(PYTHON, [path.join(AQUI, "imagens.py"), pasta, saidaImg], { encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] }));
   if (img.logo) {
     ok(`logo ${img.logo.original} -> ${img.logo.final}` + (img.logo.ampliado ? ` (ampliado: ${img.logo.ampliado})` : "") + (img.logo.fundo_removido ? ", fundo removido" : ""));
     ok(`cor do logo: ${img.logo.cor || "sem cor forte (preto/branco/prata)"}`);
