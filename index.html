@@ -211,6 +211,14 @@
     </section>
   </main>
 
+  <div class="timer" id="timer" role="timer" hidden>
+    <div class="timer-main"><span class="timer-time" id="timer-time">0:00</span><span class="timer-label" id="timer-label"></span></div>
+    <div class="timer-actions">
+      <button type="button" id="t-minus" aria-label="Menos 15 segundos">−15 s</button>
+      <button type="button" id="t-plus" aria-label="Mais 15 segundos">+15 s</button>
+      <button type="button" id="t-stop" class="stop">Parar</button>
+    </div>
+  </div>
   <div class="toast" id="toast" role="status" hidden></div>
   <div class="ask-backdrop" id="ask" hidden>
     <div class="ask card" role="dialog" aria-modal="true" aria-labelledby="ask-text">

@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.4';
+const APP_VERSION = '2.5';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -18,6 +18,7 @@ const DEFAULT_STATE = {
   items: presetItems(),
   presetVersion: 0, // versão da rotina sugerida (plan.js) já aplicada ou recusada
   wk: {},     // { 'AAAA-MM-DD': [índices dos exercícios feitos] }
+  sets: {},   // { 'AAAA-MM-DD': { índiceDoExercício: [{ r: repetições, kg }] } }
   loads: {},  // { 'nome do exercício': 'carga' }
   body: [],   // [{ d: 'AAAA-MM-DD', kg, cm }]
   shop: {},   // { 'item da lista de compras': true }
@@ -61,9 +62,9 @@ function save() {
 
 function docsFromState() {
   const out = { 'app/config': Object.fromEntries(CONFIG_FIELDS.map((f) => [f, state[f] ?? null])) };
-  const keys = new Set([...Object.keys(state.done), ...Object.keys(state.water), ...Object.keys(state.notes), ...Object.keys(state.wk)]);
+  const keys = new Set([...Object.keys(state.done), ...Object.keys(state.water), ...Object.keys(state.notes), ...Object.keys(state.wk), ...Object.keys(state.sets)]);
   for (const k of keys) {
-    out['days/' + k] = { done: state.done[k] || [], water: state.water[k] || 0, note: state.notes[k] || '', wk: state.wk[k] || [] };
+    out['days/' + k] = { done: state.done[k] || [], water: state.water[k] || 0, note: state.notes[k] || '', wk: state.wk[k] || [], sets: state.sets[k] || {} };
   }
   return out;
 }
@@ -89,13 +90,14 @@ async function flush() {
 
 function applyRemote() {
   if (saveTimer || writing || !remoteConfig) return; // edição local em andamento tem prioridade
-  const next = { ...structuredClone(DEFAULT_STATE), done: {}, water: {}, notes: {}, wk: {} };
+  const next = { ...structuredClone(DEFAULT_STATE), done: {}, water: {}, notes: {}, wk: {}, sets: {} };
   for (const f of CONFIG_FIELDS) if (remoteConfig[f] != null) next[f] = structuredClone(remoteConfig[f]);
   for (const [k, d] of Object.entries(remoteDays)) {
     if (d.done && d.done.length) next.done[k] = [...d.done];
     if (d.water) next.water[k] = d.water;
     if (d.note) next.notes[k] = d.note;
     if (d.wk && d.wk.length) next.wk[k] = [...d.wk];
+    if (d.sets && Object.keys(d.sets).length) next.sets[k] = structuredClone(d.sets);
   }
   if (!next.startDate) next.startDate = todayKey();
   state = next;
@@ -422,6 +424,121 @@ function renderManage() {
 }
 
 // ---------- Aba Plano ----------
+// ---------- Treino: séries, repetições e cronômetro ----------
+const repDraft = {}; // repetições digitadas por exercício, ainda não marcadas
+
+function parseEx(spec, rest) {
+  const secs = (s) => {
+    const m = String(s || '').match(/(\d+)(?:\s*[–-]\s*\d+)?\s*(min|s)\b/);
+    return m ? (m[2] === 'min' ? +m[1] * 60 : +m[1]) : 0;
+  };
+  let m;
+  if ((m = spec.match(/^(\d+)\s*×\s*(\d+)\s*s\b/))) return { kind: 'hold', n: +m[1], hold: +m[2], rest: secs(rest) };
+  if ((m = spec.match(/^(\d+)\s*×\s*(\d+)/))) return { kind: 'sets', n: +m[1], reps: +m[2], rest: secs(rest) };
+  if (/min\b/.test(spec)) return { kind: 'timed', secs: secs(spec) };
+  return { kind: 'check' };
+}
+
+function markSet(i, ex, name) {
+  ensureAudio();
+  const k = todayKey();
+  const day = (state.sets[k] = state.sets[k] || {});
+  const rows = (day[i] = [...(day[i] || [])]);
+  const reps = parseInt(repDraft[i], 10);
+  const kg = parseFloat(String(state.loads[name] || '').replace(',', '.'));
+  rows.push({ r: ex.kind === 'hold' ? ex.hold : (Number.isFinite(reps) ? reps : ex.reps), kg: ex.kind === 'hold' || !Number.isFinite(kg) ? null : kg });
+  delete repDraft[i];
+  const finished = rows.length >= ex.n;
+  if (finished) {
+    const cur = state.wk[k] || [];
+    if (!cur.includes(i)) state.wk[k] = [...cur, i];
+  }
+  save();
+  renderPlan();
+  if (finished && rows.length === ex.n) toast(`${name}: ${ex.n} séries ✓`);
+  if (ex.rest) startTimer(ex.rest, `Descanso · ${name}`);
+}
+
+function undoSet(i, ex) {
+  const k = todayKey();
+  const rows = ((state.sets[k] || {})[i] || []).slice(0, -1);
+  if (rows.length) state.sets[k][i] = rows;
+  else if (state.sets[k]) { delete state.sets[k][i]; if (!Object.keys(state.sets[k]).length) delete state.sets[k]; }
+  if (rows.length < ex.n) state.wk[k] = (state.wk[k] || []).filter((x) => x !== i);
+  stopTimer();
+  save();
+  renderPlan();
+}
+
+// Cronômetro: guarda a hora de término (não conta ticks), então não atrasa com a tela bloqueada
+let timer = null;
+let tickId = null;
+let audioCtx = null;
+let wake = null;
+
+const fmtTime = (s) => `${s < 0 ? '+' : ''}${Math.floor(Math.abs(s) / 60)}:${String(Math.abs(s) % 60).padStart(2, '0')}`;
+
+function ensureAudio() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch (e) { /* sem som */ }
+}
+function beep() {
+  try {
+    if (!audioCtx) return;
+    [0, 0.28, 0.56].forEach((t) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.frequency.value = 880; o.connect(g); g.connect(audioCtx.destination);
+      const now = audioCtx.currentTime + t;
+      g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.4, now + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+      o.start(now); o.stop(now + 0.22);
+    });
+  } catch (e) { /* sem som */ }
+  try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) { /* sem vibração */ }
+}
+async function lockScreen() {
+  try {
+    if (navigator.wakeLock && !wake) {
+      wake = await navigator.wakeLock.request('screen');
+      wake.addEventListener('release', () => { wake = null; });
+    }
+  } catch (e) { /* tela pode apagar, o cronômetro segue pela hora */ }
+}
+function unlockScreen() { try { if (wake) wake.release(); } catch (e) { /* ignora */ } wake = null; }
+
+function startTimer(secs, label, onEnd) {
+  stopTimer();
+  timer = { endAt: Date.now() + secs * 1000, label, onEnd, fired: false };
+  $('#timer-label').textContent = label;
+  $('#timer').hidden = false;
+  document.body.classList.add('has-timer');
+  clearInterval(tickId);
+  tickId = setInterval(updateTimer, 250);
+  lockScreen();
+  updateTimer();
+}
+function stopTimer() {
+  clearInterval(tickId); tickId = null; timer = null;
+  const t = $('#timer'); if (t) { t.hidden = true; t.classList.remove('over'); }
+  document.body.classList.remove('has-timer');
+  unlockScreen();
+}
+function updateTimer() {
+  if (!timer) return;
+  const rem = Math.ceil((timer.endAt - Date.now()) / 1000);
+  $('#timer-time').textContent = fmtTime(rem);
+  $('#timer').classList.toggle('over', rem <= 0);
+  if (rem <= 0 && !timer.fired) {
+    timer.fired = true;
+    beep();
+    $('#timer-label').textContent = 'Bora! ' + timer.label;
+    const cb = timer.onEnd;
+    if (cb) cb();
+  }
+  if (rem <= -600) stopTimer(); // esqueceu aberto: some depois de 10 min
+}
+
 let planDay = new Date().getDay();
 
 function renderPlan() {
@@ -444,21 +561,56 @@ function renderPlan() {
 
   const list = $('#plan-list');
   list.innerHTML = '';
-  w.ex.forEach(([name, sets, rest], i) => {
+  w.ex.forEach(([name, spec, rest], i) => {
+    const ex = parseEx(spec, rest);
+    const specText = [spec, rest && `descanso ${rest}`].filter(Boolean).join(' · ');
+    const rows = (isToday && (state.sets[k] || {})[i]) || [];
     const done = doneList.includes(i);
+    const loadInput = (cls) => {
+      const inp = el('input', {
+        class: cls, inputmode: 'decimal', placeholder: 'kg', 'aria-label': `Carga de ${name}`,
+        onclick: (e) => e.stopPropagation(),
+        onchange: (e) => { const v = e.target.value.trim(); if (v) state.loads[name] = v; else delete state.loads[name]; save(); },
+      });
+      inp.value = state.loads[name] || '';
+      return inp;
+    };
+
+    // Musculação e prancha: séries registradas uma a uma, com repetições separadas
+    if (isToday && (ex.kind === 'sets' || ex.kind === 'hold')) {
+      const hold = ex.kind === 'hold';
+      const chips = rows.map((r, j) => el('span', { class: 'chip' },
+        `${j + 1}ª: ${hold ? r.r + ' s' : `${r.r ?? '–'} reps${r.kg != null ? ' · ' + String(r.kg).replace('.', ',') + ' kg' : ''}`}`));
+      const reps = el('input', {
+        class: 'reps', inputmode: 'numeric', placeholder: 'reps', 'aria-label': `Repetições de ${name}`,
+        oninput: (e) => { repDraft[i] = e.target.value; },
+      });
+      reps.value = repDraft[i] ?? (rows.length ? rows[rows.length - 1].r : ex.reps) ?? '';
+      const label = hold ? `▶ Segurar ${ex.hold} s`
+        : rows.length < ex.n ? `✔ Série ${rows.length + 1} de ${ex.n}` : '＋ Série extra';
+      list.append(el('div', { class: 'exc' + (done ? ' done' : '') },
+        el('div', { class: 'exc-head' },
+          el('span', { class: 'check' }, done ? '✓' : ''),
+          el('span', { class: 't-title' }, name, el('small', {}, specText))),
+        chips.length ? el('div', { class: 'chips' }, chips) : null,
+        el('div', { class: 'exc-controls' },
+          hold ? null : el('label', { class: 'fld' }, 'reps', reps),
+          hold ? null : el('label', { class: 'fld' }, 'kg', loadInput('load')),
+          el('button', { class: 'btn setbtn', type: 'button', onclick: () => hold
+            ? (ensureAudio(), startTimer(ex.hold, `Segure · ${name}`, () => markSet(i, ex, name)))
+            : markSet(i, ex, name) }, label),
+          rows.length ? el('button', { class: 'undo', type: 'button', onclick: () => undoSet(i, ex) }, '↩︎ desfazer') : null)));
+      return;
+    }
+
+    // Cardio e alongamento: cronômetro do tempo da atividade
     const toggle = () => {
       if (!isToday) return;
       const cur = state.wk[k] || [];
       state.wk[k] = cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i];
       save(); renderPlan();
     };
-    const load = el('input', {
-      class: 'load', inputmode: 'decimal', placeholder: 'kg', 'aria-label': `Carga de ${name}`,
-      onclick: (e) => e.stopPropagation(),
-      onchange: (e) => { const v = e.target.value.trim(); if (v) state.loads[name] = v; else delete state.loads[name]; save(); },
-    });
-    load.value = state.loads[name] || '';
-    const isCardio = !rest || /cardio|caminhada|alongamento/i.test(name);
+    const isCardio = ex.kind === 'timed' || ex.kind === 'check';
     list.append(el('div', {
       class: 'task ex' + (done ? ' done' : '') + (isToday ? '' : ' readonly'),
       role: 'checkbox', 'aria-checked': String(done), tabindex: isToday ? '0' : '-1',
@@ -466,8 +618,15 @@ function renderPlan() {
       onkeydown: (e) => { if (e.target === e.currentTarget && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); toggle(); } },
     },
       el('span', { class: 'check' }, done ? '✓' : ''),
-      el('span', { class: 't-title' }, name, el('small', {}, [sets, rest && `descanso ${rest}`].filter(Boolean).join(' · '))),
-      isCardio ? null : load,
+      el('span', { class: 't-title' }, name, el('small', {}, specText)),
+      isToday && ex.kind === 'timed' && !done
+        ? el('button', { class: 'btn ghost tbtn', type: 'button', 'aria-label': `Iniciar ${name}`,
+            onclick: (e) => { e.stopPropagation(); ensureAudio(); startTimer(ex.secs, name, () => {
+              const cur = state.wk[k] || [];
+              if (!cur.includes(i)) state.wk[k] = [...cur, i];
+              save(); renderPlan(); toast(`${name} concluído ✓`);
+            }); } }, `▶ ${Math.round(ex.secs / 60)} min`)
+        : (!isCardio ? loadInput('load') : null),
     ));
   });
 
@@ -658,6 +817,13 @@ function weeklySummary() {
     const w = WORKOUTS[d.getDay()];
     const wk = (state.wk[k] || []).length;
     L.push(`- ${fmt(d)}: ${r === null ? 'sem registro' : Math.round(r * 100) + '%'} · treino ${wk}/${w.ex.length} (${w.title}) · água ${state.water[k] || 0}/${state.waterGoal}`);
+    const sets = Object.entries(state.sets[k] || {}).map(([i, rows]) => {
+      const ex = w.ex[i];
+      if (!ex) return null;
+      const hold = parseEx(ex[1], ex[2]).kind === 'hold';
+      return `${ex[0]}: ` + rows.map((s) => hold ? `${s.r}s` : `${s.r}${s.kg != null ? '×' + s.kg + 'kg' : ''}`).join(', ');
+    }).filter(Boolean);
+    if (sets.length) L.push(`  séries: ${sets.join(' | ')}`);
   }
   if (ratios.length) L.push(`Média: ${Math.round(ratios.reduce((s, x) => s + x, 0) / ratios.length * 100)}%`);
 
@@ -763,6 +929,9 @@ $('#f-cancel').addEventListener('click', resetForm);
 $('#export').addEventListener('click', exportData);
 $('#body-form').addEventListener('submit', onBodySubmit);
 $('#share-summary').addEventListener('click', shareSummary);
+$('#t-stop').addEventListener('click', stopTimer);
+$('#t-plus').addEventListener('click', () => { if (timer) { timer.endAt += 15000; timer.fired = false; $('#timer-label').textContent = timer.label.replace(/^Bora! /, ''); updateTimer(); } });
+$('#t-minus').addEventListener('click', () => { if (timer) { timer.endAt -= 15000; updateTimer(); } });
 document.querySelectorAll('.cal-link').forEach((link) => { link.href = 'webcal://' + ICS_BASE + link.dataset.file; });
 document.querySelectorAll('.cal-copy').forEach((b) => b.addEventListener('click', () =>
   copyText('https://' + ICS_BASE + b.dataset.file, 'Link copiado ✓', $('#cal-url-box'))));
@@ -806,7 +975,7 @@ $('#water-goal').addEventListener('change', (e) => {
 // Atualiza quando o dia vira ou o app volta ao primeiro plano
 let lastDay = todayKey();
 setInterval(() => { if (todayKey() !== lastDay) { lastDay = todayKey(); renderAll(); } }, 60_000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) renderAll(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { renderAll(); updateTimer(); if (timer) lockScreen(); } });
 
 document.body.classList.toggle('in-claude', IN_CLAUDE);
 resetForm();
