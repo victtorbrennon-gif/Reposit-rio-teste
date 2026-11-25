@@ -35,6 +35,26 @@
       <div><span class="vivo"></span><span id="atualizado">—</span></div>
     </div>
 
+    <div class="dia-cfg" id="dia-cfg">
+      <div class="dia-cfg-top">
+        <span id="dia-status" class="status"></span>
+        <span id="dia-tag" class="tag" hidden>só este dia</span>
+      </div>
+      <div class="acoes-dia">
+        <button id="fechar-dia" class="btn-sec perigo" type="button">Não vou atender neste dia</button>
+        <button id="dia-normal" class="btn-sec" type="button" hidden>Voltar ao horário normal</button>
+      </div>
+      <details id="mudar-dia">
+        <summary>Mudar o horário só deste dia</summary>
+        <div class="faixa">
+          <label>Abre <input id="dia-abre" type="time" step="300"></label>
+          <label>Fecha <input id="dia-fecha" type="time" step="300"></label>
+          <button id="salvar-dia" class="btn" type="button">Salvar</button>
+        </div>
+      </details>
+      <p id="aviso-dia" class="aviso" hidden></p>
+    </div>
+
     <h2>Agendamentos</h2>
     <ul id="lista" class="lista"></ul>
 
@@ -42,6 +62,12 @@
     <p class="dica">Toque num horário livre para <b>bloquear</b> (almoço, folga). Toque de novo para liberar.</p>
     <div id="grade" class="grade"></div>
     <p id="msg" class="erro" role="alert" hidden></p>
+
+    <h2>Dias e horários da semana</h2>
+    <p class="dica">Marque os dias em que você atende e o horário de cada um. Vale para todas as semanas.</p>
+    <div id="semana" class="semana"></div>
+    <button id="salvar-semana" class="btn" type="button">Salvar horário da semana</button>
+    <p id="ok-semana" class="ok" role="status" hidden></p>
   </section>
 </main>
 <script src="/admin/admin.js"></script>

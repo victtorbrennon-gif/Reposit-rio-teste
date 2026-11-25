@@ -219,7 +219,7 @@ export default function App() {
             Converse com nosso assistente: ele mostra só os horários livres, encaixa pelo tempo exato do serviço e marca em menos de 1 minuto{WA_NUM ? ", com a confirmação pronta pro WhatsApp" : ""}.
           </motion.p>
           {site.demo && <motion.p className="obs" variants={subir}>Demonstração: os agendamentos feitos aqui são de teste.</motion.p>}
-          <motion.div variants={subir}><Conversa site={site} waNumero={WA_NUM} logo={LOGO} /></motion.div>
+          <motion.div variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.6 } } }}><Conversa site={site} waNumero={WA_NUM} logo={LOGO} /></motion.div>
         </Secao>
 
         <section className="bloco manifesto">

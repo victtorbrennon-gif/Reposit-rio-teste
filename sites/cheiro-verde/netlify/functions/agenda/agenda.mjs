@@ -4,7 +4,7 @@
 //   /api/admin (com senha ADMIN_TOKEN)           -> barbeiro lista, cancela e bloqueia
 import { getStore } from "@netlify/blobs";
 import * as core from "./core.mjs";
-import CFG from "./config.mjs";
+import CFG_SITE from "./config.mjs";
 
 const SEG = {
   "Content-Type": "application/json; charset=utf-8",
@@ -34,6 +34,7 @@ export default async (req) => {
   const url = new URL(req.url);
   const store = getStore({ name: "agenda", consistency: "strong" });
   try {
+    const CFG = await core.cfgVivo(store, CFG_SITE); // inclui dias/horários que o barbeiro mudou
     if (url.pathname === "/api/agenda") {
       if (req.method === "GET") {
         const serv = (url.searchParams.get("servicos") ?? url.searchParams.get("servico") ?? "").split(",").slice(0, core.MAX_SERVICOS);
@@ -43,7 +44,10 @@ export default async (req) => {
           return json({ dias, atualizado: new Date().toISOString() });
         }
         const lista = await core.horarios(store, CFG, url.searchParams.get("data"), serv);
-        if (!lista) return json({ erro: "Dia ou serviço inválido." }, 400);
+        if (!lista) {
+          if (!core.pacote(CFG, serv)) return json({ erro: "Serviço inválido." }, 400);
+          return json({ fechado: true, horarios: [] }); // dia fechado pelo barbeiro ou fora da agenda
+        }
         return json({ horarios: lista, atualizado: new Date().toISOString() });
       }
       if (req.method === "POST") {
@@ -62,10 +66,19 @@ export default async (req) => {
       }
       if (req.method === "POST") {
         const b = await corpo(req);
+        if (b.acao === "semana") {
+          const r = await core.salvarSemana(store, b.abertura);
+          return r.ok ? json({ ok: true }) : json({ erro: r.erro }, 400);
+        }
         if (!/^\d{4}-\d{2}-\d{2}$/.test(String(b.data))) return json({ erro: "Data inválida." }, 400);
         if (b.acao === "cancelar") return json({ ok: await core.cancelar(store, b.data, String(b.id).slice(0, 12)) });
         if (b.acao === "bloquear") return json({ ok: await core.bloquear(store, CFG, b.data, b.hora, true) });
         if (b.acao === "liberar") return json({ ok: await core.bloquear(store, CFG, b.data, b.hora, false) });
+        const r =
+          b.acao === "fecharDia" ? await core.fecharDia(store, b.data) :
+          b.acao === "horarioDia" ? await core.horarioDoDia(store, b.data, b.abre, b.fecha) :
+          b.acao === "diaNormal" ? await core.diaNormal(store, b.data) : null;
+        if (r) return r.ok ? json({ ok: true }) : json({ erro: r.erro }, 400);
         return json({ erro: "Ação inválida." }, 400);
       }
       return json({ erro: "Método não permitido." }, 405);

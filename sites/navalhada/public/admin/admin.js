@@ -48,7 +48,46 @@
     } catch (e) { if (!silencioso) msg(e.message); }
   }
 
-  function render({ reservas, bloqueios, grade, intervalo }) {
+  let semanaCarregada = false;
+  const NOMES = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+
+  function renderDia({ reservas, horarioDoDia, excecao }) {
+    const st = $("dia-status");
+    st.className = "status " + (horarioDoDia ? "aberto" : "fechado");
+    st.textContent = horarioDoDia ? `Aberto das ${horarioDoDia[0]} às ${horarioDoDia[1]}` : "Fechado — clientes não conseguem marcar";
+    $("dia-tag").hidden = !excecao;
+    $("dia-normal").hidden = !excecao;
+    const fechar = $("fechar-dia");
+    fechar.hidden = !horarioDoDia;
+    fechar.classList.remove("armado");
+    fechar.textContent = "Não vou atender neste dia";
+    fechar.dataset.qtd = reservas.length;
+    if (horarioDoDia) { $("dia-abre").value = horarioDoDia[0]; $("dia-fecha").value = horarioDoDia[1]; }
+    const aviso = $("aviso-dia");
+    aviso.hidden = !( !horarioDoDia && reservas.length);
+    aviso.textContent = `Atenção: ${reservas.length} ${reservas.length > 1 ? "clientes já tinham" : "cliente já tinha"} horário neste dia. Avise pelo WhatsApp (botão em cada agendamento) e cancele.`;
+  }
+
+  function renderSemana(semana) {
+    const box = $("semana"); box.replaceChildren();
+    for (let d = 0; d <= 6; d++) {
+      const f = semana[d] || semana[String(d)] || null;
+      const linha = el("div", "dia-sem" + (f ? "" : " off"));
+      const liga = el("label", "liga");
+      const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !!f; cb.dataset.dia = d;
+      liga.append(cb, document.createTextNode(NOMES[d]));
+      const faixa = el("div", "faixa");
+      const mk = (rot, val, cls) => { const l = el("label"); const i = document.createElement("input"); i.type = "time"; i.step = 300; i.value = val; i.className = cls; l.append(rot, i); return l; };
+      faixa.append(mk("Abre", f ? f[0] : "09:00", "abre"), mk("Fecha", f ? f[1] : "18:00", "fecha"));
+      cb.onchange = () => linha.classList.toggle("off", !cb.checked);
+      linha.append(liga, faixa); box.append(linha);
+    }
+  }
+
+  function render(dados) {
+    renderDia(dados);
+    if (!semanaCarregada) { renderSemana(dados.semana); semanaCarregada = true; }
+    const { reservas, bloqueios, grade, intervalo } = dados;
     $("titulo-dia").textContent = dataLonga(data) + (data === hojeManaus() ? " (hoje)" : "");
     $("n-res").textContent = reservas.length;
     const total = reservas.reduce((s, r) => s + (Number(r.preco) || 0), 0);
@@ -100,6 +139,34 @@
     try { await api("POST", "", { acao: bloquear ? "bloquear" : "liberar", data, hora }); carregar(); }
     catch (e) { msg(e.message); }
   }
+
+  async function acaoDia(corpo) {
+    try { await api("POST", "", { data, ...corpo }); carregar(); } catch (e) { msg(e.message); }
+  }
+  $("fechar-dia").onclick = () => {
+    const b = $("fechar-dia"); const qtd = Number(b.dataset.qtd || 0);
+    if (!b.classList.contains("armado")) {
+      b.classList.add("armado");
+      b.textContent = qtd ? `Tem ${qtd} ${qtd > 1 ? "agendamentos" : "agendamento"}. Toque de novo para fechar mesmo assim` : "Toque de novo para fechar o dia";
+      return;
+    }
+    acaoDia({ acao: "fecharDia" });
+  };
+  $("dia-normal").onclick = () => acaoDia({ acao: "diaNormal" });
+  $("salvar-dia").onclick = () => acaoDia({ acao: "horarioDia", abre: $("dia-abre").value, fecha: $("dia-fecha").value });
+  $("salvar-semana").onclick = async () => {
+    const abertura = {};
+    for (const linha of $("semana").children) {
+      const cb = linha.querySelector("input[type=checkbox]");
+      if (cb.checked) abertura[cb.dataset.dia] = [linha.querySelector(".abre").value, linha.querySelector(".fecha").value];
+    }
+    $("ok-semana").hidden = true;
+    try {
+      await api("POST", "", { acao: "semana", abertura });
+      $("ok-semana").textContent = "Horário da semana salvo ✓"; $("ok-semana").hidden = false;
+      carregar();
+    } catch (e) { msg(e.message); }
+  };
 
   function irPara(d) { data = d; $("data").value = d; carregar(); }
   $("ant").onclick = () => irPara(somaDias(data, -1));

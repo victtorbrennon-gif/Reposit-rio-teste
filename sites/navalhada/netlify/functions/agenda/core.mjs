@@ -38,17 +38,23 @@ export function duracaoTxt(m) {
   return r ? `${h}h${String(r).padStart(2, "0")}` : `${h}h`;
 }
 
+/** Horário de um dia: exceção que o barbeiro marcou para aquela data, senão o da semana. null = fechado. */
+export function aberturaDo(cfg, data) {
+  if (cfg.excecoes && Object.prototype.hasOwnProperty.call(cfg.excecoes, data)) return cfg.excecoes[data];
+  return cfg.abertura[diaSemana(data)] || null;
+}
+
 /** Próximos dias da agenda, com aberto/fechado. */
 export function proximosDias(cfg, now = Date.now()) {
   const { data: hoje } = agoraManaus(now);
   return Array.from({ length: cfg.dias }, (_, i) => {
     const data = somaDias(hoje, i);
-    return { data, aberto: !!cfg.abertura[diaSemana(data)], rotulo: nomeDia(data, hoje), dia: data.slice(8, 10), mes: mesCurto(data) };
+    return { data, aberto: !!aberturaDo(cfg, data), rotulo: nomeDia(data, hoje), dia: data.slice(8, 10), mes: mesCurto(data) };
   });
 }
 
 function janela(cfg, data) {
-  const ab = cfg.abertura[diaSemana(data)];
+  const ab = aberturaDo(cfg, data);
   if (!ab) return null;
   return { ini: hm(ab[0]), fim: hm(ab[1]), pausa: cfg.pausa ? cfg.pausa.map(hm) : null };
 }
@@ -131,6 +137,7 @@ export async function resumoDias(store, cfg, indices, now = Date.now()) {
   return Promise.all(
     proximosDias(cfg, now).map(async (d) => ({
       data: d.data,
+      aberto: d.aberto,
       livres: d.aberto ? livresNoDia(cfg, d.data, p.duracao, await ocupados(store, d.data), now).length : 0,
     }))
   );
@@ -195,6 +202,64 @@ export async function reservar(store, cfg, body, now = Date.now()) {
   return { ok: true, reserva };
 }
 
+/* ---------------- horários definidos pelo barbeiro ---------------- */
+// config/semana      -> { abertura: { 0: null, 1: ["09:00","20:00"], ... } }  (substitui o padrão do site)
+// excecao/AAAA-MM-DD -> { fechado: true }  ou  { abre: "13:00", fecha: "20:00" }  (só aquela data)
+
+/** Junta a configuração do site com o que o barbeiro mudou no painel. */
+export async function cfgVivo(store, cfg) {
+  const semana = await store.get("config/semana", { type: "json" });
+  const { blobs } = await store.list({ prefix: "excecao/" });
+  const excecoes = {};
+  await Promise.all(blobs.map(async (b) => {
+    const v = await store.get(b.key, { type: "json" });
+    if (v) excecoes[b.key.slice("excecao/".length)] = v.fechado ? null : [v.abre, v.fecha];
+  }));
+  return { ...cfg, abertura: semana?.abertura ?? cfg.abertura, excecoes };
+}
+
+const horaValida = (h) => /^\d{2}:\d{2}$/.test(String(h)) && hm(h) % TIQUE === 0 && hm(h) >= 5 * 60 && hm(h) <= 24 * 60;
+const faixaValida = (f) => Array.isArray(f) && f.length === 2 && horaValida(f[0]) && horaValida(f[1]) && hm(f[1]) - hm(f[0]) >= 30;
+const dataValida = (d, now) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(d))) return false;
+  const { data: hoje } = agoraManaus(now);
+  return d >= hoje && d <= somaDias(hoje, 120);
+};
+
+/** Fecha um dia inteiro ("hoje não vou atender"). */
+export async function fecharDia(store, data, now = Date.now()) {
+  if (!dataValida(data, now)) return { erro: "Data inválida." };
+  await store.setJSON(`excecao/${data}`, { fechado: true });
+  return { ok: true };
+}
+/** Horário diferente só naquele dia. */
+export async function horarioDoDia(store, data, abre, fecha, now = Date.now()) {
+  if (!dataValida(data, now)) return { erro: "Data inválida." };
+  if (!faixaValida([abre, fecha])) return { erro: "Horário inválido: confira abertura e fechamento (mínimo 30 min)." };
+  await store.setJSON(`excecao/${data}`, { abre, fecha });
+  return { ok: true };
+}
+/** Volta o dia para o horário normal da semana. */
+export async function diaNormal(store, data) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(data))) return { erro: "Data inválida." };
+  await store.delete(`excecao/${data}`);
+  return { ok: true };
+}
+/** Dias e horários da semana. `abertura`: { 0..6: null | ["09:00","20:00"] } */
+export async function salvarSemana(store, abertura) {
+  if (!abertura || typeof abertura !== "object") return { erro: "Horário inválido." };
+  const limpo = {};
+  for (let d = 0; d <= 6; d++) {
+    const f = abertura[d] ?? abertura[String(d)] ?? null;
+    if (f === null) continue;
+    if (!faixaValida(f)) return { erro: `Horário inválido em ${DIAS_SEMANA[d]}.` };
+    limpo[d] = [f[0], f[1]];
+  }
+  if (!Object.keys(limpo).length) return { erro: "Deixe pelo menos um dia de atendimento." };
+  await store.setJSON("config/semana", { abertura: limpo });
+  return { ok: true };
+}
+
 /* ---------------- área do barbeiro ---------------- */
 
 export async function listarDia(store, cfg, data) {
@@ -207,6 +272,9 @@ export async function listarDia(store, cfg, data) {
     bloqueios: bl.map((b) => fmt(deChave(b.key))).sort(),
     grade: grade(cfg, data).map(fmt),
     intervalo: cfg.intervalo,
+    horarioDoDia: aberturaDo(cfg, data),
+    excecao: cfg.excecoes && Object.prototype.hasOwnProperty.call(cfg.excecoes, data),
+    semana: cfg.abertura,
   };
 }
 

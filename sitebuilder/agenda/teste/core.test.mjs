@@ -106,4 +106,39 @@ await t("barbeiro: lista, cancela (libera) e bloqueia/libera", async () => {
   assert.ok((await horas(s, D, [0])).includes("12:00"));
   assert.equal(await core.bloquear(s, cfg, D, "03:00", true), false);
 });
+await t("barbeiro fecha um dia: some para os clientes e volta ao normal", async () => {
+  const s = storeFalso();
+  assert.ok((await core.fecharDia(s, D, AGORA)).ok);
+  let vivo = await core.cfgVivo(s, cfg);
+  assert.equal(await core.horarios(s, vivo, D, [0], AGORA), null);              // dia não está mais disponível
+  assert.equal((await core.reservar(s, vivo, { data: D, hora: "15:00", servicos: [0], nome: "Ana", telefone: "92991112222" }, AGORA)).status, 400);
+  const dias = await core.resumoDias(s, vivo, [0], AGORA);
+  assert.deepEqual(dias.find((d) => d.data === D), { data: D, aberto: false, livres: 0 });
+  assert.equal((await core.listarDia(s, vivo, D)).grade.length, 0);
+  await core.diaNormal(s, D);
+  vivo = await core.cfgVivo(s, cfg);
+  assert.ok((await core.horarios(s, vivo, D, [0], AGORA)).length > 0);
+});
+await t("barbeiro muda o horário só de um dia (13:00–16:00)", async () => {
+  const s = storeFalso();
+  assert.ok((await core.horarioDoDia(s, D, "13:00", "16:00", AGORA)).ok);
+  const vivo = await core.cfgVivo(s, cfg);
+  const h = (await core.horarios(s, vivo, D, [0], AGORA)).map((x) => x.hora);
+  assert.equal(h[0], "13:00"); assert.equal(h.at(-1), "15:30");
+  assert.ok((await core.horarioDoDia(s, D, "16:00", "13:00", AGORA)).erro);    // fecha antes de abrir
+  assert.ok((await core.horarioDoDia(s, D, "13:03", "16:00", AGORA)).erro);    // fora dos 5 min
+  assert.ok((await core.fecharDia(s, "2020-01-01", AGORA)).erro);              // passado
+});
+await t("barbeiro muda a semana: passa a atender domingo e fecha segunda", async () => {
+  const s = storeFalso();
+  const ab = { ...cfg.abertura, 0: ["08:00", "12:00"], 1: null };
+  assert.ok((await core.salvarSemana(s, ab)).ok);
+  const vivo = await core.cfgVivo(s, cfg);
+  const dias = core.proximosDias(vivo, AGORA);
+  assert.equal(dias.find((d) => d.data === "2026-12-06").aberto, true);  // domingo
+  assert.equal(dias.find((d) => d.data === "2026-12-07").aberto, false); // segunda
+  assert.equal((await core.horarios(s, vivo, "2026-12-06", [0], AGORA)).at(-1).hora, "11:30");
+  assert.ok((await core.salvarSemana(s, {})).erro);                       // não pode fechar tudo
+  assert.ok((await core.salvarSemana(s, { 1: ["9h", "20h"] })).erro);
+});
 console.log(`\n${ok} testes passaram`);

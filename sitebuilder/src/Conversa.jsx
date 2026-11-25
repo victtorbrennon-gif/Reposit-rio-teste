@@ -71,9 +71,43 @@ export default function Conversa({ site, waNumero, logo }) {
   }
   const eu = (t) => add("eu", { texto: t });
 
+  // Segurador de página: quando a conversa encolhe de repente (ex.: some a lista de horários),
+  // o navegador às vezes rola a página inteira sozinho. Se a página pular sem o cliente ter
+  // tocado/rolado, volta para onde estava.
+  useEffect(() => {
+    let ultimaAcao = 0, ly = window.scrollY, raf = 0;
+    const marca = () => { ultimaAcao = performance.now(); };
+    const evs = ["wheel", "touchstart", "touchmove", "keydown", "pointerdown"];
+    evs.forEach((e) => window.addEventListener(e, marca, { passive: true }));
+    const vigia = () => {
+      const y = window.scrollY;
+      if (y !== ly) {
+        const r = caixa.current?.getBoundingClientRect();
+        const naTela = r && r.bottom > 0 && r.top < window.innerHeight;
+        if (naTela && performance.now() - ultimaAcao > 1500 && Math.abs(y - ly) > 40) window.scrollTo(0, ly);
+        else ly = y;
+      }
+      raf = requestAnimationFrame(vigia);
+    };
+    raf = requestAnimationFrame(vigia);
+    return () => { cancelAnimationFrame(raf); evs.forEach((e) => window.removeEventListener(e, marca)); };
+  }, []);
+
+  // desce a conversa até a última mensagem. Animação própria (frame a frame, só dentro da caixa):
+  // a rolagem "smooth" do navegador às vezes arrastava a página inteira junto.
   useEffect(() => {
     const el = lista.current;
-    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    if (!el) return;
+    let raf = 0;
+    const ini = el.scrollTop, t0 = performance.now();
+    const passo = (t) => {
+      const alvo = el.scrollHeight - el.clientHeight;
+      const p = Math.min(1, (t - t0) / 380);
+      el.scrollTop = ini + (alvo - ini) * (1 - Math.pow(1 - p, 3));
+      if (p < 1) raf = requestAnimationFrame(passo);
+    };
+    raf = requestAnimationFrame(passo);
+    return () => cancelAnimationFrame(raf);
   }, [msgs, digitando, etapa, horas, dias]);
 
   useEffect(() => {
@@ -92,7 +126,7 @@ export default function Conversa({ site, waNumero, logo }) {
       const r = await fetch(`${API}?resumo=1&servicos=${sel.join(",")}`, { cache: "no-store" });
       const j = await r.json();
       if (!r.ok) throw 0;
-      setDias(Object.fromEntries(j.dias.map((d) => [d.data, d.livres])));
+      setDias(Object.fromEntries(j.dias.map((d) => [d.data, d])));
     } catch {
       setDias({}); // mostra os dias mesmo sem o resumo
     }
@@ -103,6 +137,7 @@ export default function Conversa({ site, waNumero, logo }) {
       const r = await fetch(`${API}?data=${dia}&servicos=${sel.join(",")}`, { cache: "no-store" });
       const j = await r.json();
       if (!r.ok) throw 0;
+      if (j.fechado) return "fechado"; // o barbeiro fechou o dia enquanto o cliente escolhia
       setHoras(j.horarios.map((h) => h.hora));
       setAtualizado(new Date());
       return j.horarios.map((h) => h.hora);
@@ -118,6 +153,7 @@ export default function Conversa({ site, waNumero, logo }) {
     const tick = async () => {
       if (document.visibilityState !== "visible" || ocupado.current) return;
       const livres = await carregarHoras(true);
+      if (livres === "fechado") return diaFechou();
       if (livres && hora && etapa !== "hora" && !livres.includes(hora)) perdeuHorario();
     };
     const id = setInterval(tick, 15000);
@@ -132,6 +168,16 @@ export default function Conversa({ site, waNumero, logo }) {
     await bot("Eita! Alguém acabou de pegar esse horário 😅", "Separei os que ainda estão livres:");
     await carregarHoras();
     setEtapa("hora");
+    ocupado.current = false;
+  }
+
+  async function diaFechou() {
+    ocupado.current = true;
+    setDia(null); setHora(null); setHoras(null);
+    setEtapa("...");
+    carregarDias();
+    await bot("Poxa, a barbearia acabou de fechar a agenda desse dia 😕", "Escolhe outro dia:");
+    setEtapa("dia");
     ocupado.current = false;
   }
 
@@ -171,7 +217,9 @@ export default function Conversa({ site, waNumero, logo }) {
     await bot(`Esses são os horários livres de ${dataLonga(d.data).toLowerCase()} 👇`);
     setEtapa("hora");
   }
-  useEffect(() => { if (etapa === "hora" && dia && horas === null) carregarHoras(); }, [etapa, dia]);
+  useEffect(() => {
+    if (etapa === "hora" && dia && horas === null) carregarHoras().then((r) => r === "fechado" && diaFechou());
+  }, [etapa, dia]);
 
   async function escolherHora(h) {
     setHora(h);
@@ -207,7 +255,14 @@ export default function Conversa({ site, waNumero, logo }) {
       const j = await r.json();
       setDigitando(false);
       if (r.status === 409) { ocupado.current = false; return perdeuHorario(); }
-      if (!r.ok) { await bot(j.erro || "Não consegui agendar agora."); setEtapa("resumo"); return; }
+      if (!r.ok) {
+        await bot(j.erro || "Não consegui agendar agora.");
+        if (r.status === 400 && /dia/i.test(j.erro || "")) { // ex.: o barbeiro acabou de fechar o dia
+          setDia(null); setHora(null); setHoras(null); carregarDias();
+          await bot("Escolhe outro dia:"); setEtapa("dia"); return;
+        }
+        setEtapa("resumo"); return;
+      }
       setReserva(j.reserva);
       await bot(`Prontinho, ${primeiro(nome)}! Seu horário está reservado ✅`, { tipo: "ok" });
       setEtapa("ok");
@@ -312,15 +367,17 @@ export default function Conversa({ site, waNumero, logo }) {
     <div className="cv-widget">
       <div className="cv-carrossel" data-lenis-prevent>
         {proximosDias(cfg).map((d) => {
-          const livres = dias ? dias[d.data] : undefined;
-          const lotado = !d.aberto || livres === 0;
+          const info = dias ? dias[d.data] : undefined;      // o servidor sabe se o barbeiro fechou o dia
+          const aberto = info ? info.aberto : d.aberto;
+          const livres = info ? info.livres : undefined;
+          const lotado = !aberto || livres === 0;
           return (
             <motion.button key={d.data} type="button" className="cv-dia" disabled={lotado} whileTap={{ scale: 0.94 }} onClick={() => escolherDia(d)}>
               <span className="cv-dia-sem">{d.rotulo}</span>
               <span className="cv-dia-num">{d.dia}</span>
               <span className="cv-dia-mes">{d.mes}</span>
               <span className="cv-dia-livres">
-                {!d.aberto ? "fechado" : livres === undefined ? "…" : livres === 0 ? "lotado" : `${livres} ${livres > 1 ? "horários" : "horário"}`}
+                {!aberto ? "fechado" : livres === undefined ? "…" : livres === 0 ? "lotado" : `${livres} ${livres > 1 ? "horários" : "horário"}`}
               </span>
             </motion.button>
           );
