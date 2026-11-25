@@ -5,3 +5,4 @@
 .card{border-radius:22px}
 :root{--glow:rgba(4,120,87,.14)}
 .brilha::after{background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%)}
+.galeria figure{border-radius:28px}

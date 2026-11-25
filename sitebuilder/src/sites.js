@@ -12,6 +12,8 @@ export const SITES = [
     telefone: "(92) 9138-4642",
     instagram: "",
     tema: "alfa",
+    manifesto: "Aqui o corte sai na régua, do jeito que você pediu, sem fila e sem enrolação.",
+    imagens: ["ambiente.jpg", "detalhe.jpg"],
     slogan: "Corte na régua, sem enrolação.",
     sobre:
       "Barbearia de bairro na Compensa, com atendimento rápido e corte bem feito. Chama no WhatsApp, escolhe o horário e vem.",
@@ -30,6 +32,8 @@ export const SITES = [
     telefone: "(92) 99423-8806",
     instagram: "",
     tema: "verde",
+    manifesto: "Senta, respira e deixa a gente cuidar do cabelo e da barba enquanto a resenha rola.",
+    imagens: ["ambiente.jpg", "detalhe.jpg"],
     slogan: "Corte, barba e aquela resenha boa.",
     sobre:
       "Barbearia e tabacaria na Cidade Nova 1. Ambiente tranquilo para cortar o cabelo, fazer a barba e trocar uma ideia.",
@@ -48,6 +52,8 @@ export const SITES = [
     telefone: "",
     instagram: "",
     tema: "navalha",
+    manifesto: "Cada detalhe pensado, cada traço da navalha no lugar. Seu estilo merece esse cuidado.",
+    imagens: ["ambiente.jpg", "detalhe.jpg"],
     slogan: "Precisão na navalha. Estilo que dura.",
     sobre:
       "Barbearia no coração de Adrianópolis para quem leva o visual a sério: corte técnico, barba desenhada e atendimento com hora marcada.",

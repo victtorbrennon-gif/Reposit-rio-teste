@@ -219,12 +219,14 @@ export function Particulas({ modo, cor }) {
 export function PosteAlfa() {
   return (
     <>
-      <motion.div className="poste3d" aria-hidden="true" initial={{ y: -60, opacity: 0, rotate: -6 }} animate={{ y: 0, opacity: 1, rotate: 0 }}
-        transition={{ type: "spring", stiffness: 90, damping: 14, delay: 1.1 }}>
-        <div className="poste3d-tampa" />
-        <div className="poste3d-corpo"><span /></div>
-        <div className="poste3d-tampa baixo" />
-      </motion.div>
+      <div className="poste3d" aria-hidden="true">
+        <motion.div className="poste3d-in" initial={{ y: -60, opacity: 0, rotate: -6 }} animate={{ y: 0, opacity: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 90, damping: 14, delay: 1.1 }}>
+          <div className="poste3d-tampa" />
+          <div className="poste3d-corpo"><span /></div>
+          <div className="poste3d-tampa baixo" />
+        </motion.div>
+      </div>
       <div className="listra-corrida" aria-hidden="true"><span /></div>
     </>
   );
@@ -266,5 +268,44 @@ export function TituloNavalha({ texto }) {
           transition={{ duration: dur, ease: [0.65, 0, 0.35, 1], delay: atraso, opacity: { duration: dur, delay: atraso, times: [0, 0.1, 0.85, 1] } }} />
       )}
     </div>
+  );
+}
+
+/* Rolagem suave (Lenis). Desliga com "reduzir movimento" e em telas de toque. */
+import Lenis from "lenis";
+export function RolagemSuave() {
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    if (reduce || !window.matchMedia("(pointer: fine)").matches) return;
+    const lenis = new Lenis({ duration: 1.15, easing: (t) => 1 - Math.pow(1 - t, 4), anchors: true });
+    let raf = requestAnimationFrame(function loop(t) { lenis.raf(t); raf = requestAnimationFrame(loop); });
+    return () => { cancelAnimationFrame(raf); lenis.destroy(); };
+  }, [reduce]);
+  return null;
+}
+
+/* Cursor personalizado: ponto + anel que cresce sobre links e botões (só com mouse). */
+export function Cursor() {
+  const reduce = useReducedMotion();
+  const x = useMotionValue(-100), y = useMotionValue(-100);
+  const ax = useSpring(x, { stiffness: 260, damping: 26, mass: 0.5 });
+  const ay = useSpring(y, { stiffness: 260, damping: 26, mass: 0.5 });
+  const escala = useSpring(1, { stiffness: 300, damping: 22 });
+  useEffect(() => {
+    if (reduce || !window.matchMedia("(pointer: fine)").matches) return;
+    document.documentElement.classList.add("tem-cursor");
+    const move = (e) => {
+      x.set(e.clientX); y.set(e.clientY);
+      escala.set(e.target.closest("a,button,.card,.precos li") ? 2.2 : 1);
+    };
+    window.addEventListener("pointermove", move);
+    return () => { window.removeEventListener("pointermove", move); document.documentElement.classList.remove("tem-cursor"); };
+  }, [reduce]);
+  if (reduce) return null;
+  return (
+    <>
+      <motion.div className="cursor-anel" style={{ x: ax, y: ay, scale: escala }} aria-hidden="true" />
+      <motion.div className="cursor-ponto" style={{ x, y }} aria-hidden="true" />
+    </>
   );
 }

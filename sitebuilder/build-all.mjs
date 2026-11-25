@@ -2,7 +2,7 @@
 // Uso: npm run build            (todos)
 //      SITE=navalhada npm run build   (só um)
 import { build } from "vite";
-import { writeFileSync } from "node:fs";
+import { writeFileSync, existsSync, cpSync } from "node:fs";
 import { SITES, TEMAS } from "./src/sites.js";
 
 const HEADERS = `/*
@@ -28,5 +28,7 @@ for (const site of SITES.filter((s) => !alvo || s.slug === alvo)) {
   const out = new URL(`../sites/${site.slug}/`, import.meta.url);
   writeFileSync(new URL("_headers", out), HEADERS + (site.demo ? "/*\n  X-Robots-Tag: noindex, nofollow\n" : ""));
   writeFileSync(new URL("favicon.svg", out), favicon(TEMAS[site.tema]));
+  const imgs = new URL(`./public-imgs/${site.slug}/`, import.meta.url);
+  if (existsSync(imgs)) cpSync(imgs, new URL("img/", out), { recursive: true });
   console.log("ok", site.slug);
 }

@@ -11,8 +11,9 @@ import {
 import { SITES, AUTOR, TEMAS } from "./sites.js";
 import {
   EASE, Cortina, Magnetico, Tilt, TituloLetras, Faixa, Mancha, useHolofote,
-  Particulas, PosteAlfa, FolhasVerde, TituloNavalha,
+  Particulas, PosteAlfa, FolhasVerde, TituloNavalha, RolagemSuave, Cursor,
 } from "./Efeitos.jsx";
+import { Embaralhado, TextoAcende, LetrasPulam, Contador } from "./Tipografia.jsx";
 
 const site = SITES.find((s) => s.slug === __SLUG__);
 const COR = TEMAS[site.tema].fg;
@@ -90,7 +91,16 @@ function BotaoWA() {
   );
 }
 
-const DEPOIS = 1.25; // espera a cortina abrir
+const DEPOIS = 1.25;
+
+/* imagem com zoom suave e leve parallax dentro da moldura */
+function Parallax({ src }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.25, 1.12, 1.2]);
+  return <motion.img ref={ref} src={src} alt="" loading="lazy" decoding="async" style={{ y, scale }} />;
+} // espera a cortina abrir
 
 export default function App() {
   const { scrollY, scrollYProgress } = useScroll();
@@ -115,6 +125,8 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user">
+      <RolagemSuave />
+      <Cursor />
       <Cortina nome={site.nome} />
       <motion.div className="progresso" style={{ scaleX: progresso }} aria-hidden="true" />
 
@@ -124,7 +136,7 @@ export default function App() {
         <div className="wrap topo-in">
           <a className="marca" href="#inicio">
             <span className="marca-ico"><Tesoura /></span>
-            {site.nome}
+            <LetrasPulam texto={site.nome} />
           </a>
           <nav aria-label="Seções">
             {[["#servicos", "Serviços"], ["#horarios", "Horários"], ["#local", "Local"]].map(([h, t]) => (
@@ -145,10 +157,7 @@ export default function App() {
           {site.tema === "verde" && <FolhasVerde />}
 
           <motion.div className="wrap hero-in" style={{ y: conteudoY, opacity: conteudoOp }}>
-            <motion.p className="eyebrow" initial={{ opacity: 0, x: -24, letterSpacing: "0.5em" }} animate={{ opacity: 1, x: 0, letterSpacing: "0.16em" }}
-              transition={{ duration: 1, ease: EASE, delay: DEPOIS }}>
-              Barbearia · {site.bairro}, Manaus
-            </motion.p>
+            <Embaralhado className="eyebrow" texto={`Barbearia · ${site.bairro}, Manaus`} atraso={DEPOIS} />
             {site.tema === "navalha" ? <TituloNavalha texto={site.slogan} /> : <Palavras texto={site.slogan} delay={DEPOIS + 0.1} />}
             <motion.p className="lead" initial={{ opacity: 0, y: 24, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 0.9, ease: EASE, delay: DEPOIS + 0.7 }}>
@@ -180,7 +189,7 @@ export default function App() {
                 whileHover={{ x: 8 }}>
                 <span>{n}</span>
                 <span className="dots" aria-hidden="true" />
-                <b>R$ {p}</b>
+                <Contador valor={p} prefixo="R$ " />
               </motion.li>
             ))}
           </motion.ul>
@@ -189,7 +198,26 @@ export default function App() {
           </motion.p>
         </Secao>
 
-        <Secao className="alt">
+        <section className="bloco manifesto">
+          <div className="wrap"><TextoAcende texto={site.manifesto} /></div>
+        </section>
+
+        {site.imagens?.length > 0 && (
+          <Secao className="alt">
+            <TituloLetras texto="O ambiente" />
+            <div className="galeria">
+              {site.imagens.map((img, i) => (
+                <motion.figure key={img}
+                  variants={{ hidden: { clipPath: "inset(100% 0 0 0)" }, show: { clipPath: "inset(0% 0 0 0)", transition: { duration: 1.1, ease: [0.76, 0, 0.24, 1], delay: i * 0.15 } } }}>
+                  <Parallax src={`/img/${img}`} />
+                  {site.demo && <figcaption>Imagem ilustrativa</figcaption>}
+                </motion.figure>
+              ))}
+            </div>
+          </Secao>
+        )}
+
+        <Secao className={site.imagens?.length ? "" : "alt"}>
           <TituloLetras texto="Por que agendar pelo site" />
           <div className="cards">
             {[
