@@ -243,7 +243,7 @@ html.tem-cursor .cursor-anel,html.tem-cursor .cursor-ponto{display:block}
 @keyframes gira-anel{to{transform:rotate(360deg)}}
 .logo-brilho{position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.85) 50%,transparent 65%);background-size:250% 100%;background-position:150% 0;
-  -webkit-mask:url(/img/logo.png) center/contain no-repeat;mask:url(/img/logo.png) center/contain no-repeat;mix-blend-mode:overlay;
+  -webkit-mask:url(/img/logo.webp) center/contain no-repeat;mask:url(/img/logo.webp) center/contain no-repeat;mix-blend-mode:overlay;
   animation:cromo 4.5s ease-in-out 2.2s infinite}
 @keyframes cromo{0%{background-position:150% 0}55%,100%{background-position:-60% 0}}
 @media (max-width:900px){

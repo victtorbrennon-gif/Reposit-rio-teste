@@ -7,7 +7,7 @@ export const SITES = [
   {
     slug: "barbearia-alfa",
     nome: "Alpha Barbearia",
-    logo: "logo.png",
+    logo: "logo.webp",
     icone: "logo-icone.png",
     bairro: "Compensa",
     endereco: "Av. Oscar Borel, 102 – Compensa, Manaus – AM",
