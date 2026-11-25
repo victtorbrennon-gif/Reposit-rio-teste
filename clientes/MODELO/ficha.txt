@@ -1,0 +1,39 @@
+# FICHA DO CLIENTE  ·  preencha e salve. Linhas com # são só explicação.
+# Depois rode: npm run fabrica -- <nome-da-pasta>
+
+nome: Barbearia Exemplo
+bairro: Flores
+endereco: Rua Exemplo, 123 – Flores, Manaus – AM
+whatsapp: (92) 99999-9999
+instagram: @barbeariaexemplo
+
+# estilo: auto (escolho pelo logo), urbano (escuro, forte), classico (claro, aconchegante) ou premium (preto e dourado)
+estilo: auto
+# cor: deixe vazio para usar a cor do logo, ou escreva uma (ex.: #E11D48)
+cor:
+
+# Textos (opcional: se deixar vazio, eu escrevo)
+slogan:
+sobre:
+manifesto:
+
+# demo: sim = prévia para mostrar (faixa "demonstração", Google não mostra). Na venda fechada, troque para: nao
+demo: sim
+# fotos_ilustrativas: sim = as fotos não são da barbearia (aparece "Imagem ilustrativa")
+fotos_ilustrativas: nao
+
+# Serviços: nome | preço | minutos que leva
+servicos:
+Corte masculino | 35 | 30
+Barba | 25 | 30
+Corte + barba | 55 | 60
+Sobrancelha | 10 | 15
+
+# Horários: dias | abre | fecha   (dias: seg, ter, qua, qui, sex, sab, dom; ou seg-sex; ou "seg a sex")
+horarios:
+seg-sex | 09:00 | 20:00
+sab | 08:00 | 18:00
+dom | fechado
+
+# pausa (opcional, ex.: almoço): 12:00-13:00
+pausa:

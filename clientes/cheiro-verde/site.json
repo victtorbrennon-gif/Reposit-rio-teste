@@ -1,0 +1,96 @@
+{
+  "slug": "cheiro-verde",
+  "nome": "Barbearia Cheiro Verde",
+  "bairro": "Cidade Nova",
+  "endereco": "Rua Fraternidade, 36 – Cidade Nova 1, Manaus – AM",
+  "telefone": "(92) 99423-8806",
+  "instagram": "",
+  "tema": "verde",
+  "estilo": "classico",
+  "cores": {
+    "bg": "#0E2A1E",
+    "fg": "#34D399"
+  },
+  "abertura": {
+    "1": [
+      "09:00",
+      "20:00"
+    ],
+    "2": [
+      "09:00",
+      "20:00"
+    ],
+    "3": [
+      "09:00",
+      "20:00"
+    ],
+    "4": [
+      "09:00",
+      "20:00"
+    ],
+    "5": [
+      "09:00",
+      "20:00"
+    ],
+    "6": [
+      "09:00",
+      "18:00"
+    ]
+  },
+  "pausa": null,
+  "slogan": "Corte, barba e aquela resenha boa.",
+  "sobre": "Barbearia e tabacaria na Cidade Nova 1. Ambiente tranquilo para cortar o cabelo, fazer a barba e trocar uma ideia.",
+  "manifesto": "Senta, respira e deixa a gente cuidar do cabelo e da barba enquanto a resenha rola.",
+  "imagens": [
+    "foto-1.jpg",
+    "foto-2.jpg"
+  ],
+  "fotosIlustrativas": true,
+  "servicos": [
+    [
+      "Corte masculino",
+      "30",
+      30
+    ],
+    [
+      "Barba na toalha quente",
+      "25",
+      30
+    ],
+    [
+      "Corte + barba",
+      "50",
+      60
+    ],
+    [
+      "Degradê",
+      "35",
+      45
+    ],
+    [
+      "Pigmentação",
+      "25",
+      30
+    ],
+    [
+      "Sobrancelha",
+      "10",
+      15
+    ]
+  ],
+  "horarios": [
+    [
+      "Segunda a sexta",
+      "9h às 20h"
+    ],
+    [
+      "Sábado",
+      "9h às 18h"
+    ],
+    [
+      "Domingo",
+      "Fechado"
+    ]
+  ],
+  "demo": true
+}

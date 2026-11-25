@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "node build-all.mjs",
-    "test": "node agenda/teste/core.test.mjs"
+    "test": "node agenda/teste/core.test.mjs",
+    "fabrica": "node fabrica/fabrica.mjs"
   },
   "dependencies": {
     "@fontsource/anton": "^5.3.0",

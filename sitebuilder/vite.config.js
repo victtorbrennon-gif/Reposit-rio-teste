@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
+import { existsSync } from "node:fs";
 import { SITES, TEMAS } from "./src/sites.js";
 
 const slug = process.env.SITE || SITES[0].slug;
@@ -22,7 +23,7 @@ export default defineConfig({
           OG_TITLE: site.nome,
           SLOGAN: site.slogan,
           ROBOTS: site.demo ? "noindex, nofollow" : "index, follow",
-          THEME: TEMAS[site.tema].bg,
+          THEME: (site.cores || TEMAS[site.tema]).bg,
           ICON: site.icone ? `/img/${site.icone}` : "/favicon.svg",
           ICONTYPE: site.icone ? "image/png" : "image/svg+xml",
         };
@@ -31,7 +32,8 @@ export default defineConfig({
     },
   ],
   resolve: {
-    alias: { "@tema": fileURLToPath(new URL(`./src/temas/${site.tema}.js`, import.meta.url)) },
+    // tema do cliente gerado pela fábrica (tema base + cor do logo); senão o tema base
+    alias: { "@tema": fileURLToPath(new URL(existsSync(new URL(`./src/temas/gerado/${slug}.js`, import.meta.url)) ? `./src/temas/gerado/${slug}.js` : `./src/temas/${site.tema}.js`, import.meta.url)) },
   },
   define: { __SLUG__: JSON.stringify(slug) },
   build: {

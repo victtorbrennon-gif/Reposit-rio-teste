@@ -2,3 +2,5 @@ node_modules/
 __pycache__/
 .netlify/
 sites/*/node_modules/
+sitebuilder/fabrica/modelos/
+clientes/*/previa/

@@ -1,0 +1,24 @@
+nome: Alpha Barbearia
+bairro: Compensa
+endereco: Av. Oscar Borel, 102 – Compensa, Manaus – AM
+whatsapp: (92) 9138-4642
+instagram:
+estilo: urbano
+slogan: Corte na régua, sem enrolação.
+sobre: Barbearia de bairro na Compensa, com atendimento rápido e corte bem feito. Agende online, escolhe o horário e vem.
+manifesto: Aqui o corte sai na régua, do jeito que você pediu, sem fila e sem enrolação.
+demo: sim
+fotos_ilustrativas: sim
+
+servicos:
+Corte masculino | 35 | 30
+Barba | 25 | 30
+Corte + barba | 55 | 60
+Pezinho e acabamento | 15 | 15
+Sobrancelha | 10 | 15
+Corte infantil | 30 | 30
+
+horarios:
+seg-sex | 09:00 | 20:00
+sab | 08:00 | 19:00
+dom | fechado

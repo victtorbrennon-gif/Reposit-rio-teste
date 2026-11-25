@@ -14,10 +14,11 @@ import {
   Particulas, PosteAlfa, FolhasVerde, TituloNavalha, RolagemSuave, Cursor, LogoHero,
 } from "./Efeitos.jsx";
 import Conversa from "./Conversa.jsx";
+import { horariosTexto } from "../agenda/core.mjs";
 import { Embaralhado, TextoAcende, LetrasPulam, Contador } from "./Tipografia.jsx";
 
 const site = SITES.find((s) => s.slug === __SLUG__);
-const COR = TEMAS[site.tema].fg;
+const COR = (site.cores || TEMAS[site.tema]).fg;
 const LOGO = site.logo ? `/img/${site.logo}` : null;
 
 function waLink(tel, nome) {
@@ -115,6 +116,15 @@ export default function App() {
     setRolou(y > 24);
     setMostraFixo(y > 520);
   });
+
+  // horários da semana ao vivo (o barbeiro pode mudar no painel); começa com os da ficha
+  const [horarios, setHorarios] = useState(site.horarios);
+  useEffect(() => {
+    fetch("/api/agenda?semana=1", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => j?.abertura && setHorarios(horariosTexto(j.abertura)))
+      .catch(() => {});
+  }, []);
 
   // esconde o botão fixo enquanto a área de agendamento está na tela
   const [noAgendar, setNoAgendar] = useState(false);
@@ -234,7 +244,7 @@ export default function App() {
                 <motion.figure key={img}
                   variants={{ hidden: { clipPath: "inset(100% 0 0 0)" }, show: { clipPath: "inset(0% 0 0 0)", transition: { duration: 1.1, ease: [0.76, 0, 0.24, 1], delay: i * 0.15 } } }}>
                   <Parallax src={`/img/${img}`} />
-                  {site.demo && <figcaption>Imagem ilustrativa</figcaption>}
+                  {(site.fotosIlustrativas ?? site.demo) && <figcaption>Imagem ilustrativa</figcaption>}
                 </motion.figure>
               ))}
             </div>
@@ -287,7 +297,7 @@ export default function App() {
               <TituloLetras texto="Horários" icone={<span className="h-ico"><IcoClock /></span>} />
               <table className="horas">
                 <tbody>
-                  {site.horarios.map(([d, h]) => (
+                  {horarios.map(([d, h]) => (
                     <tr key={d}><th scope="row">{d}</th><td>{h}</td></tr>
                   ))}
                 </tbody>

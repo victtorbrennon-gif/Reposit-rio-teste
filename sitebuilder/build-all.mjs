@@ -46,7 +46,7 @@ for (const site of SITES.filter((s) => !alvo || s.slug === alvo)) {
 
   const pub = new URL("public/", raiz);
   writeFileSync(new URL("_headers", pub), HEADERS + (site.demo ? "/*\n  X-Robots-Tag: noindex, nofollow\n" : ""));
-  writeFileSync(new URL("favicon.svg", pub), favicon(TEMAS[site.tema]));
+  writeFileSync(new URL("favicon.svg", pub), favicon(site.cores || TEMAS[site.tema]));
   const imgs = new URL(`./public-imgs/${site.slug}/`, import.meta.url);
   if (existsSync(imgs)) cpSync(imgs, new URL("img/", pub), { recursive: true });
   cpSync(new URL("./admin/", import.meta.url), new URL("admin/", pub), { recursive: true });

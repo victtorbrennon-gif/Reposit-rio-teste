@@ -44,6 +44,22 @@ export function aberturaDo(cfg, data) {
   return cfg.abertura[diaSemana(data)] || null;
 }
 
+/** Texto da tabela "Horários" do site, agrupando dias iguais: ["Segunda a sexta", "9h às 20h"]. */
+export function horariosTexto(abertura) {
+  const h = (x) => { const [a, m] = x.split(":"); return `${Number(a)}h${m === "00" ? "" : m}`; };
+  const txt = (f) => (f ? `${h(f[0])} às ${h(f[1])}` : "Fechado");
+  const ordem = [1, 2, 3, 4, 5, 6, 0];
+  const grupos = [];
+  for (const d of ordem) {
+    const t = txt(abertura[d] || null);
+    const g = grupos.at(-1);
+    if (g && g.t === t && ordem.indexOf(d) === ordem.indexOf(g.fim) + 1) g.fim = d;
+    else grupos.push({ ini: d, fim: d, t });
+  }
+  const juntar = (g) => (ordem.indexOf(g.fim) - ordem.indexOf(g.ini) === 1 ? " e " : " a ");
+  return grupos.map((g) => [g.ini === g.fim ? DIAS_SEMANA[g.ini] : `${DIAS_SEMANA[g.ini]}${juntar(g)}${DIAS_SEMANA[g.fim].toLowerCase()}`, g.t]);
+}
+
 /** Próximos dias da agenda, com aberto/fechado. */
 export function proximosDias(cfg, now = Date.now()) {
   const { data: hoje } = agoraManaus(now);

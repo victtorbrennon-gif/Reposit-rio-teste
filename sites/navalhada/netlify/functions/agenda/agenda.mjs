@@ -37,6 +37,7 @@ export default async (req) => {
     const CFG = await core.cfgVivo(store, CFG_SITE); // inclui dias/horários que o barbeiro mudou
     if (url.pathname === "/api/agenda") {
       if (req.method === "GET") {
+        if (url.searchParams.get("semana")) return json({ abertura: CFG.abertura, pausa: CFG.pausa || null });
         const serv = (url.searchParams.get("servicos") ?? url.searchParams.get("servico") ?? "").split(",").slice(0, core.MAX_SERVICOS);
         if (url.searchParams.get("resumo")) {
           const dias = await core.resumoDias(store, CFG, serv);
