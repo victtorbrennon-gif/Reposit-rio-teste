@@ -13,7 +13,7 @@ import {
   EASE, Cortina, Magnetico, Tilt, TituloLetras, Faixa, Mancha, useHolofote,
   Particulas, PosteAlfa, FolhasVerde, TituloNavalha, RolagemSuave, Cursor, LogoHero,
 } from "./Efeitos.jsx";
-import Agendamento from "./Agendamento.jsx";
+import Conversa from "./Conversa.jsx";
 import { Embaralhado, TextoAcende, LetrasPulam, Contador } from "./Tipografia.jsx";
 
 const site = SITES.find((s) => s.slug === __SLUG__);
@@ -85,7 +85,7 @@ function Secao({ id, className = "", children }) {
 function BotaoWA() {
   return (
     <Magnetico>
-      <motion.a className="btn btn-main brilha" href="#agendar"
+      <motion.a className="btn btn-main brilha" href="#conversa"
         whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
         <IcoClock /> Agendar horário
       </motion.a>
@@ -216,10 +216,10 @@ export default function App() {
         <Secao id="agendar" className="agendar">
           <TituloLetras texto="Agende seu horário" />
           <motion.p className="lead ag-intro" variants={subir}>
-            Escolha o serviço, o dia e um horário livre. Em menos de 1 minuto está marcado{WA_NUM ? " e a confirmação vai pronta pro WhatsApp" : ""}.
+            Converse com nosso assistente: ele mostra só os horários livres, encaixa pelo tempo exato do serviço e marca em menos de 1 minuto{WA_NUM ? ", com a confirmação pronta pro WhatsApp" : ""}.
           </motion.p>
           {site.demo && <motion.p className="obs" variants={subir}>Demonstração: os agendamentos feitos aqui são de teste.</motion.p>}
-          <motion.div variants={subir}><Agendamento site={site} waNumero={WA_NUM} /></motion.div>
+          <motion.div variants={subir}><Conversa site={site} waNumero={WA_NUM} logo={LOGO} /></motion.div>
         </Secao>
 
         <section className="bloco manifesto">
@@ -333,7 +333,7 @@ export default function App() {
 
       <AnimatePresence>
         {mostraFixo && !noAgendar && (
-          <motion.a className="fixo" href="#agendar"
+          <motion.a className="fixo" href="#conversa"
             initial={{ y: 120, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 120, opacity: 0 }}
             transition={{ type: "spring", stiffness: 320, damping: 26 }}>
             <motion.span className="fixo-pulso" animate={{ scale: [1, 1.12], opacity: [0.6, 0] }} transition={{ duration: 1.8, repeat: Infinity }} aria-hidden="true" />

@@ -48,7 +48,7 @@
     } catch (e) { if (!silencioso) msg(e.message); }
   }
 
-  function render({ reservas, bloqueios, grade }) {
+  function render({ reservas, bloqueios, grade, intervalo }) {
     $("titulo-dia").textContent = dataLonga(data) + (data === hojeManaus() ? " (hoje)" : "");
     $("n-res").textContent = reservas.length;
     const total = reservas.reduce((s, r) => s + (Number(r.preco) || 0), 0);
@@ -76,8 +76,14 @@
       ac.append(wa, cancel); li.append(ac); ul.append(li);
     }
 
+    // um bloco da grade fica ocupado se qualquer atendimento encostar nele (atendimentos podem começar em 10:45, por ex.)
+    const passo = intervalo || 30;
     const ocup = new Map();
-    for (const r of reservas) for (let m = hm(r.hora); m < hm(r.fim); m += 30) ocup.set(m, r.nome);
+    for (const h of grade) {
+      const g = hm(h);
+      const r = reservas.find((x) => g < hm(x.fim) && g + passo > hm(x.hora));
+      if (r) ocup.set(g, r.nome);
+    }
     const g = $("grade"); g.replaceChildren();
     if (!grade.length) g.append(el("p", "vazio", "Fechado neste dia."));
     for (const h of grade) {

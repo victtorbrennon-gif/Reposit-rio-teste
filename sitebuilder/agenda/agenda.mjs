@@ -36,7 +36,13 @@ export default async (req) => {
   try {
     if (url.pathname === "/api/agenda") {
       if (req.method === "GET") {
-        const lista = await core.horarios(store, CFG, url.searchParams.get("data"), Number(url.searchParams.get("servico")));
+        const serv = (url.searchParams.get("servicos") ?? url.searchParams.get("servico") ?? "").split(",").slice(0, core.MAX_SERVICOS);
+        if (url.searchParams.get("resumo")) {
+          const dias = await core.resumoDias(store, CFG, serv);
+          if (!dias) return json({ erro: "Serviço inválido." }, 400);
+          return json({ dias, atualizado: new Date().toISOString() });
+        }
+        const lista = await core.horarios(store, CFG, url.searchParams.get("data"), serv);
         if (!lista) return json({ erro: "Dia ou serviço inválido." }, 400);
         return json({ horarios: lista, atualizado: new Date().toISOString() });
       }
