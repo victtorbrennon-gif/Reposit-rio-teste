@@ -3,3 +3,5 @@
   --f-display:"DM Serif Display",Georgia,serif;--f-body:"Didact Gothic",system-ui,sans-serif;
   --raio:999px;--h-weight:400;--h-track:-.01em}
 .card{border-radius:22px}
+:root{--glow:rgba(4,120,87,.14)}
+.brilha::after{background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%)}
