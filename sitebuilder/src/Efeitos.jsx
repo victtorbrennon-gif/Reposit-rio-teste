@@ -26,7 +26,7 @@ const finoPonteiro = (e) => e.pointerType === "mouse" || e.pointerType === "pen"
 /* Abertura: tesoura atravessa a tela cortando a linha e a cortina se parte em duas.
    Aparece uma vez por visita (sessionStorage) e some com "reduzir movimento". */
 export const T_CORTE = 0.25, D_CORTE = 0.85, D_ABRE = 0.75;
-export function Cortina({ nome }) {
+export function Cortina({ nome, logo }) {
   const reduce = useReducedMotion();
   const [mostrar] = useState(() => {
     try { if (sessionStorage.getItem("abertura-vista")) return false; sessionStorage.setItem("abertura-vista", "1"); } catch {}
@@ -42,9 +42,14 @@ export function Cortina({ nome }) {
   return (
     <div className="corte" aria-hidden="true">
       <motion.div className="corte-metade cima" animate={{ y: "-100%" }} transition={abre}>
-        <motion.span className="corte-nome" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
-          {nome}
-        </motion.span>
+        {logo ? (
+          <motion.img className="corte-logo" src={logo} alt="" initial={{ opacity: 0, scale: 0.7, rotate: -12 }} animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 120, damping: 14 }} />
+        ) : (
+          <motion.span className="corte-nome" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
+            {nome}
+          </motion.span>
+        )}
       </motion.div>
       <motion.div className="corte-metade baixo" animate={{ y: "100%" }} transition={abre} />
       <motion.div className="corte-linha" animate={{ opacity: 0 }} transition={{ duration: 0.2, delay: T_CORTE + D_CORTE }}>
@@ -247,17 +252,17 @@ export function Particulas({ modo, cor }) {
 }
 
 /* ALFA: poste de barbearia 3D girando + faixa listrada correndo no rodapé do topo. */
-export function PosteAlfa() {
+export function PosteAlfa({ soListra = false }) {
   return (
     <>
-      <div className="poste3d" aria-hidden="true">
+      {!soListra && <div className="poste3d" aria-hidden="true">
         <motion.div className="poste3d-in" initial={{ y: -60, opacity: 0, rotate: -6 }} animate={{ y: 0, opacity: 1, rotate: 0 }}
           transition={{ type: "spring", stiffness: 90, damping: 14, delay: 1.1 }}>
           <div className="poste3d-tampa" />
           <div className="poste3d-corpo"><span /></div>
           <div className="poste3d-tampa baixo" />
         </motion.div>
-      </div>
+      </div>}
       <div className="listra-corrida" aria-hidden="true"><span /></div>
     </>
   );
@@ -338,5 +343,19 @@ export function Cursor() {
       <motion.div className="cursor-anel" style={{ x: ax, y: ay, scale: escala }} aria-hidden="true" />
       <motion.div className="cursor-ponto" style={{ x, y }} aria-hidden="true" />
     </>
+  );
+}
+
+/* Logo grande no topo: entra girando, flutua devagar, anel tracejado girando e brilho cromado passando. */
+export function LogoHero({ src, nome }) {
+  return (
+    <motion.div className="logo-hero" initial={{ opacity: 0, scale: 0.6, rotate: -25 }} animate={{ opacity: 1, scale: 1, rotate: 0 }}
+      transition={{ type: "spring", stiffness: 70, damping: 13, delay: 0.2 }}>
+      <motion.div className="logo-flutua" animate={{ y: [0, -12, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
+        <span className="logo-anel" aria-hidden="true" />
+        <img src={src} alt={`Logo da ${nome}`} />
+        <span className="logo-brilho" aria-hidden="true" />
+      </motion.div>
+    </motion.div>
   );
 }

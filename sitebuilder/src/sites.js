@@ -6,7 +6,9 @@ export const AUTOR = "BR3NNOX";
 export const SITES = [
   {
     slug: "barbearia-alfa",
-    nome: "Barbearia Alfa",
+    nome: "Alpha Barbearia",
+    logo: "logo.png",
+    icone: "logo-icone.png",
     bairro: "Compensa",
     endereco: "Av. Oscar Borel, 102 – Compensa, Manaus – AM",
     telefone: "(92) 9138-4642",

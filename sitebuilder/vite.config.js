@@ -15,7 +15,7 @@ export default defineConfig({
     react(),
     {
       name: "meta-da-barbearia",
-      transformIndexHtml(html) {
+      transformIndexHtml: { order: "pre", handler(html) {
         const vars = {
           TITLE: `${site.nome} · Barbearia em ${site.bairro}, Manaus`,
           DESC: `${site.nome}: barbearia em ${site.bairro}, Manaus. ${site.slogan} Agende pelo WhatsApp.`,
@@ -23,9 +23,11 @@ export default defineConfig({
           SLOGAN: site.slogan,
           ROBOTS: site.demo ? "noindex, nofollow" : "index, follow",
           THEME: TEMAS[site.tema].bg,
+          ICON: site.icone ? `/img/${site.icone}` : "/favicon.svg",
+          ICONTYPE: site.icone ? "image/png" : "image/svg+xml",
         };
         return html.replace(/%(\w+)%/g, (m, k) => (k in vars ? esc(vars[k]) : m));
-      },
+      } },
     },
   ],
   resolve: {

@@ -11,12 +11,13 @@ import {
 import { SITES, AUTOR, TEMAS } from "./sites.js";
 import {
   EASE, Cortina, Magnetico, Tilt, TituloLetras, Faixa, Mancha, useHolofote,
-  Particulas, PosteAlfa, FolhasVerde, TituloNavalha, RolagemSuave, Cursor,
+  Particulas, PosteAlfa, FolhasVerde, TituloNavalha, RolagemSuave, Cursor, LogoHero,
 } from "./Efeitos.jsx";
 import { Embaralhado, TextoAcende, LetrasPulam, Contador } from "./Tipografia.jsx";
 
 const site = SITES.find((s) => s.slug === __SLUG__);
 const COR = TEMAS[site.tema].fg;
+const LOGO = site.logo ? `/img/${site.logo}` : null;
 
 function waLink(tel, nome) {
   let d = String(tel || "").replace(/\D/g, "");
@@ -129,7 +130,7 @@ export default function App() {
     <MotionConfig reducedMotion="user">
       <RolagemSuave />
       <Cursor />
-      <Cortina nome={site.nome} />
+      <Cortina nome={site.nome} logo={LOGO} />
       <motion.div className="progresso" style={{ scaleX: progresso }} aria-hidden="true" />
 
       {site.demo && <div className="demo">Prévia de demonstração feita para a {site.nome}. Textos e valores são exemplos.</div>}
@@ -137,7 +138,7 @@ export default function App() {
       <header className={`topo ${rolou ? "is-rolou" : ""}`}>
         <div className="wrap topo-in">
           <a className="marca" href="#inicio">
-            <span className="marca-ico"><Tesoura /></span>
+            {LOGO ? <img className="marca-logo" src={LOGO} alt="" /> : <span className="marca-ico"><Tesoura /></span>}
             <LetrasPulam texto={site.nome} />
           </a>
           <nav aria-label="Seções">
@@ -155,7 +156,8 @@ export default function App() {
           {site.tema === "verde" && <Particulas modo="fumaca" cor="#2F5D46" />}
           {site.tema === "navalha" && <Particulas modo="ouro" cor={COR} />}
           <motion.div className="hero-fundo" style={{ x: fundoX }} aria-hidden="true">{site.bairro} · {site.bairro}</motion.div>
-          {site.tema === "alfa" && <PosteAlfa />}
+          {site.tema === "alfa" && <PosteAlfa soListra={!!LOGO} />}
+          {LOGO && <LogoHero src={LOGO} nome={site.nome} />}
           {site.tema === "verde" && <FolhasVerde />}
 
           <motion.div className="wrap hero-in" style={{ y: conteudoY, opacity: conteudoOp }}>
