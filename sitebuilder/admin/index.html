@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Agenda do barbeiro</title>
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+<main class="wrap">
+  <header class="topo">
+    <h1>Agenda do barbeiro</h1>
+    <button id="sair" class="link" type="button" hidden>Sair</button>
+  </header>
+
+  <form id="login" class="cartao" autocomplete="off">
+    <label for="senha">Senha de acesso</label>
+    <input id="senha" type="password" autocomplete="current-password" required>
+    <button class="btn" type="submit">Entrar</button>
+    <p id="login-erro" class="erro" role="alert" hidden></p>
+  </form>
+
+  <section id="painel" hidden>
+    <div class="dia-nav">
+      <button id="ant" class="btn-sec" type="button" aria-label="Dia anterior">‹</button>
+      <input id="data" type="date" aria-label="Escolher dia">
+      <button id="prox" class="btn-sec" type="button" aria-label="Próximo dia">›</button>
+      <button id="hoje" class="btn-sec" type="button">Hoje</button>
+    </div>
+    <p id="titulo-dia" class="titulo-dia"></p>
+    <div class="resumo">
+      <div><b id="n-res">0</b><span>agendamentos</span></div>
+      <div><b id="total">R$ 0</b><span>previsto no dia</span></div>
+      <div><span class="vivo"></span><span id="atualizado">—</span></div>
+    </div>
+
+    <h2>Agendamentos</h2>
+    <ul id="lista" class="lista"></ul>
+
+    <h2>Horários do dia</h2>
+    <p class="dica">Toque num horário livre para <b>bloquear</b> (almoço, folga). Toque de novo para liberar.</p>
+    <div id="grade" class="grade"></div>
+    <p id="msg" class="erro" role="alert" hidden></p>
+  </section>
+</main>
+<script src="/admin/admin.js"></script>
+</body>
+</html>

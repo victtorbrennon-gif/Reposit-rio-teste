@@ -35,7 +35,7 @@ export default defineConfig({
   },
   define: { __SLUG__: JSON.stringify(slug) },
   build: {
-    outDir: fileURLToPath(new URL(`../sites/${slug}`, import.meta.url)),
+    outDir: fileURLToPath(new URL(`../sites/${slug}/public`, import.meta.url)),
     emptyOutDir: true,
     assetsInlineLimit: 0, // nada de data: (a CSP só permite arquivos do próprio site)
     modulePreload: { polyfill: false },

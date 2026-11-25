@@ -3,8 +3,13 @@
 Todo site de cliente feito neste projeto segue este checklist antes da entrega.
 
 ## 1. Estrutura
-- [ ] Site estático (HTML/CSS/JS), sem banco de dados nem painel de login. Assim quase não há o que invadir.
-- [ ] Contato e agendamento por link do WhatsApp (`https://wa.me/55...`). Não há formulário guardando dados no nosso servidor.
+- [ ] Páginas estáticas (HTML/CSS/JS). A única parte com servidor é o **agendamento** (função `agenda` no Netlify).
+- [ ] Agendamento: a API pública (`/api/agenda`) só mostra horários livres/ocupados, **nunca nome ou telefone** de clientes.
+- [ ] Reserva com trava "só grava se não existir" por horário (dois clientes nunca pegam o mesmo horário). Testes em `sitebuilder/agenda/teste/`.
+- [ ] Validação no servidor: serviço, dia dentro da janela, horário da grade, nome (2–60), telefone (10–13 dígitos), campo-isca contra robôs, máx. 2 reservas futuras por telefone, corpo até 2 KB.
+- [ ] Limite de 40 pedidos/minuto por IP na função (rate limit do Netlify).
+- [ ] Painel do barbeiro (`/admin`) protegido pela senha `ADMIN_TOKEN` (variável do Netlify, **nunca no código**), comparação em tempo constante, sem cache e sem indexação.
+- [ ] Respostas da API com `Cache-Control: no-store`, `nosniff` e CSP própria (o `_headers` não vale para funções).
 - [ ] Nenhuma senha, chave de API ou token no código ou no repositório.
 
 ## 2. Hospedagem e HTTPS
@@ -34,6 +39,8 @@ Configurar em `_headers` (Netlify) ou `vercel.json` (Vercel):
 - [ ] Senhas guardadas num gerenciador (Bitwarden, que é gratuito), nunca em conversa de WhatsApp.
 
 ## 6. LGPD
+- [ ] Formulário de agendamento avisa: "Seu nome e WhatsApp são usados só para este agendamento".
+- [ ] Dados de clientes só aparecem no painel do barbeiro (com senha).
 - [ ] Se usar analytics ou pixel, incluir aviso de privacidade e banner de cookies.
 - [ ] Sem analytics, não há coleta de dados e não é preciso banner.
 

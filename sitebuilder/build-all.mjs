@@ -2,8 +2,8 @@
 // Uso: npm run build            (todos)
 //      SITE=navalhada npm run build   (só um)
 import { build } from "vite";
-import { writeFileSync, existsSync, cpSync } from "node:fs";
-import { SITES, TEMAS } from "./src/sites.js";
+import { writeFileSync, existsSync, cpSync, mkdirSync, readdirSync, rmSync } from "node:fs";
+import { SITES, TEMAS, agendaDe } from "./src/sites.js";
 
 const HEADERS = `/*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
@@ -16,6 +16,21 @@ const HEADERS = `/*
   Cross-Origin-Resource-Policy: same-origin
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+/admin/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+`;
+
+const NETLIFY_TOML = `[build]
+  publish = "public"
+  command = ""
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
 `;
 
 const favicon = ({ bg, fg }) =>
@@ -24,12 +39,25 @@ const favicon = ({ bg, fg }) =>
 const alvo = process.env.SITE;
 for (const site of SITES.filter((s) => !alvo || s.slug === alvo)) {
   process.env.SITE = site.slug;
+  const raiz = new URL(`../sites/${site.slug}/`, import.meta.url);
+  // limpa a pasta do site (mantém só .netlify, que liga a pasta ao projeto no Netlify)
+  if (existsSync(raiz)) for (const f of readdirSync(raiz)) if (f !== ".netlify") rmSync(new URL(f, raiz), { recursive: true, force: true });
   await build({ configFile: new URL("./vite.config.js", import.meta.url).pathname, logLevel: "warn" });
-  const out = new URL(`../sites/${site.slug}/`, import.meta.url);
-  writeFileSync(new URL("_headers", out), HEADERS + (site.demo ? "/*\n  X-Robots-Tag: noindex, nofollow\n" : ""));
-  writeFileSync(new URL("favicon.svg", out), favicon(TEMAS[site.tema]));
+
+  const pub = new URL("public/", raiz);
+  writeFileSync(new URL("_headers", pub), HEADERS + (site.demo ? "/*\n  X-Robots-Tag: noindex, nofollow\n" : ""));
+  writeFileSync(new URL("favicon.svg", pub), favicon(TEMAS[site.tema]));
   const imgs = new URL(`./public-imgs/${site.slug}/`, import.meta.url);
-  if (existsSync(imgs)) cpSync(imgs, new URL("img/", out), { recursive: true });
-  writeFileSync(new URL("netlify.toml", out), '[build]\n  publish = "."\n  command = ""\n');
+  if (existsSync(imgs)) cpSync(imgs, new URL("img/", pub), { recursive: true });
+  cpSync(new URL("./admin/", import.meta.url), new URL("admin/", pub), { recursive: true });
+
+  // função do agendamento (servidor) com a configuração desta barbearia
+  const fn = new URL("netlify/functions/agenda/", raiz);
+  mkdirSync(fn, { recursive: true });
+  cpSync(new URL("./agenda/agenda.mjs", import.meta.url), new URL("agenda.mjs", fn));
+  cpSync(new URL("./agenda/core.mjs", import.meta.url), new URL("core.mjs", fn));
+  writeFileSync(new URL("config.mjs", fn), `// gerado por build-all.mjs\nexport default ${JSON.stringify(agendaDe(site), null, 2)};\n`);
+  writeFileSync(new URL("package.json", raiz), JSON.stringify({ name: `site-${site.slug}`, private: true, type: "module", dependencies: { "@netlify/blobs": "^11.1.11" } }, null, 2) + "\n");
+  writeFileSync(new URL("netlify.toml", raiz), NETLIFY_TOML);
   console.log("ok", site.slug);
 }

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   MotionConfig,
@@ -13,6 +13,7 @@ import {
   EASE, Cortina, Magnetico, Tilt, TituloLetras, Faixa, Mancha, useHolofote,
   Particulas, PosteAlfa, FolhasVerde, TituloNavalha, RolagemSuave, Cursor, LogoHero,
 } from "./Efeitos.jsx";
+import Agendamento from "./Agendamento.jsx";
 import { Embaralhado, TextoAcende, LetrasPulam, Contador } from "./Tipografia.jsx";
 
 const site = SITES.find((s) => s.slug === __SLUG__);
@@ -26,6 +27,7 @@ function waLink(tel, nome) {
   return `https://wa.me/${d}?text=${encodeURIComponent(`Olá, ${nome}! Vi o site e quero agendar um horário.`)}`;
 }
 const WA = waLink(site.telefone, site.nome);
+const WA_NUM = WA ? WA.slice("https://wa.me/".length).split("?")[0] : null;
 const MAPA = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(`${site.nome}, ${site.endereco}`);
 
 /* ---------- ícones (traço no estilo Lucide) ---------- */
@@ -81,12 +83,11 @@ function Secao({ id, className = "", children }) {
 }
 
 function BotaoWA() {
-  if (!WA) return <span className="btn btn-main is-off">WhatsApp: número a confirmar</span>;
   return (
     <Magnetico>
-      <motion.a className="btn btn-main brilha" href={WA} target="_blank" rel="noopener noreferrer"
+      <motion.a className="btn btn-main brilha" href="#agendar"
         whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
-        <IcoChat /> Agendar no WhatsApp
+        <IcoClock /> Agendar horário
       </motion.a>
     </Magnetico>
   );
@@ -115,6 +116,16 @@ export default function App() {
     setMostraFixo(y > 520);
   });
 
+  // esconde o botão fixo enquanto a área de agendamento está na tela
+  const [noAgendar, setNoAgendar] = useState(false);
+  useEffect(() => {
+    const alvo = document.getElementById("agendar");
+    if (!alvo) return;
+    const io = new IntersectionObserver(([e]) => setNoAgendar(e.isIntersecting), { threshold: 0.05 });
+    io.observe(alvo);
+    return () => io.disconnect();
+  }, []);
+
   const heroRef = useRef(null);
   const { scrollYProgress: heroP } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const fundoX = useTransform(heroP, [0, 1], ["0%", "-25%"]);
@@ -142,7 +153,7 @@ export default function App() {
             <LetrasPulam texto={site.nome} />
           </a>
           <nav aria-label="Seções">
-            {[["#servicos", "Serviços"], ["#horarios", "Horários"], ["#local", "Local"]].map(([h, t]) => (
+            {[["#servicos", "Serviços"], ["#agendar", "Agendar"], ["#local", "Local"]].map(([h, t]) => (
               <a key={h} href={h}>{t}<span className="sublinha" aria-hidden="true" /></a>
             ))}
           </nav>
@@ -202,6 +213,15 @@ export default function App() {
           </motion.p>
         </Secao>
 
+        <Secao id="agendar" className="agendar">
+          <TituloLetras texto="Agende seu horário" />
+          <motion.p className="lead ag-intro" variants={subir}>
+            Escolha o serviço, o dia e um horário livre. Em menos de 1 minuto está marcado{WA_NUM ? " e a confirmação vai pronta pro WhatsApp" : ""}.
+          </motion.p>
+          {site.demo && <motion.p className="obs" variants={subir}>Demonstração: os agendamentos feitos aqui são de teste.</motion.p>}
+          <motion.div variants={subir}><Agendamento site={site} waNumero={WA_NUM} /></motion.div>
+        </Secao>
+
         <section className="bloco manifesto">
           <div className="wrap"><TextoAcende texto={site.manifesto} /></div>
         </section>
@@ -225,7 +245,7 @@ export default function App() {
           <TituloLetras texto="Por que agendar pelo site" />
           <div className="cards">
             {[
-              [IcoChat, "Agenda pelo WhatsApp", "Um toque e a conversa já abre com a mensagem pronta."],
+              [IcoClock, "Agenda online", "Veja os horários livres na hora e reserve o seu em menos de 1 minuto."],
               [IcoTag, "Preço claro", "Você vê os valores antes de sair de casa."],
               [IcoPin, "Fácil de achar", `Endereço em ${site.bairro} com rota direto no Google Maps.`],
             ].map(([I, t, d]) => (
@@ -244,9 +264,9 @@ export default function App() {
             <motion.span className="passos-linha" style={{ scaleX: linha }} aria-hidden="true" />
             <ol className="passos">
               {[
-                ["Chama no WhatsApp", "Manda uma mensagem pelo botão do site."],
-                ["Escolhe o horário", "A barbearia responde com os horários livres."],
-                ["Chega e senta", "Sem fila: seu horário fica reservado."],
+                ["Escolhe o serviço", "Já mostra o preço e quanto tempo leva."],
+                ["Pega um horário livre", "Os horários ocupados somem na hora, em tempo real."],
+                ["Confirma e pronto", "A confirmação vai pronta pro WhatsApp. É só chegar."],
               ].map(([t, d], i) => (
                 <motion.li key={t} variants={subir}>
                   <motion.span className="num" initial={{ scale: 0, rotate: -90 }} whileInView={{ scale: 1, rotate: 0 }} viewport={{ once: true }}
@@ -281,6 +301,13 @@ export default function App() {
                 <p><a className="link" href={`https://www.instagram.com/${encodeURIComponent(site.instagram.replace(/^@/, ""))}/`} target="_blank" rel="noopener noreferrer">{site.instagram}</a></p>
               )}
               <div className="acoes">
+                {WA && (
+                  <Magnetico forca={0.25}>
+                    <motion.a className="btn btn-ghost" href={WA} target="_blank" rel="noopener noreferrer" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
+                      <IcoChat /> Chamar no WhatsApp
+                    </motion.a>
+                  </Magnetico>
+                )}
                 <Magnetico forca={0.25}>
                   <motion.a className="btn btn-ghost" href={MAPA} target="_blank" rel="noopener noreferrer" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
                     <IcoPin /> Abrir no Google Maps
@@ -305,12 +332,12 @@ export default function App() {
       </footer>
 
       <AnimatePresence>
-        {WA && mostraFixo && (
-          <motion.a className="fixo" href={WA} target="_blank" rel="noopener noreferrer"
+        {mostraFixo && !noAgendar && (
+          <motion.a className="fixo" href="#agendar"
             initial={{ y: 120, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 120, opacity: 0 }}
             transition={{ type: "spring", stiffness: 320, damping: 26 }}>
             <motion.span className="fixo-pulso" animate={{ scale: [1, 1.12], opacity: [0.6, 0] }} transition={{ duration: 1.8, repeat: Infinity }} aria-hidden="true" />
-            <IcoChat /> Agendar no WhatsApp
+            <IcoClock /> Agendar horário
           </motion.a>
         )}
       </AnimatePresence>

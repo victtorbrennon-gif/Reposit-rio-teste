@@ -7,3 +7,4 @@
 - Fontes e animações de texto: siga a skill `tipografia-barbearias` (`.claude/skills/tipografia-barbearias/SKILL.md`).
 - Imagens: geradas no Canva (conector) e exportadas em JPG; ficam em `sitebuilder/public-imgs/<slug>/`, otimizadas e sem metadados. Em demonstração, sempre com a legenda "Imagem ilustrativa".
 - **Cada modificação feita nos sites vira um lembrete** na coleção `lembretes` do painel (ArtifactData, campos: titulo, detalhe, site, data ISO, visto:false).
+- Agendamento online: regras em `sitebuilder/agenda/core.mjs` (testes: `cd sitebuilder && npm test`), função em `sitebuilder/agenda/agenda.mjs`, painel do barbeiro em `sitebuilder/admin/`. Duração dos serviços = 3º item de `servicos` em `sites.js`; horários em `abertura`. Senha do painel = variável `ADMIN_TOKEN` no Netlify (nunca no repositório).
