@@ -1,0 +1,41 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { fileURLToPath } from "node:url";
+import { SITES, TEMAS } from "./src/sites.js";
+
+const slug = process.env.SITE || SITES[0].slug;
+const site = SITES.find((s) => s.slug === slug);
+if (!site) throw new Error(`Site desconhecido: ${slug}`);
+
+const esc = (s) =>
+  String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+export default defineConfig({
+  plugins: [
+    react(),
+    {
+      name: "meta-da-barbearia",
+      transformIndexHtml(html) {
+        const vars = {
+          TITLE: `${site.nome} · Barbearia em ${site.bairro}, Manaus`,
+          DESC: `${site.nome}: barbearia em ${site.bairro}, Manaus. ${site.slogan} Agende pelo WhatsApp.`,
+          OG_TITLE: site.nome,
+          SLOGAN: site.slogan,
+          ROBOTS: site.demo ? "noindex, nofollow" : "index, follow",
+          THEME: TEMAS[site.tema].bg,
+        };
+        return html.replace(/%(\w+)%/g, (m, k) => (k in vars ? esc(vars[k]) : m));
+      },
+    },
+  ],
+  resolve: {
+    alias: { "@tema": fileURLToPath(new URL(`./src/temas/${site.tema}.js`, import.meta.url)) },
+  },
+  define: { __SLUG__: JSON.stringify(slug) },
+  build: {
+    outDir: fileURLToPath(new URL(`../sites/${slug}`, import.meta.url)),
+    emptyOutDir: true,
+    assetsInlineLimit: 0, // nada de data: (a CSP só permite arquivos do próprio site)
+    modulePreload: { polyfill: false },
+  },
+});

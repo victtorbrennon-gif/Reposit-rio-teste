@@ -1,0 +1,5 @@
+/* Cheiro Verde: clássico e acolhedor, creme com verde. */
+:root{--bg:#F6F3EA;--bg2:#ECE6D6;--ink:#0E2A1E;--muted:#4B5E52;--accent:#047857;--accent-ink:#fff;--line:#D8D0BA;
+  --f-display:"DM Serif Display",Georgia,serif;--f-body:"Didact Gothic",system-ui,sans-serif;
+  --raio:999px;--h-weight:400;--h-track:-.01em}
+.card{border-radius:22px}

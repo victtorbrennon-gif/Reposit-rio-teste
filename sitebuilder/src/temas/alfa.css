@@ -1,0 +1,4 @@
+/* Alfa: urbano, contraste alto, preto e vermelho. */
+:root{--bg:#0B0B0D;--bg2:#131316;--ink:#F8FAFC;--muted:#A1A1AA;--accent:#E11D48;--accent-ink:#fff;--line:#27272A;
+  --f-display:"Anton",Impact,"Arial Narrow",sans-serif;--f-body:"Rubik",system-ui,sans-serif;
+  --raio:6px;--h1-case:uppercase;--h-weight:400;--h-track:.005em}
