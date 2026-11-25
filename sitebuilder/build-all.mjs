@@ -30,5 +30,6 @@ for (const site of SITES.filter((s) => !alvo || s.slug === alvo)) {
   writeFileSync(new URL("favicon.svg", out), favicon(TEMAS[site.tema]));
   const imgs = new URL(`./public-imgs/${site.slug}/`, import.meta.url);
   if (existsSync(imgs)) cpSync(imgs, new URL("img/", out), { recursive: true });
+  writeFileSync(new URL("netlify.toml", out), '[build]\n  publish = "."\n  command = ""\n');
   console.log("ok", site.slug);
 }
