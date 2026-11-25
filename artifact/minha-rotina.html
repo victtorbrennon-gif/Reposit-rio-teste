@@ -388,6 +388,14 @@ body.has-timer .toast { bottom: calc(132px + env(safe-area-inset-bottom, 0px)); 
         <span class="muted small" id="plan-sub"></span>
       </div>
       <div id="plan-list"></div>
+    </section>
+
+    <!-- DICAS -->
+    <section class="view" id="view-dicas" hidden>
+      <div class="card-head plan-head">
+        <h2>Dicas e guias</h2>
+        <span class="muted small">compras, comida, pele, sono</span>
+      </div>
       <div id="starter"></div>
       <div id="shopping"></div>
       <div id="guides"></div>
@@ -526,6 +534,7 @@ body.has-timer .toast { bottom: calc(132px + env(safe-area-inset-bottom, 0px)); 
   <nav class="tabs">
     <button data-view="hoje" class="active"><span>✅</span>Hoje</button>
     <button data-view="plano"><span>🏋️</span>Plano</button>
+    <button data-view="dicas"><span>💡</span>Dicas</button>
     <button data-view="rotina"><span>🗓️</span>Rotina</button>
     <button data-view="progresso"><span>📈</span>Progresso</button>
   </nav>
@@ -957,7 +966,7 @@ const GUIDES = [
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.5';
+const APP_VERSION = '2.6';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -1585,6 +1594,10 @@ function renderPlan() {
     ));
   });
 
+}
+
+// ---------- Aba Dicas ----------
+function renderTips() {
   renderStarter();
   renderShopping();
   const g = $('#guides');
@@ -1870,6 +1883,7 @@ function renderAll() {
   renderHeader();
   if (currentView === 'hoje') renderToday();
   if (currentView === 'plano') renderPlan();
+  if (currentView === 'dicas') renderTips();
   if (currentView === 'rotina') renderManage();
   if (currentView === 'progresso') renderProgress();
 }
