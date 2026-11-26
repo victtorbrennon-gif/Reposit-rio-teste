@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.9';
+const APP_VERSION = '3.0';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -206,6 +206,13 @@ async function saveFin() {
   if (finPending) { finPending = false; saveFin(); }
 }
 
+// Lê valores como 500, 500,50, 1.250,50 ou 500.50
+function parseMoney(s) {
+  let t = String(s).replace(/[R$\s]/g, '');
+  if (t.includes(',')) t = t.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, '');
+  return parseFloat(t);
+}
 const brl = (n) => (Number(n) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const monthKey = () => todayKey().slice(0, 7);
 // O mês das contas: o atual, ou o mês cadastrado se for mais à frente (contas de dezembro cadastradas em novembro)
@@ -254,17 +261,32 @@ function renderFinance() {
   if (g && g.target) {
     const saved = +g.saved || 0;
     const pct = Math.min(100, Math.round((saved / g.target) * 100));
-    const monthsLeft = g.monthly ? Math.max(0, Math.ceil((g.target - saved) / g.monthly)) : null;
+    // schedule: [{ from: 'AAAA-MM', monthly }] — o valor do mês vale a partir de 'from'
+    const sched = (g.schedule && g.schedule.length ? g.schedule : [{ from: monthKey(), monthly: g.monthly }])
+      .slice().sort((x, y) => x.from.localeCompare(y.from));
+    const monthlyAt = (mk) => { let v = 0; for (const s of sched) if (s.from <= mk) v = +s.monthly || 0; return v; };
+    const nowMonthly = monthlyAt(monthKey()) || +sched[0].monthly || 0;
+    let monthsLeft = null;
+    if (saved < g.target) {
+      let total = saved, n = 0;
+      let [y, m] = (monthKey() > sched[0].from ? monthKey() : sched[0].from).split('-').map(Number);
+      while (total < g.target && n < 240) {
+        const mk = `${y}-${String(m).padStart(2, '0')}`;
+        total += monthlyAt(mk); n++;
+        m++; if (m > 12) { m = 1; y++; }
+      }
+      monthsLeft = n < 240 ? n : null;
+    }
     const inp = el('input', { id: 'goal-saved', inputmode: 'decimal', placeholder: 'R$ guardado', 'aria-label': 'Quanto já tem guardado' });
     inp.value = saved ? String(saved).replace('.', ',') : '';
     box.append(el('div', { class: 'card fin-goal' },
       el('h2', {}, `🎯 ${g.name || 'Meta'}`),
-      el('p', { class: 'fin-goal-rule' }, `Guarde ${brl(g.monthly)} todo mês`, el('small', {}, g.rule || 'No dia do salário, antes de qualquer gasto.')),
+      el('p', { class: 'fin-goal-rule' }, `Guarde ${brl(nowMonthly)} todo mês`, el('small', {}, g.rule || 'No dia do salário, antes de qualquer gasto.')),
       el('div', { class: 'fin-bar' }, el('div', { style: `width:${pct}%` })),
       el('p', { class: 'small' }, `${brl(saved)} de ${brl(g.target)} (${pct}%)` + (monthsLeft ? ` · faltam uns ${monthsLeft} meses` : saved >= g.target ? ' · meta batida! 🎉' : '')),
       el('form', { class: 'row', onsubmit: (e) => {
         e.preventDefault();
-        const v = parseFloat(String(inp.value).replace(/\./g, '').replace(',', '.'));
+        const v = parseMoney(inp.value);
         if (!Number.isFinite(v) || v < 0) { toast('Digite só o valor, por exemplo 500'); return; }
         g.saved = v; g.savedAt = todayKey();
         saveFin(); renderFinance(); toast('Reserva atualizada ✓');

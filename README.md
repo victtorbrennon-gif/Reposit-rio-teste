@@ -11,6 +11,7 @@ A versão do GitHub Pages (PWA, dados só no aparelho) continua no ar só para m
 - **Hoje**: checklist das atividades do dia, separadas em manhã, tarde e noite, com anel de progresso; contador de copos de água; nota do dia.
 - **Plano**: treino de cada dia da semana (musculação + cardio), com séries, repetições, carga e cronômetro de descanso.
 - **Dicas**: lista "Antes de começar", lista de compras e guias de suplementos, alimentação, marmitas, sono, pele, trajeto, moto e renda extra (conteúdo em `plan.js`).
+- **Finanças**: resumo do mês, dívidas, contas, passo a passo e meta de reserva. Os valores ficam só no banco do artifact, na área privada do usuário (`data/users/<id>/finance`); nada disso vai para o código.
 - **Rotina**: adicionar, editar e remover atividades, com período, horário opcional e dias da semana.
 - **Progresso**: sequência de dias com 80% ou mais, média dos últimos 7 dias, gráfico da semana, mapa dos últimos 30 dias, desempenho por atividade e registro semanal de peso e cintura. Também tem backup (exportar e importar JSON) e a meta de água.
 

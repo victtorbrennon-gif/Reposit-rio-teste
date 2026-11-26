@@ -297,7 +297,7 @@ function mealTip(now) {
 const STARTER = [
   ['🔴 Compre antes de começar', [
     ['Potes de marmita com tampa: 6 a 8 (vidro ou plástico próprio para micro-ondas)',
-     'Cada marmita pronta no domingo é uma refeição que você não compra na rua. São 5 jantares mais lanches, então comece com 6.',
+     'Cada marmita pronta no domingo é uma refeição que você não compra na rua. São 5 marmitas para o intervalo das 14h, mais os lanches, então comece com 6.',
      'Enquanto não compra: potes de vidro de conserva bem lavados, ou marmitex descartável. Não esquente pote de sorvete ou margarina no micro-ondas.'],
     ['Gelos reutilizáveis: 2 (a bolsa térmica você já tem ✅)',
      'Você sai às 12:35 e come a marmita às 14h, e o lanche só às 18h. Com o gelo dentro da bolsa, a comida chega boa até a hora de comer.',
@@ -358,7 +358,7 @@ const GUIDES = [
 <p><b>Ordem de prioridade (pra gastar bem):</b></p>
 <ol>
 <li><b>Creatina:</b> a mais estudada e a mais barata. <b>3–5 g todo dia</b>, inclusive nos dias sem treino, em qualquer horário (deixei no café da manhã). Não precisa fazer "saturação". Pode inchar um pouco no começo, porque é água dentro do músculo.</li>
-<li><b>Whey:</b> não é obrigatório. Serve para bater a meta de proteína quando a comida não alcança. 1 dose (≈25–30 g de proteína) no pós-treino ou no lanche das 16h.</li>
+<li><b>Whey:</b> não é obrigatório. Serve para bater a meta de proteína quando a comida não alcança. 1 dose (≈25–30 g de proteína) no pós-treino ou no lanche das 18h. Compre só depois de limpar o nome.</li>
 <li><b>Cafeína:</b> um <b>café coado forte</b> faz quase o mesmo que o pré-treino e custa bem menos. Tome por volta de 06:35, antes de sair: o efeito chega no treino das 07:40. Fique em 150–200 mg nessa dose e não passe de 400 mg no dia todo.</li>
 </ol>
 <p><b>Sem cafeína depois das 15h:</b> você dorme às 23h e ela atrapalha o sono por muitas horas. No trabalho à noite, prefira água, chá sem cafeína ou café descafeinado.</p>
@@ -405,7 +405,7 @@ const GUIDES = [
 
   ['🛵 Trajeto passo a passo', ROUTES_HTML],
 
-  ['🔧 Moto (domingo, 09:00)', `
+  ['🔧 Moto (domingo, 09:30)', `
 <ul>
 <li><b>Pneus:</b> calibre toda semana e veja se há desgaste ou prego.</li>
 <li><b>Corrente:</b> limpe e lubrifique a cada ~500 km ou depois de pegar chuva.</li>
@@ -416,5 +416,5 @@ const GUIDES = [
 
   ['💰 Renda extra', `
 <p>Reservei <b>1h30 de segunda a sexta (09:45–11:15)</b>, ou seja, 7h30 por semana de foco, e o domingo à noite para planejar.</p>
-<p>Quando você mandar seus ganhos e gastos, a gente decide o que fazer nesse bloco, por exemplo aproveitar as lives que você já faz. Até lá, use o tempo para listar o que você sabe fazer e o que as pessoas já te pedem.</p>`],
+<p>O ponto de partida são as suas lives de games no TikTok (sábado, e às vezes domingo, às 20h). Use o bloco para preparar as lives, editar cortes dos melhores momentos e postar durante a semana. Quando o projeto das lives estiver no GitHub, o Claude monta um plano para elas virarem renda.</p>`],
 ];
