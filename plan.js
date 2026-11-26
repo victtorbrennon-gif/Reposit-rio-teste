@@ -219,12 +219,13 @@ const QUOTES = [
 // Lista de compras: [grupo, semanal?, itens]
 const SHOPPING = [
   ['🥩 Proteínas', true, [
-    'Ovos: 1 bandeja de 30',
-    'Frango (peito ou sobrecoxa sem pele): 2 kg',
-    'Carne moída magra (patinho): 1 kg',
-    'Peixe (jaraqui, tambaqui ou matrinxã): 1 kg',
-    'Iogurte natural: 4 potes',
-    'Leite desnatado: 2 L',
+    'Ovos: 1 bandeja de 30 (a proteína mais barata)',
+    'Frango (coxa ou sobrecoxa, mais em conta que o peito): 2 kg',
+    'Carne moída (acém ou músculo, mais em conta que o patinho): 1 kg',
+    'Peixe (jaraqui, o mais em conta): 1 kg',
+    'Sardinha em lata: 2 (lanche rápido)',
+    'Iogurte natural: 1 pote grande',
+    'Leite: 2 L',
   ]],
   ['🍚 Carboidratos', true, [
     'Arroz: 2 kg',
@@ -257,12 +258,12 @@ const SHOPPING = [
   ]],
   ['💊 Suplementos (por ordem)', false, [
     'Creatina: ✅ já tem',
-    'Whey concentrado: 900 g (~30 doses). Prefira marca que publica laudo de análise',
+    'Whey concentrado: 900 g. Só depois de limpar o nome; ovos e frango já dão conta',
     'Opcional: cafeína em cápsula de 200 mg (mais barata que pré-treino)',
   ]],
 ];
 
-const SHOPPING_TIPS = 'Quantidades para 1 pessoa por 1 semana. Se a esposa comer junto, aumente arroz, feijão, legumes e frutas. Faça o mercado no sábado, depois do turno, para preparar as marmitas no domingo. Para economizar, compre frango e peixe na feira ou em promoção e congele em porções.';
+const SHOPPING_TIPS = 'Versão econômica. Pague com o Caju primeiro e compare o preço por quilo. Quantidades para 1 pessoa por 1 semana. Se a esposa comer junto, aumente arroz, feijão, legumes e frutas. Faça o mercado no sábado, depois do turno, para preparar as marmitas no domingo. Para economizar, compre frango e peixe na feira ou em promoção e congele em porções.';
 
 // Cardápio por dia da semana (0 = domingo). work = true leva marmita pro trabalho.
 const WEEK_MENU = {
@@ -315,7 +316,7 @@ const STARTER = [
      'O forro do capacete absorve suor e gordura e encosta no seu rosto por horas. A balaclava segura isso e lava fácil. Ela evita espinha na testa e no queixo.',
      'Enquanto não compra: lave o forro do capacete a cada 15 dias e use uma bandana de algodão limpa por baixo.'],
     ['Whey concentrado, 900 g',
-     'Só ajuda a bater a meta de proteína. Com ovos, frango e iogurte, você chega lá sem ele. Compre depois que a rotina estiver rodando.', ''],
+     'Só ajuda a bater a meta de proteína. Com ovos, frango e iogurte, você chega lá sem ele. Compre depois de limpar o nome.', ''],
     ['Caneta e fita para escrever a data nas marmitas', 'Você vê o que está há mais de 3 dias na geladeira e descarta.', ''],
     ['Lubrificante de corrente e shampoo automotivo', 'Para o domingo da moto. Pode comprar no mês que vem.', ''],
   ]],

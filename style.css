@@ -300,3 +300,20 @@ button:focus-visible, a:focus-visible, .task:focus-visible, summary:focus-visibl
 .timer-actions .stop { background: var(--hero-sun); color: #1b2a4a; border-color: var(--hero-sun); }
 body.has-timer { padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)); }
 body.has-timer .toast { bottom: calc(132px + env(safe-area-inset-bottom, 0px)); }
+
+/* finanças */
+.tabs button { font-size: .66rem; }
+.fin-sum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.fin-sum div { background: var(--bg); border-radius: 10px; padding: 8px; text-align: center; }
+.fin-sum small { display: block; color: var(--muted); font-size: .7rem; }
+.fin-sum b { font-size: .95rem; font-variant-numeric: tabular-nums; }
+.pos { color: var(--ok); }
+.neg { color: var(--danger); }
+.fin-lines { list-style: none; padding: 0; margin: 0; }
+.fin-lines li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line); font-size: .88rem; font-variant-numeric: tabular-nums; }
+.fin-lines small { display: block; color: var(--muted); font-size: .75rem; }
+.fin-note { background: var(--accent-soft); border-radius: 10px; padding: 10px; margin-bottom: 0; }
+.fin-bar { height: 10px; background: var(--line); border-radius: 6px; overflow: hidden; }
+.fin-bar div { height: 100%; background: var(--ok); }
+.fin-plan { padding-left: 20px; margin: 0; }
+.fin-plan li { margin-bottom: 8px; font-size: .9rem; line-height: 1.45; }

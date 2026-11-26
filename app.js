@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.6';
+const APP_VERSION = '2.7';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -124,7 +124,8 @@ async function connectDb() {
   setSync('loading');
   const timer = setTimeout(() => { if (!dbReady) setSync('offline'); }, 10000);
   try { db = await window.claude.use('db'); } catch (e) { db = null; }
-  if (!db) { clearTimeout(timer); setSync('nodb'); return; }
+  if (!db) { clearTimeout(timer); setSync('nodb'); finStatus = 'nodb'; return; }
+  connectFinance();
   let gotConfig = false;
   let gotDays = false;
   const update = () => {
@@ -171,6 +172,142 @@ function parseBackup(txt) {
   const data = JSON.parse(txt);
   if (!data || !Array.isArray(data.items)) throw new Error('formato inválido');
   return data;
+}
+
+// ---------- Finanças ----------
+// Ficam em data/users/<id>/finance: área privada de cada pessoa, que nem quem tem o link consegue ler.
+// Nenhum valor fica no código do app.
+let fin = null;
+let finRef = null;
+let finStatus = IN_CLAUDE ? 'loading' : 'web'; // loading | ok | empty | nodb | noid | error | web
+let finWriting = false;
+let finPending = false;
+
+async function connectFinance() {
+  let user = null;
+  try { user = await window.claude.use('user'); } catch (e) { user = null; }
+  const id = user ? await user.id() : null;
+  if (!id) { finStatus = 'noid'; if (currentView === 'financas') renderFinance(); return; }
+  finRef = db.doc(`data/users/${id}/finance`);
+  finRef.onSnapshot((snap) => {
+    if (finWriting || finPending) return; // edição local em andamento
+    fin = snap.exists ? structuredClone(snap.data()) : null;
+    finStatus = fin ? 'ok' : (snap.metadata.fromCache ? 'loading' : 'empty');
+    if (currentView === 'financas') renderFinance();
+  }, () => { finStatus = 'error'; if (currentView === 'financas') renderFinance(); });
+}
+
+async function saveFin() {
+  if (!finRef || !fin) return;
+  if (finWriting) { finPending = true; return; }
+  finWriting = true;
+  try { await finRef.set(fin); } catch (e) { toast('Não consegui salvar. Tente de novo em instantes.'); }
+  finWriting = false;
+  if (finPending) { finPending = false; saveFin(); }
+}
+
+const brl = (n) => (Number(n) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const monthKey = () => todayKey().slice(0, 7);
+// O mês das contas: o atual, ou o mês cadastrado se for mais à frente (contas de dezembro cadastradas em novembro)
+const finMonth = () => (fin && fin.month && fin.month > monthKey() ? fin.month : monthKey());
+const monthName = () => new Date(finMonth() + '-15T12:00:00').toLocaleDateString('pt-BR', { month: 'long' });
+
+function renderFinance() {
+  const box = $('#fin');
+  box.innerHTML = '';
+  const msg = {
+    web: 'As finanças só aparecem no app novo, dentro da sua conta do Claude.',
+    loading: 'Carregando suas finanças…',
+    empty: 'Suas finanças ainda não foram cadastradas. Mande seus ganhos e gastos para o Claude na conversa.',
+    nodb: 'Entre na sua conta do Claude para ver suas finanças.',
+    noid: 'Entre na sua conta do Claude para ver suas finanças.',
+    error: 'Não consegui carregar suas finanças agora. Tente de novo em instantes.',
+  }[finStatus];
+  if (finStatus !== 'ok' || !fin) { box.append(el('div', { class: 'card empty' }, msg)); return; }
+
+  const income = fin.income || [];
+  const bills = fin.bills || [];
+  const debts = fin.debts || [];
+  const cashIn = income.filter((i) => i.kind !== 'voucher').reduce((s, i) => s + (+i.amount || 0), 0);
+  const billsTotal = bills.reduce((s, b) => s + (+b.amount || 0), 0);
+  const left = cashIn - billsTotal;
+  const mk = finMonth();
+  fin.paid = fin.paid || {};
+  const paidNow = fin.paid[mk] || [];
+
+  // Resumo
+  box.append(el('div', { class: 'card' },
+    el('h2', {}, `💰 Dinheiro de ${monthName()}`),
+    el('div', { class: 'fin-sum' },
+      el('div', {}, el('small', {}, 'Entra'), el('b', { class: 'pos' }, brl(cashIn))),
+      el('div', {}, el('small', {}, 'Contas e parcelas'), el('b', {}, brl(billsTotal))),
+      el('div', {}, el('small', {}, 'Sobra'), el('b', { class: left >= 0 ? 'pos' : 'neg' }, brl(left)))),
+    el('ul', { class: 'fin-lines' }, income.map((i) => el('li', {},
+      el('span', {}, i.name, i.note ? el('small', {}, i.note) : null),
+      el('span', { class: i.kind === 'voucher' ? 'muted' : '' }, brl(i.amount) + (i.kind === 'voucher' ? ' *' : ''))))),
+    income.some((i) => i.kind === 'voucher') ? el('p', { class: 'muted small' }, '* Vale: só serve para comida ou gasolina, não entra na sobra.') : null,
+    fin.note ? el('p', { class: 'small fin-note' }, fin.note) : null));
+
+  // Limpar o nome
+  if (debts.length) {
+    const orig = debts.reduce((s, d) => s + (+d.original || 0), 0);
+    const offer = debts.reduce((s, d) => s + (+d.offer || 0), 0);
+    const cleaned = debts.filter((d) => d.paid).reduce((s, d) => s + (+d.original || 0), 0);
+    const pct = orig ? Math.round((cleaned / orig) * 100) : 0;
+    box.append(el('div', { class: 'card' },
+      el('h2', {}, '🧹 Limpar o nome'),
+      el('p', { class: 'small' }, `${brl(orig)} em dívidas saem por ${brl(offer)} à vista nas ofertas de agora.`),
+      el('div', { class: 'fin-bar', 'aria-label': `${pct}% limpo` }, el('div', { style: `width:${pct}%` })),
+      el('p', { class: 'muted small' }, `${brl(cleaned)} de dívida já quitada (${pct}%).`),
+      debts.map((d, idx) => {
+        const id = 'debt-' + idx;
+        const cb = el('input', { type: 'checkbox', id, onchange: (e) => {
+          d.paid = e.target.checked;
+          if (d.paid) d.paidAt = todayKey(); else delete d.paidAt;
+          saveFin(); renderFinance();
+          if (d.paid) toast(`${d.name} quitada ✓ Guarde o comprovante.`);
+        } });
+        cb.checked = !!d.paid;
+        const off = d.original ? Math.round((1 - d.offer / d.original) * 100) : 0;
+        return el('label', { class: 'shop-item starter fin-item' + (d.paid ? ' got' : ''), for: id }, cb,
+          el('span', {}, el('span', { class: 'nm' }, `${idx + 1}. ${d.name}`),
+            el('small', { class: 'why' }, `de ${brl(d.original)} por ${brl(d.offer)}${off > 0 ? ` (−${off}%)` : ''}`),
+            d.note ? el('small', { class: 'why alt' }, d.note) : null));
+      }),
+      el('p', { class: 'muted small' }, 'Negocie só pelo app oficial da Serasa ou do banco. Nunca pague boleto que chegou por WhatsApp ou SMS.')));
+  }
+
+  // Contas do mês
+  if (bills.length) {
+    const paidSum = bills.filter((b) => paidNow.includes(b.id)).reduce((s, b) => s + (+b.amount || 0), 0);
+    box.append(el('div', { class: 'card' },
+      el('h2', {}, `🧾 Contas de ${monthName()}`),
+      el('p', { class: 'muted small' }, `Pago: ${brl(paidSum)} · Falta: ${brl(billsTotal - paidSum)}`),
+      bills.map((b) => {
+        const id = 'bill-' + b.id;
+        const on = paidNow.includes(b.id);
+        const cb = el('input', { type: 'checkbox', id, onchange: (e) => {
+          const cur = fin.paid[mk] || [];
+          fin.paid[mk] = e.target.checked ? [...cur, b.id] : cur.filter((x) => x !== b.id);
+          saveFin(); renderFinance();
+        } });
+        cb.checked = on;
+        const meta = [brl(b.amount), b.due ? `vence dia ${b.due}` : null, b.left ? `faltam ${b.left} parcela${b.left > 1 ? 's' : ''}` : null].filter(Boolean).join(' · ');
+        return el('label', { class: 'shop-item starter fin-item' + (on ? ' got' : ''), for: id }, cb,
+          el('span', {}, el('span', { class: 'nm' }, b.name), el('small', { class: 'why' }, meta), b.note ? el('small', { class: 'why' }, b.note) : null));
+      })));
+  }
+
+  // Plano e perguntas
+  if ((fin.plan || []).length) {
+    box.append(el('div', { class: 'card' }, el('h2', {}, '🗺️ Plano'),
+      el('ol', { class: 'fin-plan' }, fin.plan.map((p) => el('li', {}, p)))));
+  }
+  if ((fin.questions || []).length) {
+    box.append(el('div', { class: 'card' }, el('h2', {}, '❓ Para confirmar com o Claude'),
+      el('ul', { class: 'fin-plan' }, fin.questions.map((q) => el('li', {}, q)))));
+  }
+  if (fin.updated) box.append(el('p', { class: 'muted small', style: 'text-align:center' }, `Atualizado em ${fin.updated.split('-').reverse().join('/')}`));
 }
 
 // ---------- Diálogos dentro da página ----------
@@ -920,6 +1057,7 @@ function renderAll() {
   if (currentView === 'hoje') renderToday();
   if (currentView === 'plano') renderPlan();
   if (currentView === 'dicas') renderTips();
+  if (currentView === 'financas') renderFinance();
   if (currentView === 'rotina') renderManage();
   if (currentView === 'progresso') renderProgress();
 }
