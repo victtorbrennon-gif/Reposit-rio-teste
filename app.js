@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.7';
+const APP_VERSION = '2.8';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -235,6 +235,20 @@ function renderFinance() {
   fin.paid = fin.paid || {};
   const paidNow = fin.paid[mk] || [];
 
+  // Próximo passo do plano
+  const plan = fin.plan || [];
+  fin.planDone = fin.planDone || [];
+  const nextStep = plan.find((p) => !fin.planDone.includes(p));
+  if (plan.length) {
+    box.append(el('div', { class: 'card banner fin-next' },
+      el('small', {}, nextStep ? `Próximo passo · ${plan.indexOf(nextStep) + 1} de ${plan.length}` : 'Plano do mês'),
+      el('b', {}, nextStep || 'Tudo feito este mês! 🎉'),
+      nextStep ? el('button', { class: 'btn', type: 'button', onclick: () => {
+        fin.planDone = [...fin.planDone, nextStep];
+        saveFin(); renderFinance(); toast('Passo feito ✓');
+      } }, '✔ Fiz este passo') : null));
+  }
+
   // Resumo
   box.append(el('div', { class: 'card' },
     el('h2', {}, `💰 Dinheiro de ${monthName()}`),
@@ -299,9 +313,20 @@ function renderFinance() {
   }
 
   // Plano e perguntas
-  if ((fin.plan || []).length) {
-    box.append(el('div', { class: 'card' }, el('h2', {}, '🗺️ Plano'),
-      el('ol', { class: 'fin-plan' }, fin.plan.map((p) => el('li', {}, p)))));
+  if (plan.length) {
+    const doneN = plan.filter((p) => fin.planDone.includes(p)).length;
+    box.append(el('div', { class: 'card' }, el('h2', {}, `🗺️ Passo a passo (${doneN}/${plan.length})`),
+      plan.map((p, i) => {
+        const id = 'step-' + i;
+        const on = fin.planDone.includes(p);
+        const cb = el('input', { type: 'checkbox', id, onchange: (e) => {
+          fin.planDone = e.target.checked ? [...fin.planDone, p] : fin.planDone.filter((x) => x !== p);
+          saveFin(); renderFinance();
+        } });
+        cb.checked = on;
+        return el('label', { class: 'shop-item starter fin-item' + (on ? ' got' : '') + (p === nextStep ? ' next' : ''), for: id }, cb,
+          el('span', {}, el('span', { class: 'nm' }, `${i + 1}. ${p}`)));
+      })));
   }
   if ((fin.questions || []).length) {
     box.append(el('div', { class: 'card' }, el('h2', {}, '❓ Para confirmar com o Claude'),
