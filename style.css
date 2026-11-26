@@ -322,3 +322,8 @@ body.has-timer .toast { bottom: calc(132px + env(safe-area-inset-bottom, 0px)); 
 .fin-next small { color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: .7rem; }
 .fin-next b { font-size: .95rem; line-height: 1.45; font-weight: 600; }
 .fin-item.next { background: var(--accent-soft); border-radius: 10px; padding-left: 6px; padding-right: 6px; }
+
+.fin-goal-rule { font-size: 1.15rem; font-weight: 700; margin: 0 0 10px; color: var(--ok); }
+.fin-goal-rule small { display: block; font-size: .8rem; font-weight: 400; color: var(--muted); margin-top: 2px; }
+.fin-goal form { margin-top: 4px; }
+.fin-goal input { min-width: 0; }

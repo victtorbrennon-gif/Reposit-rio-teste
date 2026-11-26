@@ -2,7 +2,7 @@
 
 // ---------- Estado e armazenamento ----------
 const KEY = 'minha-rotina-v1';
-const APP_VERSION = '2.8';
+const APP_VERSION = '2.9';
 // Dentro do Claude (artifact) os dados ficam online no banco do artifact; fora dele, só no aparelho.
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const NEW_APP_URL = 'https://claude.ai/artifact/AJ2totqj2CjhetECE5RrwH'; // endereço do app novo (artifact)
@@ -247,6 +247,29 @@ function renderFinance() {
         fin.planDone = [...fin.planDone, nextStep];
         saveFin(); renderFinance(); toast('Passo feito ✓');
       } }, '✔ Fiz este passo') : null));
+  }
+
+  // Meta fixa de reserva
+  const g = fin.goal;
+  if (g && g.target) {
+    const saved = +g.saved || 0;
+    const pct = Math.min(100, Math.round((saved / g.target) * 100));
+    const monthsLeft = g.monthly ? Math.max(0, Math.ceil((g.target - saved) / g.monthly)) : null;
+    const inp = el('input', { id: 'goal-saved', inputmode: 'decimal', placeholder: 'R$ guardado', 'aria-label': 'Quanto já tem guardado' });
+    inp.value = saved ? String(saved).replace('.', ',') : '';
+    box.append(el('div', { class: 'card fin-goal' },
+      el('h2', {}, `🎯 ${g.name || 'Meta'}`),
+      el('p', { class: 'fin-goal-rule' }, `Guarde ${brl(g.monthly)} todo mês`, el('small', {}, g.rule || 'No dia do salário, antes de qualquer gasto.')),
+      el('div', { class: 'fin-bar' }, el('div', { style: `width:${pct}%` })),
+      el('p', { class: 'small' }, `${brl(saved)} de ${brl(g.target)} (${pct}%)` + (monthsLeft ? ` · faltam uns ${monthsLeft} meses` : saved >= g.target ? ' · meta batida! 🎉' : '')),
+      el('form', { class: 'row', onsubmit: (e) => {
+        e.preventDefault();
+        const v = parseFloat(String(inp.value).replace(/\./g, '').replace(',', '.'));
+        if (!Number.isFinite(v) || v < 0) { toast('Digite só o valor, por exemplo 500'); return; }
+        g.saved = v; g.savedAt = todayKey();
+        saveFin(); renderFinance(); toast('Reserva atualizada ✓');
+      } }, inp, el('button', { class: 'btn', type: 'submit' }, 'Atualizar')),
+      g.note ? el('p', { class: 'muted small' }, g.note) : null));
   }
 
   // Resumo
