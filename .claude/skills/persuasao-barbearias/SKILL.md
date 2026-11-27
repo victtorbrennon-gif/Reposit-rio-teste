@@ -51,6 +51,14 @@ jeito dele de falar. A mesma lógica roda na Central BR3NNOX (botão "Resposta d
 10. **Silêncio não é não.** Acompanhamento no dia 2, 5 e 10, cada um com um motivo novo; depois do
     dia 10, encerre com elegância e deixe a porta aberta.
 
+## Época (até 24/12/2026)
+
+Use a dor real de dezembro: é o mês mais corrido de barbearia (festas, Natal, Ano-Novo) e o barbeiro não
+consegue responder "tem horário?" a tempo. O prazo também é real: entrega em até 3 dias úteis, então para
+estar rodando nas festas o ideal é fechar até uns 10/12. Pode dizer isso; não invente vagas, números ou
+"últimos dias" falsos. Na Central, a primeira mensagem e o acompanhamento do dia 2 já usam esse ângulo
+(constante `NATAL`), e voltam ao padrão sozinhos depois do Natal.
+
 ## Ética (inegociável)
 
 - Nada de urgência ou escassez falsa ("só hoje", "última vaga"), promessa de resultado, número inventado,
