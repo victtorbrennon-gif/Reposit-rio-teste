@@ -8,9 +8,11 @@ Abordagem só por WhatsApp. Preços: Completo R$ 897 + R$ 79/mês · Site R$ 497
 sinal de 50% no Pix · entrega em até 3 dias úteis.
 
 ## Links (Artifacts do Claude, privados)
-- Central de Fechamento (venda por etapas, mensagens prontas, acompanhamento dias 2/5/10):
-  https://claude.ai/artifact/WYAVWjNBCuZRTqXjrf3fj3 (coleções `negociacoes` e `config/geral`)
-- Painel de leads e lembretes: https://claude.ai/artifact/J5a2NYbmwK8zD5dvRrYyu6 (coleção `lembretes`)
+- **Central BR3NNOX** (app único, instalável no PC): https://claude.ai/artifact/J5a2NYbmwK8zD5dvRrYyu6
+  - Início: meta R$ 5.000, "Hoje" (acompanhamentos), passos, lembretes, seus dados (nome e Pix).
+  - Clientes: lista + venda em 8 etapas com mensagens prontas e acompanhamento dias 2/5/10 (coleção `clientes`).
+  - Criar site: só no app instalado (acesso total): cria `clientes/<slug>/` com ficha, logo e fotos e roda a fábrica.
+  - A antiga Central de Fechamento (WYAVWjNBCuZRTqXjrf3fj3) só mostra um aviso apontando para cá.
 - Kit de vendas (Claude Docs): https://claude.ai/artifact/VhawzG67ZTCcySsE4rpLb4
 - Design system BR3NNOX: https://claude.ai/artifact/Wggr3YFmKXLY1ChPqD4ju8
 

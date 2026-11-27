@@ -33,3 +33,11 @@ Lá o Claude enxerga tudo e roda a fábrica direto no seu computador. É só ped
 4. **`fabrica.bat`** → digite o nome. No fim, a pasta `previa` abre com os prints (e o vídeo, se pediu).
 
 Dúvida em qualquer passo: pergunte ao Claude.
+
+## 5. Ou pelo app Central BR3NNOX (o mais fácil)
+
+1. Abra o link da Central no **app do Claude no computador** e toque em **Instalar na área de trabalho**.
+2. Abra pelo ícone, vá na aba **Criar site** e toque em **Permitir e abrir o criador** (permite uma vez só).
+3. Primeira vez: confira a pasta (`Documents\Barbearias`) e toque em **Instalar dependências**.
+4. Preencha o formulário (ou puxe os dados do cliente), escolha o logo e as fotos e toque em **Criar pasta e montar o site**.
+   Os prints aparecem no próprio app. Para publicar, peça no chat do Claude.

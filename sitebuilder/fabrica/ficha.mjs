@@ -38,7 +38,8 @@ export function lerFicha(texto, slug) {
   const campos = {}, servicos = [], abertura = {};
   let secao = null;
   texto.split(/\r?\n/).forEach((linha0, i) => {
-    const linha = linha0.replace(/#.*$/, "").trim();
+    // comentário = linha que começa com # (assim "cor: #E11D48" funciona)
+    const linha = linha0.trim().startsWith("#") ? "" : linha0.trim();
     const n = i + 1;
     if (!linha) return;
     const kv = linha.match(/^([a-zçãéíóú_ ]+):\s*(.*)$/i);
