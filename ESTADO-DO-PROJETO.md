@@ -11,6 +11,9 @@ sinal de 50% no Pix · entrega em até 3 dias úteis.
 - **Central BR3NNOX** (app único, instalável no PC): https://claude.ai/artifact/J5a2NYbmwK8zD5dvRrYyu6
   - Início: meta R$ 5.000, "Hoje" (acompanhamentos), passos, lembretes, seus dados (nome e Pix).
   - Clientes: lista + venda em 8 etapas com mensagens prontas e acompanhamento dias 2/5/10 (coleção `clientes`).
+  - "Ele respondeu? Cole aqui": cola a mensagem do barbeiro e o Claude sugere a resposta (capacidade `sample`),
+    guardando o histórico em `clientes/<id>.conversa`. Regras na skill `.claude/skills/persuasao-barbearias`
+    (o texto `PLAYBOOK` dentro do app é a mesma coisa: mudou uma, mude a outra).
   - Criar site: só no app instalado (acesso total): cria `clientes/<slug>/` com ficha, logo e fotos e roda a fábrica.
   - A antiga Central de Fechamento (WYAVWjNBCuZRTqXjrf3fj3) só mostra um aviso apontando para cá.
 - Kit de vendas (Claude Docs): https://claude.ai/artifact/VhawzG67ZTCcySsE4rpLb4
