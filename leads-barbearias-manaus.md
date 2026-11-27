@@ -61,3 +61,21 @@ Legenda de prioridade:
 - https://barbier-am.com.br/
 - https://basebarbearia.netlify.app/
 - https://barbeariaspertodemim.com/e/barbearia-charles-barber-shop-blgwro/
+
+## Novas (busca de 27/11/2026): barbearias ativas (Instagram, WhatsApp ou agenda online)
+
+Números vindos de Instagram, sites e diretórios: confirme antes. Todas já estão na Central BR3NNOX, na etapa 2.
+
+| Barbearia | Bairro | WhatsApp | Instagram | Obs. |
+|---|---|---|---|---|
+| Barões Barbershop | Compensa (2 unidades) | (92) 99128-0073 | @baroesbarbershop | Só com hora marcada, seg-sáb 9h-20h |
+| Soberano Exclusive Barbers | Adrianópolis (Soberane Mall, Rua Salvador, 440) | (92) 98459-9292 | @soberanobarbers | Agenda pelo WhatsApp |
+| Bruno Barbearia | Cidade Nova | (92) 99121-5805 | — | Diretório |
+| Barbearia do Presidente | Flores (Rua José Praxedes de Oliveira, 723) | (92) 99344-7422 | — | Usa Trinks, seg-sáb 9h-22h |
+| La Barberia Manaus | Djalma Batista e Dom Pedro | pegar no Instagram | @labarberiamanaus | 2 unidades |
+| Barbearia Dom Manoel | Alvorada 2 | pegar no Instagram | @barbearia.dommanoel | Corte desde R$ 20 |
+| Barbearia Dom Bigode | ? | pegar no Instagram | @barbeariadombigodee | Desde 2017 |
+| Barbearia Menor du Corte | São José Operário (Rua Barreirinha, 175) | pegar no Instagram | @barbearia.menorducorte | Zona Leste |
+| Master Barbearia | Cidade Nova (Rua Padre João Ribeiro, 34) | fixo (92) 3232-5363 | — | Achar WhatsApp |
+| Barbier Barbearia | Ponta Negra | (92) 98452-9292 | — | Já tem site (prioridade C) |
+| Barbearia Procópio (atualizado) | várias | (92) 98414-0830 | — | Já tem site (prioridade C) |
