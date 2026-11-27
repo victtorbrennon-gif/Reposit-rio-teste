@@ -14,6 +14,8 @@ sinal de 50% no Pix · entrega em até 3 dias úteis.
   - "Ele respondeu? Cole aqui": cola a mensagem do barbeiro e o Claude sugere a resposta (capacidade `sample`),
     guardando o histórico em `clientes/<id>.conversa`. Regras na skill `.claude/skills/persuasao-barbearias`
     (o texto `PLAYBOOK` dentro do app é a mesma coisa: mudou uma, mude a outra).
+  - Vídeos de demonstração guardados na Central (assets): Cheiro Verde, Alpha e Navalhada, com Enviar (compartilhar)
+    e Salvar; aparecem no Início e na etapa 3 de cada barbearia (campo `video` escolhe qual). Funciona no celular.
   - Criar site: só no app instalado (acesso total): cria `clientes/<slug>/` com ficha, logo e fotos e roda a fábrica.
   - A antiga Central de Fechamento (WYAVWjNBCuZRTqXjrf3fj3) só mostra um aviso apontando para cá.
 - Kit de vendas (Claude Docs): https://claude.ai/artifact/VhawzG67ZTCcySsE4rpLb4
