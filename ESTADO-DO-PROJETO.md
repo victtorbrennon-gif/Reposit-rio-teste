@@ -19,6 +19,8 @@ sinal de 50% no Pix · entrega em até 3 dias úteis.
 - Agendamento em conversa (estilo inBarber) com trava de horário em tempo real, confirmação no WhatsApp.
 - Painel do barbeiro em `/admin` (fechar dia, horário do dia, dias/horários da semana, cancelar, bloquear).
 - Prévias: `barbearia-alfa` (logo HD), `cheiro-verde`, `navalhada`.
+- Portfólio BR3NNOX: fonte em `portfolio/` (textos em `index.html`, contato em `dados.json`), montar com
+  `cd sitebuilder && npm run portfolio` (saída `sites/portfolio/public`, noindex até aprovar; `-- --publico` libera). Não publicado.
 - Atalhos para Windows: `instalar.bat`, `novo-cliente.bat`, `fabrica.bat`, guia `COMO-USAR-NO-PC.md`.
 
 ## Regras combinadas com o usuário
@@ -31,6 +33,7 @@ sinal de 50% no Pix · entrega em até 3 dias úteis.
 - Segurança: seguir `SEGURANCA.md`. `ADMIN_TOKEN` só no Netlify.
 
 ## A confirmar com o usuário
+- WhatsApp e Instagram do próprio usuário para o portfólio (`portfolio/dados.json`).
 - WhatsApp real da Alpha (o (92) 9138-4642 parece fixo) e da Navalhada.
 - Se a "Alpha" do logo é a "Barbearia Alfa" da Compensa.
 - Marca BR3NNOX no rodapé dos sites, durações dos serviços e preços finais.
