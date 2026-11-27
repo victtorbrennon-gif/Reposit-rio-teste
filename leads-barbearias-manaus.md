@@ -79,3 +79,18 @@ Números vindos de Instagram, sites e diretórios: confirme antes. Todas já est
 | Master Barbearia | Cidade Nova (Rua Padre João Ribeiro, 34) | fixo (92) 3232-5363 | — | Achar WhatsApp |
 | Barbier Barbearia | Ponta Negra | (92) 98452-9292 | — | Já tem site (prioridade C) |
 | Barbearia Procópio (atualizado) | várias | (92) 98414-0830 | — | Já tem site (prioridade C) |
+
+## Mais novas com número (busca de 27/11/2026, diretórios e páginas próprias)
+
+| Barbearia | Bairro | WhatsApp | Obs. |
+|---|---|---|---|
+| Barbearia Herbie 53 | Chapada | (92) 99297-3421 | Diretório |
+| Romanos 8:31 | Nova Cidade | (92) 98464-6893 | Zona Norte |
+| Barbearia Espaço M | Jorge Teixeira | (92) 98197-7799 | Adicionei o 9, confirmar |
+| Padrão Ouro Barbearia | Dom Pedro I | (92) 99266-9390 | Diretório |
+| Barão Barbearia | ? | (92) 99294-2184 | Facebook; não é a Barões |
+| Kingsman - The Barber Shop | Av. Tambaqui, 693 | (92) 98804-2234 | Página simples, sem agenda |
+| Base Barbearia | Jorge Teixeira | (92) 99150-5818 | Já tem site (prioridade C) |
+
+Usam Trinks (pagam ~R$ 110/mês), número na página da Trinks: Barbearia Mr. John (Colônia Santo Antônio),
+NYC Barbearia (Parque 10), Dom Antônio Barbearia (Alvorada), Teixeira Barbearia.
