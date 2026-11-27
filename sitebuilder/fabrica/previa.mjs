@@ -37,8 +37,10 @@ export async function gerarPrevia(raizSite, saida, { video = false, porta = 9600
     rel.checagens.celularSemEstourar = !(await p.evaluate(() => document.documentElement.scrollWidth > innerWidth));
     if (video) { for (let y = 0; y < 900; y += 8) { await p.evaluate((v) => scrollTo(0, v), y); await p.waitForTimeout(16); } await p.waitForTimeout(1500); }
     await p.locator(".hero .btn-main").tap(); await p.waitForTimeout(2200);
-    rel.checagens.conversaComecou = await ate("nome");
-    await p.locator("#cv-input").tap(); await p.keyboard.type("Cliente Teste", { delay: video ? 80 : 0 }); await p.locator(".cv-enviar").tap();
+    // gravando vídeo a máquina fica lenta e a rolagem suave pode não chegar à conversa: ajuda se precisar
+    if (!(await ate("nome", 6000))) { await p.locator("#conversa").scrollIntoViewIfNeeded().catch(() => {}); await p.waitForTimeout(1500); }
+    rel.checagens.conversaComecou = await ate("nome", 12000);
+    await p.locator("#cv-input:not([disabled])").waitFor({ timeout: 15000 }); await p.locator("#cv-input").tap(); await p.keyboard.type("Cliente Teste", { delay: video ? 80 : 0 }); await p.locator(".cv-enviar").tap();
     await ate("O que você vai fazer"); await p.waitForTimeout(700);
     await p.locator(".cv-serv").first().tap(); await p.waitForTimeout(500);
     await p.screenshot({ path: path.join(saida, "celular-servicos.png") });
@@ -47,7 +49,7 @@ export async function gerarPrevia(raizSite, saida, { video = false, porta = 9600
     rel.checagens.horariosLivres = await p.locator(".cv-hora:not(.esq)").count();
     await p.screenshot({ path: path.join(saida, "celular-horarios.png") });
     await p.locator(".cv-hora:not(.esq)").first().tap(); await ate("WhatsApp");
-    await p.locator("#cv-input").tap(); await p.keyboard.type("92988887777", { delay: video ? 70 : 0 }); await p.locator(".cv-enviar").tap();
+    await p.locator("#cv-input:not([disabled])").waitFor({ timeout: 15000 }); await p.locator("#cv-input").tap(); await p.keyboard.type("92988887777", { delay: video ? 70 : 0 }); await p.locator(".cv-enviar").tap();
     await ate("Confere"); await p.waitForTimeout(video ? 2000 : 500);
     await p.locator(".cv-botoes .btn").tap();
     rel.checagens.agendamentoConfirmado = await ate("Prontinho", 9000); await p.waitForTimeout(1500);
