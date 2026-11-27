@@ -36,9 +36,16 @@ export async function gerarPrevia(raizSite, saida, { video = false, porta = 9600
     await p.screenshot({ path: path.join(saida, "celular-topo.png") });
     rel.checagens.celularSemEstourar = !(await p.evaluate(() => document.documentElement.scrollWidth > innerWidth));
     if (video) { for (let y = 0; y < 900; y += 8) { await p.evaluate((v) => scrollTo(0, v), y); await p.waitForTimeout(16); } await p.waitForTimeout(1500); }
-    await p.locator(".hero .btn-main").tap(); await p.waitForTimeout(2200);
+    // No vídeo não clica no botão do topo (a animação dele deixa o robô esperando com a máquina lenta): rola até a conversa
+    if (!video) { await p.locator(".hero .btn-main").tap(); await p.waitForTimeout(2200); }
     // gravando vídeo a máquina fica lenta e a rolagem suave pode não chegar à conversa: ajuda se precisar
-    if (!(await ate("nome", 6000))) { await p.locator("#conversa").scrollIntoViewIfNeeded().catch(() => {}); await p.waitForTimeout(1500); }
+    if (video || !(await ate("nome", 2500))) {
+      // rola até a conversa em passos (fica natural no vídeo) em vez de esperar a rolagem suave
+      const alvo = await p.evaluate(() => { const e = document.querySelector("#conversa"); return e ? e.getBoundingClientRect().top + scrollY - 84 : 0; });
+      const y0 = await p.evaluate(() => scrollY), passo = alvo > y0 ? 24 : -24;
+      for (let y = y0; passo > 0 ? y < alvo : y > alvo; y += passo) { await p.evaluate((v) => scrollTo(0, v), y); await p.waitForTimeout(12); }
+      await p.waitForTimeout(800);
+    }
     rel.checagens.conversaComecou = await ate("nome", 12000);
     await p.locator("#cv-input:not([disabled])").waitFor({ timeout: 15000 }); await p.locator("#cv-input").tap(); await p.keyboard.type("Cliente Teste", { delay: video ? 80 : 0 }); await p.locator(".cv-enviar").tap();
     await ate("O que você vai fazer"); await p.waitForTimeout(700);
