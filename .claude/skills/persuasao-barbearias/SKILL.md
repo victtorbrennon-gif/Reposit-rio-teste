@@ -20,7 +20,10 @@ jeito dele de falar. A mesma lógica roda na Central BR3NNOX (botão "Resposta d
 - **Unidade extra:** R$ 597. **Pagamento:** metade no Pix para começar, metade na entrega.
 - **Prazo:** até 3 dias úteis depois de receber logo, fotos, serviços (preço e tempo) e horários.
 - O cliente não baixa app nem cria conta. O barbeiro não precisa entender de computador.
-- Já existe **prévia/vídeo** com a cara da barbearia (ou dá para fazer em 1 dia com o logo dele).
+- **Prévia:** só existe para quem tem pasta em `clientes/` (hoje: Alfa, Cheiro Verde, Navalhada).
+  Para as outras, NÃO diga "montei uma prévia de vocês": ofereça o vídeo de exemplo e montar a
+  prévia dele (fica pronta em 1 dia com o logo).
+- Diga "aí na Compensa", mas "aí no Japiim" / "no Dom Pedro" (respeite o gênero do bairro).
 - Não existem: depoimentos de clientes, números de "aumento de faturamento", parcerias, prêmios.
   Enquanto não houver, **não cite**.
 

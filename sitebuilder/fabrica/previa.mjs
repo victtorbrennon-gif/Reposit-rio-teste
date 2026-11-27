@@ -26,7 +26,7 @@ export async function gerarPrevia(raizSite, saida, { video = false, porta = 9600
 
     // Celular: abre, vai para a conversa e faz um agendamento completo
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true,
-      ...(video ? { recordVideo: { dir: saida, size: { width: 780, height: 1688 } } } : {}) });
+      ...(video ? { recordVideo: { dir: saida, size: { width: 390, height: 844 } } } : {}) });
     const p = await ctx.newPage();
     p.on("pageerror", (e) => rel.erros.push("Celular: " + e.message));
     p.on("console", (m) => m.type() === "error" && rel.erros.push("Celular: " + m.text()));
@@ -67,7 +67,7 @@ export async function gerarPrevia(raizSite, saida, { video = false, porta = 9600
     const webm = fs.readdirSync(saida).find((f) => f.endsWith(".webm"));
     if (webm) {
       try {
-        execFileSync("ffmpeg", ["-loglevel", "error", "-y", "-i", path.join(saida, webm), "-vf", "fps=30,scale=720:-2", "-c:v", "libx264", "-crf", "23", "-pix_fmt", "yuv420p", "-movflags", "+faststart", path.join(saida, "demonstracao.mp4")]);
+        execFileSync("ffmpeg", ["-loglevel", "error", "-y", "-i", path.join(saida, webm), "-vf", "fps=30,scale=780:-2:flags=lanczos", "-c:v", "libx264", "-crf", "23", "-pix_fmt", "yuv420p", "-movflags", "+faststart", path.join(saida, "demonstracao.mp4")]);
         fs.unlinkSync(path.join(saida, webm));
       } catch { rel.erros.push("ffmpeg não encontrado: vídeo ficou em .webm"); }
     }
