@@ -1,0 +1,23 @@
+nome: Barbearia Cheiro Verde
+bairro: Cidade Nova
+endereco: Rua Fraternidade, 36 – Cidade Nova 1, Manaus – AM
+whatsapp: (92) 99423-8806
+estilo: classico
+slogan: Corte, barba e aquela resenha boa.
+sobre: Barbearia e tabacaria na Cidade Nova 1. Ambiente tranquilo para cortar o cabelo, fazer a barba e trocar uma ideia.
+manifesto: Senta, respira e deixa a gente cuidar do cabelo e da barba enquanto a resenha rola.
+demo: sim
+fotos_ilustrativas: sim
+
+servicos:
+Corte masculino | 30 | 30
+Barba na toalha quente | 25 | 30
+Corte + barba | 50 | 60
+Degradê | 35 | 45
+Pigmentação | 25 | 30
+Sobrancelha | 10 | 15
+
+horarios:
+seg-sex | 09:00 | 20:00
+sab | 09:00 | 18:00
+dom | fechado

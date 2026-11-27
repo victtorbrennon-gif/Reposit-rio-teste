@@ -1,0 +1,10 @@
+/* Navalhada: premium, preto e dourado, movimento lento. */
+:root{--bg:#0C0A09;--bg2:#151210;--ink:#F2ECE1;--muted:#A8A096;--accent:#CA8A04;--accent-ink:#120D02;--line:#2A2520;
+  --f-display:"Cormorant",Georgia,serif;--f-body:"Montserrat",system-ui,sans-serif;
+  --raio:2px;--h-weight:600;--h-track:-.015em}
+body{font-size:16px}
+.eyebrow{letter-spacing:.28em}
+.poste{width:2px;opacity:.7}
+.poste span{background:linear-gradient(var(--accent),transparent);animation:none}
+.num{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+:root{--glow:rgba(202,138,4,.16)}

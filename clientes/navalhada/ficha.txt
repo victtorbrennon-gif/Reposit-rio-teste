@@ -1,0 +1,23 @@
+nome: Navalhada Barbershop
+bairro: Adrianópolis
+endereco: Rua Belo Horizonte, 990 – Adrianópolis, Manaus – AM
+whatsapp:
+estilo: premium
+slogan: Precisão na navalha. Estilo que dura.
+sobre: Barbearia no coração de Adrianópolis para quem leva o visual a sério: corte técnico, barba desenhada e atendimento com hora marcada.
+manifesto: Cada detalhe pensado, cada traço da navalha no lugar. Seu estilo merece esse cuidado.
+demo: sim
+fotos_ilustrativas: sim
+
+servicos:
+Corte assinatura | 60 | 45
+Barba completa | 45 | 45
+Corte + barba | 95 | 60
+Platinado | 180 | 120
+Hidratação de barba | 35 | 30
+Dia do noivo | 250 | 120
+
+horarios:
+seg-sex | 10:00 | 21:00
+sab | 09:00 | 20:00
+dom | fechado

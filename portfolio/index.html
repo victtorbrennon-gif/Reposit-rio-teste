@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>%NOME% · Sites com agendamento para barbearias em Manaus</title>
+<meta name="description" content="Sites com agendamento online para barbearias de Manaus: o cliente marca sozinho, o horário some na hora e a confirmação chega pronta no WhatsApp.">
+<meta name="robots" content="%ROBOTS%">
+<meta name="theme-color" content="#0b0d17">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fontes/chakra-petch-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="estilo.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<header class="topo">
+  <a class="marca" href="#inicio" aria-label="%NOME%, início">BR3N<span>NOX</span></a>
+  <nav aria-label="Seções">
+    <a href="#trabalhos">Trabalhos</a>
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#precos">Preços</a>
+  </nav>
+  <a class="btn btn-wa peq" href="%WHATSAPP%" target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
+</header>
+
+<main id="conteudo">
+  <!-- HERO -->
+  <section class="hero" id="inicio">
+    <div class="hero-txt">
+      <p class="rot">Sites para barbearias · %CIDADE%</p>
+      <h1 class="titulo-anim">Sua barbearia com agenda aberta <em>24 horas</em>.</h1>
+      <p class="lead">Faço o site da sua barbearia com agendamento online. O cliente escolhe o serviço e marca sozinho, o horário some na hora pros outros e a confirmação chega pronta no seu WhatsApp.</p>
+      <div class="acoes">
+        <a class="btn btn-prim" href="#trabalhos">Ver trabalhos</a>
+        <a class="btn btn-wa" href="%WHATSAPP%" target="_blank" rel="noopener noreferrer">Quero um site assim</a>
+      </div>
+      <ul class="selos" aria-label="Destaques">
+        <li>Pronto em até 3 dias úteis</li>
+        <li>Feito pro celular</li>
+        <li>Painel do barbeiro</li>
+      </ul>
+    </div>
+
+    <!-- demonstração viva: um horário é marcado e some -->
+    <div class="agenda-viva" aria-hidden="true">
+      <div class="av-cab"><span class="ao-vivo">Ao vivo</span><span>Hoje · horários livres</span></div>
+      <div class="av-grade" id="av-grade"></div>
+      <div class="av-msg" id="av-msg">
+        <span class="av-wa">WhatsApp</span>
+        <p id="av-texto">Novo agendamento: Corte + Barba às 15:00</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="faixa" aria-hidden="true"><div class="faixa-trilho">
+    <span>Agenda 24h</span><span>Horário some na hora</span><span>Confirmação no WhatsApp</span><span>Painel no celular</span><span>Seu logo, suas cores</span><span>Site seguro</span>
+    <span>Agenda 24h</span><span>Horário some na hora</span><span>Confirmação no WhatsApp</span><span>Painel no celular</span><span>Seu logo, suas cores</span><span>Site seguro</span>
+  </div></div>
+
+  <!-- TRABALHOS -->
+  <section class="secao" id="trabalhos">
+    <p class="rot">Trabalhos</p>
+    <h2>Cada barbearia com a sua cara</h2>
+    <p class="sub">O estilo, as cores e as fontes saem do logo e do jeito de cada barbearia. Abaixo, prévias que montei para apresentar.</p>
+
+    %TRABALHOS%
+
+    <p class="nota-demo">Projetos conceito: prévias de demonstração montadas para apresentação. As fotos de ambiente são ilustrativas.</p>
+  </section>
+
+  <!-- COMO FUNCIONA O AGENDAMENTO -->
+  <section class="secao" id="como-funciona">
+    <p class="rot">Agendamento</p>
+    <h2>Como o seu cliente marca</h2>
+    <p class="sub">Uma conversa simples, sem cadastro e sem baixar aplicativo.</p>
+    <ol class="fluxo">
+      <li class="revelar">
+        <figure class="tela"><img src="img/%FLUXO%-celular-servicos.webp" width="390" height="844" loading="lazy" alt="Tela do site com a lista de serviços e preços"></figure>
+        <div><span class="n">01</span><h3>Escolhe o serviço</h3><p>Corte, barba, sobrancelha… pode juntar mais de um. O site já sabe quanto tempo cada um leva.</p></div>
+      </li>
+      <li class="revelar">
+        <figure class="tela"><img src="img/%FLUXO%-celular-horarios.webp" width="390" height="844" loading="lazy" alt="Tela do site com os horários livres do dia"></figure>
+        <div><span class="n">02</span><h3>Vê só o que está livre</h3><p>Aparecem só os horários em que o serviço cabe. Marcou, o horário some na hora pros outros: nunca dá dois no mesmo horário.</p></div>
+      </li>
+      <li class="revelar">
+        <figure class="tela"><img src="img/%FLUXO%-celular-confirmado.webp" width="390" height="844" loading="lazy" alt="Tela de agendamento confirmado com botão do WhatsApp"></figure>
+        <div><span class="n">03</span><h3>Confirma no WhatsApp</h3><p>A mensagem chega pronta pra você: nome, serviço, dia e hora. Você só responde “fechado”.</p></div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- RECURSOS -->
+  <section class="secao" id="recursos">
+    <p class="rot">O que vem no site</p>
+    <h2>Tudo pra você parar de responder “tem horário hoje?”</h2>
+    <div class="recursos">
+      <article class="card revelar"><h3>Agenda aberta 24h</h3><p>O cliente marca de madrugada, no domingo, no meio do seu corte. Você não perde ninguém.</p></article>
+      <article class="card revelar"><h3>Painel do barbeiro</h3><p>No celular: agenda do dia, total previsto, cancelar, bloquear o almoço e fechar o dia quando for folgar.</p></article>
+      <article class="card revelar"><h3>Seus dias e horários</h3><p>Muda o horário da semana ou de um dia só, na hora, sem precisar me chamar.</p></article>
+      <article class="card revelar"><h3>Com o seu logo</h3><p>Nada de cara de plataforma: o site é da sua barbearia, com o seu logo em alta qualidade.</p></article>
+      <article class="card revelar"><h3>Rápido e seguro</h3><p>HTTPS, proteções contra invasão e nenhum dado de cliente exposto. Abre rápido até no 4G.</p></article>
+      <article class="card revelar"><h3>Link na bio</h3><p>Coloca no Instagram e no Google Maps: quem vê o seu trabalho já marca na hora.</p></article>
+    </div>
+  </section>
+
+  <!-- PREÇOS -->
+  <section class="secao" id="precos">
+    <p class="rot">Preços</p>
+    <h2>Sem surpresa</h2>
+    <div class="precos">
+      <article class="plano destaque revelar">
+        <span class="selo">Mais pedido</span>
+        <h3>Completo</h3>
+        <p class="valor"><b>R$ 897</b> <small>+ R$ 79/mês</small></p>
+        <ul>
+          <li>Site com o seu logo e as suas cores</li>
+          <li>Agendamento online em tempo real</li>
+          <li>Confirmação pronta no WhatsApp</li>
+          <li>Painel do barbeiro no celular</li>
+          <li>Hospedagem, suporte e ajustes no mensal</li>
+        </ul>
+        <a class="btn btn-prim" href="%WHATSAPP%" target="_blank" rel="noopener noreferrer">Quero o completo</a>
+      </article>
+      <article class="plano revelar">
+        <h3>Site</h3>
+        <p class="valor"><b>R$ 497</b> <small>pagamento único</small></p>
+        <ul>
+          <li>Site com o seu logo e as suas cores</li>
+          <li>Serviços, preços e horários</li>
+          <li>Botão direto pro seu WhatsApp</li>
+          <li>Mapa e Instagram</li>
+        </ul>
+        <a class="btn" href="%WHATSAPP%" target="_blank" rel="noopener noreferrer">Quero só o site</a>
+      </article>
+    </div>
+    <p class="nota-demo">Metade para começar, metade na entrega. Tem mais de uma unidade? Me chama.</p>
+  </section>
+
+  <!-- PROCESSO -->
+  <section class="secao" id="processo">
+    <p class="rot">Como eu trabalho</p>
+    <h2>Do “bora” ao site no ar</h2>
+    <ol class="passos">
+      <li class="revelar"><span class="n">01</span><h3>A gente conversa</h3><p>Pelo WhatsApp mesmo. Eu entendo os seus serviços e o seu estilo.</p></li>
+      <li class="revelar"><span class="n">02</span><h3>Você me manda o material</h3><p>Logo, algumas fotos, serviços com preço e seus horários.</p></li>
+      <li class="revelar"><span class="n">03</span><h3>Prévia em até 3 dias</h3><p>Você vê pronto no celular e pede os ajustes que quiser.</p></li>
+      <li class="revelar"><span class="n">04</span><h3>No ar</h3><p>Coloco o link na sua bio e te ensino o painel em 10 minutos.</p></li>
+    </ol>
+  </section>
+
+  <!-- PERGUNTAS -->
+  <section class="secao" id="perguntas">
+    <p class="rot">Perguntas</p>
+    <h2>Dúvidas comuns</h2>
+    <div class="faq">
+      <details><summary>Preciso entender de computador?</summary><p>Não. Eu monto tudo. Você só usa o painel no celular, que é tão simples quanto o WhatsApp.</p></details>
+      <details><summary>O cliente precisa baixar aplicativo ou criar conta?</summary><p>Não. Ele abre o link, escolhe o serviço e o horário, coloca nome e telefone e pronto.</p></details>
+      <details><summary>E se eu não for atender num dia?</summary><p>No painel você toca em “Não vou atender neste dia” e o dia some do site na hora.</p></details>
+      <details><summary>Já uso um app de agendamento. Vale trocar?</summary><p>Aqui o site é seu, com a sua marca, e o mensal é só R$ 79 de suporte e hospedagem. Me chama que eu comparo com o que você paga hoje.</p></details>
+      <details><summary>Como funciona o pagamento?</summary><p>Metade no Pix para começar e a outra metade quando o site estiver no ar e aprovado por você.</p></details>
+    </div>
+  </section>
+
+  <section class="final revelar">
+    <h2>Bora colocar a sua barbearia na agenda 24h?</h2>
+    <p>Me chama no WhatsApp que eu te mostro funcionando em 1 minuto.</p>
+    <a class="btn btn-wa grande" href="%WHATSAPP%" target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
+  </section>
+</main>
+
+<footer class="rodape">
+  <span class="marca">BR3N<span>NOX</span></span>
+  <span>Sites para barbearias · %CIDADE% · %ANO%</span>
+  %INSTAGRAM%
+</footer>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Agenda do barbeiro</title>
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+<main class="wrap">
+  <header class="topo">
+    <h1>Agenda do barbeiro</h1>
+    <button id="sair" class="link" type="button" hidden>Sair</button>
+  </header>
+
+  <form id="login" class="cartao" autocomplete="off">
+    <label for="senha">Senha de acesso</label>
+    <input id="senha" type="password" autocomplete="current-password" required>
+    <button class="btn" type="submit">Entrar</button>
+    <p id="login-erro" class="erro" role="alert" hidden></p>
+  </form>
+
+  <section id="painel" hidden>
+    <div class="dia-nav">
+      <button id="ant" class="btn-sec" type="button" aria-label="Dia anterior">‹</button>
+      <input id="data" type="date" aria-label="Escolher dia">
+      <button id="prox" class="btn-sec" type="button" aria-label="Próximo dia">›</button>
+      <button id="hoje" class="btn-sec" type="button">Hoje</button>
+    </div>
+    <p id="titulo-dia" class="titulo-dia"></p>
+    <div class="resumo">
+      <div><b id="n-res">0</b><span>agendamentos</span></div>
+      <div><b id="total">R$ 0</b><span>previsto no dia</span></div>
+      <div><span class="vivo"></span><span id="atualizado">—</span></div>
+    </div>
+
+    <div class="dia-cfg" id="dia-cfg">
+      <div class="dia-cfg-top">
+        <span id="dia-status" class="status"></span>
+        <span id="dia-tag" class="tag" hidden>só este dia</span>
+      </div>
+      <div class="acoes-dia">
+        <button id="fechar-dia" class="btn-sec perigo" type="button">Não vou atender neste dia</button>
+        <button id="dia-normal" class="btn-sec" type="button" hidden>Voltar ao horário normal</button>
+      </div>
+      <details id="mudar-dia">
+        <summary>Mudar o horário só deste dia</summary>
+        <div class="faixa">
+          <label>Abre <input id="dia-abre" type="time" step="300"></label>
+          <label>Fecha <input id="dia-fecha" type="time" step="300"></label>
+          <button id="salvar-dia" class="btn" type="button">Salvar</button>
+        </div>
+      </details>
+      <p id="aviso-dia" class="aviso" hidden></p>
+    </div>
+
+    <h2>Agendamentos</h2>
+    <ul id="lista" class="lista"></ul>
+
+    <h2>Horários do dia</h2>
+    <p class="dica">Toque num horário livre para <b>bloquear</b> (almoço, folga). Toque de novo para liberar.</p>
+    <div id="grade" class="grade"></div>
+    <p id="msg" class="erro" role="alert" hidden></p>
+
+    <h2>Dias e horários da semana</h2>
+    <p class="dica">Marque os dias em que você atende e o horário de cada um. Vale para todas as semanas.</p>
+    <div id="semana" class="semana"></div>
+    <button id="salvar-semana" class="btn" type="button">Salvar horário da semana</button>
+    <p id="ok-semana" class="ok" role="status" hidden></p>
+  </section>
+</main>
+<script src="/admin/admin.js"></script>
+</body>
+</html>

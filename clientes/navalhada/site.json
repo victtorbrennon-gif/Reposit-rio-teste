@@ -1,0 +1,96 @@
+{
+  "slug": "navalhada",
+  "nome": "Navalhada Barbershop",
+  "bairro": "Adrianópolis",
+  "endereco": "Rua Belo Horizonte, 990 – Adrianópolis, Manaus – AM",
+  "telefone": "",
+  "instagram": "",
+  "tema": "navalha",
+  "estilo": "premium",
+  "cores": {
+    "bg": "#0C0A09",
+    "fg": "#CA8A04"
+  },
+  "abertura": {
+    "1": [
+      "10:00",
+      "21:00"
+    ],
+    "2": [
+      "10:00",
+      "21:00"
+    ],
+    "3": [
+      "10:00",
+      "21:00"
+    ],
+    "4": [
+      "10:00",
+      "21:00"
+    ],
+    "5": [
+      "10:00",
+      "21:00"
+    ],
+    "6": [
+      "09:00",
+      "20:00"
+    ]
+  },
+  "pausa": null,
+  "slogan": "Precisão na navalha. Estilo que dura.",
+  "sobre": "Barbearia no coração de Adrianópolis para quem leva o visual a sério: corte técnico, barba desenhada e atendimento com hora marcada.",
+  "manifesto": "Cada detalhe pensado, cada traço da navalha no lugar. Seu estilo merece esse cuidado.",
+  "imagens": [
+    "foto-1.jpg",
+    "foto-2.jpg"
+  ],
+  "fotosIlustrativas": true,
+  "servicos": [
+    [
+      "Corte assinatura",
+      "60",
+      45
+    ],
+    [
+      "Barba completa",
+      "45",
+      45
+    ],
+    [
+      "Corte + barba",
+      "95",
+      60
+    ],
+    [
+      "Platinado",
+      "180",
+      120
+    ],
+    [
+      "Hidratação de barba",
+      "35",
+      30
+    ],
+    [
+      "Dia do noivo",
+      "250",
+      120
+    ]
+  ],
+  "horarios": [
+    [
+      "Segunda a sexta",
+      "10h às 21h"
+    ],
+    [
+      "Sábado",
+      "9h às 20h"
+    ],
+    [
+      "Domingo",
+      "Fechado"
+    ]
+  ],
+  "demo": true
+}
